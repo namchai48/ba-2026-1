@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 2 (สื่อทบทวน Interactive)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.65}
+  a{color:var(--brand2)}
+  header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 11px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; transition:.15s; font-family:inherit}
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none}
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  /* controls */
+  select, input[type=text], input[type=date], input[type=number]{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink)}
+  select:focus, input:focus{outline:none; border-color:var(--brand)}
+  label.fld{display:block; font-weight:700; font-size:13.5px; margin-bottom:5px; color:#334155}
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row > div{flex:1; min-width:150px}
+  input[type=range]{width:100%; accent-color:var(--brand)}
+  /* formula box */
+  .fx{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px 16px; font-family:"Consolas",monospace; font-size:14px; margin-top:12px; overflow-x:auto}
+  .fx .formula{color:#4ade80; white-space:pre-wrap}
+  .fx .res{color:#fde047; font-weight:700; font-size:18px}
+  .fx .desc{color:#94a3b8; font-size:13px; margin-top:8px; font-family:inherit}
+  /* tables */
+  table.xl{border-collapse:collapse; width:100%; font-size:13.5px; margin-top:10px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 9px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700; position:sticky; top:0}
+  table.xl tr:nth-child(even) td{background:#f8fafc}
+  table.xl td.hl{background:#dcfce7 !important; font-weight:700}
+  .scroll{max-height:340px; overflow:auto; border-radius:10px; border:1px solid var(--line)}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .note{font-size:13px; color:var(--muted)}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .kv .box{flex:1; min-width:120px; text-align:center; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb}
+  .kv .box .v{font-size:22px; font-weight:800; color:var(--brand2)}
+  .kv .box .l{font-size:12px; color:var(--muted)}
+  /* pivot zones */
+  .pivot-ctrl{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  /* quiz */
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 2</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">Logic</button>
+      <button data-p="2">Text</button>
+      <button data-p="3">Date</button>
+      <button data-p="4">Lookup</button>
+      <button data-p="5">Dynamic Arrays</button>
+      <button data-p="6">PivotTable</button>
+      <button data-p="7">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ===== PAGE 0 : OVERVIEW ===== -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">Basic &amp; Advanced Excel</span>
+    <h1>ครั้งที่ 2 — ฟังก์ชันขั้นสูงและตารางสรุปข้อมูล</h1>
+    <p class="lead muted">ต่อยอดจากครั้งที่ 1 · เปลี่ยนข้อมูลดิบให้พร้อมวิเคราะห์ และสรุปผลได้เร็วโดยไม่ต้องเขียนสูตรยาว<br>
+    ทุกหน้า <b style="color:#bbf7d0">พิมพ์/เลือกค่าแล้วเห็นผลลัพธ์จริง</b> จากข้อมูลฟาร์มชุดเดียวกัน</p>
+    <div class="row" style="margin-top:18px">
+      <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(6)">ลองสร้าง PivotTable</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แผนที่เนื้อหาวันนี้</span>
+    <h2>🗺️ 6 หัวข้อหลัก</h2>
+    <div class="grid g3" style="margin-top:8px">
+      <div class="tile"><div class="n">1</div><b>Logic &amp; Conditional</b><div class="muted" style="font-size:13.5px">IF, IFS, SUMIFS, COUNTIFS — สรุปแบบมีเงื่อนไข</div></div>
+      <div class="tile"><div class="n">2</div><b>Text Functions</b><div class="muted" style="font-size:13.5px">LEFT, MID, TRIM, PROPER — ทำความสะอาดข้อความ</div></div>
+      <div class="tile"><div class="n">3</div><b>Date &amp; Time</b><div class="muted" style="font-size:13.5px">WEEKDAY, WEEKNUM, NETWORKDAYS, TEXT</div></div>
+      <div class="tile"><div class="n">4</div><b>Lookup</b><div class="muted" style="font-size:13.5px">VLOOKUP, XLOOKUP, INDEX+MATCH</div></div>
+      <div class="tile"><div class="n">5</div><b>Dynamic Arrays</b><div class="muted" style="font-size:13.5px">FILTER, SORT, UNIQUE — ผลลัพธ์หลายค่า</div></div>
+      <div class="tile"><div class="n">6</div><b>PivotTable / PivotChart</b><div class="muted" style="font-size:13.5px">สรุป จัดกลุ่ม นับ หาผลรวม ในไม่กี่คลิก</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">ข้อมูลที่ใช้ตลอดบทเรียน</span>
+    <h2>🌾 สมุดบันทึกการเก็บเกี่ยว (Harvest Log)</h2>
+    <p class="muted" style="margin-top:0">ทุกเครื่องมือในหน้าถัด ๆ ไปทำงานบนตารางนี้ — ลองสังเกตว่าฟังก์ชันแต่ละตัวหยิบข้อมูลจากตรงไหน</p>
+    <div class="scroll" id="rawTableWrap"></div>
+  </div>
+</section>
+
+<!-- ===== PAGE 1 : LOGIC ===== -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">Basic Excel (ต่อ)</span>
+    <h2>🧮 Logic &amp; Conditional Aggregation</h2>
+    <p class="muted">ตรรกะและการสรุปผลแบบ "มีเงื่อนไข" — หัวใจของการวิเคราะห์ข้อมูลใน Excel</p>
+
+    <h3>1) IF — ตรวจเงื่อนไขทีละค่า</h3>
+    <p class="note">ลากเพื่อกำหนดผลผลิต (กก.) แล้วดูว่าเมล่อนลูกนี้จัดเป็นเกรดไหน (เกณฑ์ ≥ 700 = พรีเมียม)</p>
+    <input type="range" id="ifKg" min="0" max="1000" value="820" step="10">
+    <div class="fx">
+      <div class="formula" id="ifFormula"></div>
+      <div style="margin-top:8px">→ <span class="res" id="ifRes"></span></div>
+    </div>
+
+    <h3>2) SUMIFS / COUNTIFS — สรุปเฉพาะแถวที่ตรงเงื่อนไข</h3>
+    <div class="row">
+      <div><label class="fld">เลือกพืช (เงื่อนไขที่ 1)</label>
+        <select id="lgCrop"><option value="*">ทั้งหมด</option><option>เมล่อน</option><option>มะเขือเทศ</option><option>ผักสลัด</option></select></div>
+      <div><label class="fld">เลือกเกรด (เงื่อนไขที่ 2)</label>
+        <select id="lgGrade"><option value="*">ทั้งหมด</option><option>A</option><option>B</option><option>C</option></select></div>
+    </div>
+    <div class="fx">
+      <div class="formula" id="lgFormula"></div>
+      <div class="desc" id="lgDesc"></div>
+    </div>
+    <div class="kv">
+      <div class="box"><div class="v" id="lgCount">–</div><div class="l">COUNTIFS (จำนวนแถว)</div></div>
+      <div class="box"><div class="v" id="lgSum">–</div><div class="l">SUMIFS (ผลรวม กก.)</div></div>
+      <div class="box"><div class="v" id="lgAvg">–</div><div class="l">AVERAGEIFS (เฉลี่ย)</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><span></span><button class="btn" onclick="go(2)">ถัดไป: Text Functions →</button></div>
+</section>
+
+<!-- ===== PAGE 2 : TEXT ===== -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">Text Functions</span>
+    <h2>✂️ จัดการและทำความสะอาดข้อความ</h2>
+    <p class="muted">ในฟาร์มมักมี "รหัสล็อตสินค้า" ที่ต้องแยกส่วน ลองพิมพ์รหัสแล้วดูว่าแต่ละฟังก์ชันตัด/แปลงอย่างไร</p>
+    <label class="fld">รหัสล็อต (พิมพ์แก้ได้)</label>
+    <input type="text" id="txtIn" value="  mel-A1-2026  " style="width:100%; max-width:360px; font-family:Consolas,monospace">
+    <p class="note">ตัวอย่างมีเว้นวรรคหน้า-หลังไว้ให้เห็นผลของ TRIM · โครงสร้าง = พืช(3)-แปลง-ปี</p>
+    <div class="scroll" style="max-height:none"><table class="xl" id="txtTable"></table></div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: Date &amp; Time →</button></div>
+</section>
+
+<!-- ===== PAGE 3 : DATE ===== -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">Date &amp; Time Functions</span>
+    <h2>📅 ทำงานกับวันที่และเวลา</h2>
+    <p class="muted">สำคัญมากในงานโลจิสติกส์/ฟาร์ม เช่น นับวันทำงานจนถึงวันเก็บเกี่ยว หรือหาว่าวันส่งของตรงกับวันอะไร</p>
+    <div class="row">
+      <div><label class="fld">วันที่เริ่ม (เช่น วันเพาะปลูก)</label><input type="date" id="dStart" value="2026-06-01"></div>
+      <div><label class="fld">วันที่สิ้นสุด (เช่น วันเก็บเกี่ยว)</label><input type="date" id="dEnd" value="2026-07-06"></div>
+    </div>
+    <table class="xl" id="dateTable" style="margin-top:16px"></table>
+    <p class="note" style="margin-top:10px">💡 WEEKDAY แบบมาตรฐาน: 1 = อาทิตย์ … 7 = เสาร์ · NETWORKDAYS นับเฉพาะวันจันทร์–ศุกร์ (ไม่รวมเสาร์-อาทิตย์)</p>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: Lookup →</button></div>
+</section>
+
+<!-- ===== PAGE 4 : LOOKUP ===== -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">Lookup Functions</span>
+    <h2>🔎 ค้นหาและดึงข้อมูลข้ามตาราง</h2>
+    <p class="muted">เลือกรหัสแปลง แล้วให้ Excel "ค้น" ข้อมูลของแปลงนั้นจากตาราง Harvest Log มาแสดง</p>
+    <div class="row">
+      <div style="flex:0; min-width:200px"><label class="fld">ค้นหาแปลง (ค่าที่ต้องการหา)</label>
+        <select id="lkPlot"></select></div>
+    </div>
+    <div class="kv" id="lkResult"></div>
+    <div class="fx">
+      <div class="formula" id="lkFormula"></div>
+      <div class="desc">VLOOKUP ค้นจากคอลัมน์ซ้ายสุด · XLOOKUP ยืดหยุ่นกว่า ค้นได้ทุกทิศและไม่ต้องนับเลขคอลัมน์</div>
+    </div>
+
+    <div class="example-box">
+      <span class="lbl">เลือกใช้ตัวไหน?</span>
+      <div class="grid g2" style="margin-top:8px">
+        <div class="tile" style="border-color:#bbf7d0"><b style="color:var(--brand)">XLOOKUP</b><div class="muted" style="font-size:13.5px">Excel รุ่นใหม่ — ใช้ตัวนี้ก่อน เขียนสั้นและยืดหยุ่นที่สุด</div></div>
+        <div class="tile"><b>INDEX + MATCH</b><div class="muted" style="font-size:13.5px">ทางเลือกที่ทำงานได้ทุกเวอร์ชัน แทน VLOOKUP ได้</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(3)">← ย้อนกลับ</button><button class="btn" onclick="go(5)">ถัดไป: Dynamic Arrays →</button></div>
+</section>
+
+<!-- ===== PAGE 5 : DYNAMIC ARRAYS ===== -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">Dynamic Arrays</span>
+    <h2>⚡ สูตรที่คืนผลลัพธ์หลายค่าในครั้งเดียว</h2>
+    <p class="muted">พิมพ์สูตรช่องเดียว ผลลัพธ์จะ "หก" (spill) ออกมาหลายแถวและอัปเดตเองเมื่อข้อมูลเปลี่ยน</p>
+    <div class="fn-list" id="daTabs">
+      <button class="on" data-d="filter">FILTER()</button>
+      <button data-d="sort">SORT()</button>
+      <button data-d="unique">UNIQUE()</button>
+    </div>
+    <div id="daControls"></div>
+    <div class="fx"><div class="formula" id="daFormula"></div></div>
+    <div class="scroll" style="margin-top:12px"><table class="xl" id="daTable"></table></div>
+    <p class="note" id="daNote" style="margin-top:10px"></p>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: PivotTable →</button></div>
+</section>
+
+<!-- ===== PAGE 6 : PIVOT ===== -->
+<section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">Advanced Excel</span>
+    <h2>📊 PivotTable — สรุปข้อมูลในไม่กี่คลิก</h2>
+    <p class="muted">เครื่องมือสรุปข้อมูลที่ทรงพลังที่สุดของ Excel · เลือกฟิลด์ลงแต่ละโซน แล้วดูตารางสรุปและกราฟเกิดขึ้นทันที (จำลองการลาก-วางฟิลด์)</p>
+    <div class="pivot-ctrl">
+      <div><label class="fld">🧱 Rows — จัดกลุ่มตาม</label>
+        <select id="pvRow"><option value="crop">พืช</option><option value="grade">เกรด</option><option value="plot">แปลง</option></select></div>
+      <div><label class="fld">🔢 Values — สรุปค่า</label>
+        <select id="pvAgg"><option value="sum">ผลรวมผลผลิต (SUM)</option><option value="count">จำนวนครั้ง (COUNT)</option><option value="avg">เฉลี่ยผลผลิต (AVERAGE)</option></select></div>
+      <div><label class="fld">🔎 Filters — กรองเกรด</label>
+        <select id="pvFilter"><option value="*">ทั้งหมด</option><option>A</option><option>B</option><option>C</option></select></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px; align-items:start">
+      <div><table class="xl" id="pvTable"></table></div>
+      <div style="height:300px"><canvas id="pvChart"></canvas></div>
+    </div>
+    <p class="note" style="margin-top:12px">💡 นี่คือแนวคิดเดียวกับการลากฟิลด์ลงโซน Rows / Values / Filters ในหน้าต่าง PivotTable จริง · เพิ่มกราฟได้ทันทีด้วย PivotChart</p>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: แบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 7 : QUIZ ===== -->
+<section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">ทบทวนความเข้าใจ</span>
+    <h2>📝 แบบทดสอบท้ายบท</h2>
+    <p class="muted">7 ข้อ · เลือกคำตอบแล้วเห็นเฉลยและคำอธิบายทันที ทำซ้ำได้ไม่จำกัด</p>
+    <div id="quiz"></div>
+    <div class="scorebox" id="scorebox">
+      <div class="big" id="scoreBig">0/7</div>
+      <div id="scoreMsg"></div>
+      <button class="btn ghost" style="margin-top:14px;background:#fff" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn ghost" onclick="go(0)">กลับหน้าแรก</button></div>
+</section>
+
+<div class="foot">Business Data Analytics · ครั้งที่ 2 — Basic &amp; Advanced Excel · สื่อทบทวนสำหรับนิสิต Smart Farm<br>
+ผู้สอน Namchai Sokai (P'Jack) · คณะโลจิสติกส์ มหาวิทยาลัยบูรพา</div>
+</main>
+
+<script>
+/* ===== Shared dataset: Harvest Log ===== */
+const DATA=[
+  {date:'2026-06-01',plot:'A1',crop:'เมล่อน',grade:'A',kg:820},
+  {date:'2026-06-03',plot:'A2',crop:'เมล่อน',grade:'B',kg:640},
+  {date:'2026-06-05',plot:'B1',crop:'มะเขือเทศ',grade:'A',kg:910},
+  {date:'2026-06-08',plot:'B2',crop:'มะเขือเทศ',grade:'C',kg:480},
+  {date:'2026-06-11',plot:'A3',crop:'เมล่อน',grade:'A',kg:750},
+  {date:'2026-06-14',plot:'C1',crop:'ผักสลัด',grade:'B',kg:300},
+  {date:'2026-06-17',plot:'C2',crop:'ผักสลัด',grade:'A',kg:420},
+  {date:'2026-06-20',plot:'B3',crop:'มะเขือเทศ',grade:'B',kg:560},
+  {date:'2026-06-23',plot:'A4',crop:'เมล่อน',grade:'C',kg:390},
+  {date:'2026-06-26',plot:'C3',crop:'ผักสลัด',grade:'A',kg:510}
+];
+const fmt=n=>n.toLocaleString();
+
+/* ===== Navigation ===== */
+const TOTAL=8;
+const pages=[...document.querySelectorAll('.page')];
+const tabBtns=[...document.querySelectorAll('#tabs button')];
+let visited=new Set([0]);
+function go(i){
+  pages.forEach(p=>p.classList.remove('active'));
+  tabBtns.forEach(b=>b.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  tabBtns[i].classList.add('active');
+  visited.add(i);
+  document.getElementById('pbar').style.width=(visited.size/TOTAL*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(i===6) buildPivot();
+}
+tabBtns.forEach(b=>b.addEventListener('click',()=>go(+b.dataset.p)));
+
+/* ===== Page 0: raw table ===== */
+(function(){
+  let h='<table class="xl"><thead><tr><th>#</th><th>วันที่</th><th>แปลง</th><th>พืช</th><th>เกรด</th><th>ผลผลิต (กก.)</th></tr></thead><tbody>';
+  DATA.forEach((r,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+r.date+'</td><td>'+r.plot+'</td><td>'+r.crop+'</td><td>'+r.grade+'</td><td>'+fmt(r.kg)+'</td></tr>';});
+  h+='</tbody></table>';
+  document.getElementById('rawTableWrap').innerHTML=h;
+})();
+
+/* ===== Page 1: Logic ===== */
+const ifKg=document.getElementById('ifKg');
+function updIf(){
+  const v=+ifKg.value;
+  const out=v>=700?'เกรดพรีเมียม':'ทั่วไป';
+  document.getElementById('ifFormula').textContent='=IF( '+v+' >= 700 , "เกรดพรีเมียม" , "ทั่วไป" )';
+  document.getElementById('ifRes').textContent='"'+out+'"';
+}
+ifKg.addEventListener('input',updIf); updIf();
+
+function updLogic(){
+  const c=document.getElementById('lgCrop').value;
+  const g=document.getElementById('lgGrade').value;
+  const rows=DATA.filter(r=>(c==='*'||r.crop===c)&&(g==='*'||r.grade===g));
+  const cnt=rows.length;
+  const sum=rows.reduce((a,b)=>a+b.kg,0);
+  const avg=cnt?Math.round(sum/cnt):0;
+  document.getElementById('lgCount').textContent=cnt;
+  document.getElementById('lgSum').textContent=fmt(sum);
+  document.getElementById('lgAvg').textContent=cnt?fmt(avg):'–';
+  const cc=c==='*'?'"*"':'"'+c+'"', gg=g==='*'?'"*"':'"'+g+'"';
+  document.getElementById('lgFormula').textContent=
+    '=SUMIFS( ผลผลิต , พืช , '+cc+' , เกรด , '+gg+' )';
+  document.getElementById('lgDesc').textContent=
+    'บวกผลผลิตเฉพาะแถวที่พืช = '+(c==='*'?'ทุกชนิด':c)+' และเกรด = '+(g==='*'?'ทุกเกรด':g)+' → พบ '+cnt+' แถว';
+}
+['lgCrop','lgGrade'].forEach(id=>document.getElementById(id).addEventListener('change',updLogic));
+updLogic();
+
+/* ===== Page 2: Text ===== */
+const txtIn=document.getElementById('txtIn');
+function updText(){
+  const s=txtIn.value;
+  const trimmed=s.trim();
+  const rows=[
+    ['LEFT(A2,3)','ตัด 3 ตัวจากซ้าย', JSON.stringify(trimmed.substring(0,3))],
+    ['RIGHT(A2,4)','ตัด 4 ตัวจากขวา', JSON.stringify(trimmed.slice(-4))],
+    ['MID(A2,5,2)','ตัด 2 ตัวเริ่มตำแหน่งที่ 5', JSON.stringify(trimmed.substring(4,6))],
+    ['LEN(A2)','นับตัวอักษร (รวมเว้นวรรค)', String(s.length)],
+    ['TRIM(A2)','ลบเว้นวรรคเกิน', JSON.stringify(trimmed)],
+    ['UPPER(A2)','ตัวพิมพ์ใหญ่ทั้งหมด', JSON.stringify(trimmed.toUpperCase())],
+    ['LOWER(A2)','ตัวพิมพ์เล็กทั้งหมด', JSON.stringify(trimmed.toLowerCase())],
+    ['PROPER(A2)','ขึ้นต้นแต่ละคำด้วยตัวใหญ่', JSON.stringify(trimmed.replace(/\b\w/g,c=>c.toUpperCase()))],
+    ['FIND("-",A2)','ตำแหน่งของ "-" ตัวแรก', String(trimmed.indexOf('-')+1)],
+    ['CONCAT("ล็อต:",TRIM(A2))','ต่อข้อความ', JSON.stringify('ล็อต:'+trimmed)]
+  ];
+  let h='<thead><tr><th>สูตร (A2 = ช่องรหัส)</th><th>ความหมาย</th><th>ผลลัพธ์</th></tr></thead><tbody>';
+  rows.forEach(r=>{h+='<tr><td style="text-align:left;font-family:Consolas,monospace;color:#15803d">='+r[0]+'</td><td style="text-align:left">'+r[1]+'</td><td class="hl" style="font-family:Consolas,monospace">'+r[2]+'</td></tr>';});
+  h+='</tbody>';
+  document.getElementById('txtTable').innerHTML=h;
+}
+txtIn.addEventListener('input',updText); updText();
+
+/* ===== Page 3: Date ===== */
+const thDays=['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+const thMon=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function weekNum(d){
+  const jan1=new Date(d.getFullYear(),0,1);
+  const days=Math.floor((d-jan1)/86400000);
+  return Math.floor((days+jan1.getDay())/7)+1;
+}
+function networkDays(a,b){
+  if(b<a){const t=a;a=b;b=t;}
+  let cnt=0; const cur=new Date(a);
+  while(cur<=b){const wd=cur.getDay(); if(wd!==0&&wd!==6)cnt++; cur.setDate(cur.getDate()+1);}
+  return cnt;
+}
+function updDate(){
+  const s=new Date(document.getElementById('dStart').value);
+  const e=new Date(document.getElementById('dEnd').value);
+  if(isNaN(s)||isNaN(e)) return;
+  const rows=[
+    ['WEEKDAY(เริ่ม)','วันเริ่มเป็นวันอะไร', (s.getDay()+1)+' = วัน'+thDays[s.getDay()]],
+    ['WEEKNUM(เริ่ม)','สัปดาห์ที่เท่าไรของปี', 'สัปดาห์ '+weekNum(s)],
+    ['NETWORKDAYS(เริ่ม,สิ้นสุด)','นับวันทำงาน จ.–ศ.', networkDays(s,e)+' วันทำงาน'],
+    ['(สิ้นสุด - เริ่ม)','จำนวนวันทั้งหมด', Math.round((e-s)/86400000)+' วัน'],
+    ['TEXT(เริ่ม,"dddd d mmm")','จัดรูปแบบวันที่เป็นข้อความ', 'วัน'+thDays[s.getDay()]+' '+s.getDate()+' '+thMon[s.getMonth()]],
+    ['TODAY()','วันที่ปัจจุบันของเครื่อง', (()=>{const t=new Date();return t.getDate()+' '+thMon[t.getMonth()]+' '+t.getFullYear();})()]
+  ];
+  let h='<thead><tr><th>ฟังก์ชัน</th><th>ความหมาย</th><th>ผลลัพธ์</th></tr></thead><tbody>';
+  rows.forEach(r=>{h+='<tr><td style="text-align:left;font-family:Consolas,monospace;color:#15803d">='+r[0]+'</td><td style="text-align:left">'+r[1]+'</td><td class="hl">'+r[2]+'</td></tr>';});
+  h+='</tbody>';
+  document.getElementById('dateTable').innerHTML=h;
+}
+['dStart','dEnd'].forEach(id=>document.getElementById(id).addEventListener('change',updDate));
+updDate();
+
+/* ===== Page 4: Lookup ===== */
+(function(){
+  const sel=document.getElementById('lkPlot');
+  DATA.forEach(r=>{const o=document.createElement('option');o.value=r.plot;o.textContent=r.plot+' ('+r.crop+')';sel.appendChild(o);});
+  sel.addEventListener('change',updLookup);
+})();
+function updLookup(){
+  const p=document.getElementById('lkPlot').value;
+  const r=DATA.find(x=>x.plot===p);
+  document.getElementById('lkResult').innerHTML=
+    '<div class="box"><div class="v">'+r.crop+'</div><div class="l">พืช</div></div>'+
+    '<div class="box"><div class="v">'+r.grade+'</div><div class="l">เกรด</div></div>'+
+    '<div class="box"><div class="v">'+fmt(r.kg)+'</div><div class="l">ผลผลิต (กก.)</div></div>'+
+    '<div class="box"><div class="v" style="font-size:16px">'+r.date+'</div><div class="l">วันที่</div></div>';
+  document.getElementById('lkFormula').textContent=
+    '=VLOOKUP( "'+p+'" , A:F , 6 , FALSE )      → '+r.kg+'\n'+
+    '=XLOOKUP( "'+p+'" , แปลง , ผลผลิต )        → '+r.kg;
+}
+document.getElementById('lkPlot').selectedIndex=0; updLookup();
+
+/* ===== Page 5: Dynamic Arrays ===== */
+let daMode='filter';
+function renderDaTable(rows){
+  let h='<thead><tr><th>วันที่</th><th>แปลง</th><th>พืช</th><th>เกรด</th><th>ผลผลิต</th></tr></thead><tbody>';
+  if(!rows.length) h+='<tr><td colspan="5" class="note">(ไม่มีแถวที่ตรงเงื่อนไข)</td></tr>';
+  rows.forEach(r=>{h+='<tr><td>'+r.date+'</td><td>'+r.plot+'</td><td>'+r.crop+'</td><td>'+r.grade+'</td><td class="hl">'+fmt(r.kg)+'</td></tr>';});
+  h+='</tbody>'; document.getElementById('daTable').innerHTML=h;
+}
+function updDa(){
+  const ctrl=document.getElementById('daControls');
+  if(daMode==='filter'){
+    ctrl.innerHTML='<div class="row"><div><label class="fld">กรองพืช</label><select id="daCrop"><option value="*">ทั้งหมด</option><option>เมล่อน</option><option>มะเขือเทศ</option><option>ผักสลัด</option></select></div>'+
+      '<div><label class="fld">ผลผลิตขั้นต่ำ (กก.)</label><input type="number" id="daMin" value="500" step="50" style="width:120px"></div></div>';
+    const run=()=>{
+      const c=document.getElementById('daCrop').value, m=+document.getElementById('daMin').value;
+      const rows=DATA.filter(r=>(c==='*'||r.crop===c)&&r.kg>=m);
+      renderDaTable(rows);
+      document.getElementById('daFormula').textContent='=FILTER( ตาราง , (พืช='+(c==='*'?'ทุกชนิด':'"'+c+'"')+') * (ผลผลิต>='+m+') )';
+      document.getElementById('daNote').textContent='FILTER แสดงเฉพาะแถวที่ตรงทุกเงื่อนไข → พบ '+rows.length+' แถว';
+    };
+    document.getElementById('daCrop').addEventListener('change',run);
+    document.getElementById('daMin').addEventListener('input',run);
+    run();
+  }else if(daMode==='sort'){
+    ctrl.innerHTML='<div class="row"><div><label class="fld">เรียงตามผลผลิต</label><select id="daDir"><option value="desc">มาก → น้อย</option><option value="asc">น้อย → มาก</option></select></div></div>';
+    const run=()=>{
+      const dir=document.getElementById('daDir').value;
+      const rows=[...DATA].sort((a,b)=>dir==='asc'?a.kg-b.kg:b.kg-a.kg);
+      renderDaTable(rows);
+      document.getElementById('daFormula').textContent='=SORT( ตาราง , คอลัมน์ผลผลิต , '+(dir==='asc'?'1':'-1')+' )';
+      document.getElementById('daNote').textContent='SORT เรียงทั้งตารางอัตโนมัติตามผลผลิต ('+(dir==='asc'?'น้อยไปมาก':'มากไปน้อย')+')';
+    };
+    document.getElementById('daDir').addEventListener('change',run); run();
+  }else{
+    ctrl.innerHTML='<p class="note">UNIQUE ดึงเฉพาะค่าที่ไม่ซ้ำในคอลัมน์ "พืช"</p>';
+    const uniq=[...new Set(DATA.map(r=>r.crop))];
+    let h='<thead><tr><th>พืช (ไม่ซ้ำ)</th><th>จำนวนแถว</th><th>ผลรวมผลผลิต</th></tr></thead><tbody>';
+    uniq.forEach(c=>{const rs=DATA.filter(r=>r.crop===c);h+='<tr><td class="hl">'+c+'</td><td>'+rs.length+'</td><td>'+fmt(rs.reduce((a,b)=>a+b.kg,0))+'</td></tr>';});
+    h+='</tbody>'; document.getElementById('daTable').innerHTML=h;
+    document.getElementById('daFormula').textContent='=UNIQUE( คอลัมน์พืช )';
+    document.getElementById('daNote').textContent='UNIQUE คืนรายชื่อพืชที่แตกต่างกัน '+uniq.length+' ชนิด (จาก '+DATA.length+' แถว)';
+  }
+}
+document.querySelectorAll('#daTabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#daTabs button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); daMode=b.dataset.d; updDa();
+}));
+updDa();
+
+/* ===== Page 6: Pivot ===== */
+let pvChart=null;
+function buildPivot(){
+  const rowF=document.getElementById('pvRow').value;
+  const agg=document.getElementById('pvAgg').value;
+  const filt=document.getElementById('pvFilter').value;
+  const rows=DATA.filter(r=>filt==='*'||r.grade===filt);
+  const groups={};
+  rows.forEach(r=>{const k=r[rowF]; (groups[k]=groups[k]||[]).push(r.kg);});
+  const keys=Object.keys(groups).sort();
+  const aggName={sum:'SUM',count:'COUNT',avg:'AVERAGE'}[agg];
+  const calc=arr=>agg==='sum'?arr.reduce((a,b)=>a+b,0):agg==='count'?arr.length:Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  const vals=keys.map(k=>calc(groups[k]));
+  const rowLabel={crop:'พืช',grade:'เกรด',plot:'แปลง'}[rowF];
+  let total=agg==='count'?rows.length:agg==='avg'?Math.round(rows.reduce((a,b)=>a+b.kg,0)/rows.length):rows.reduce((a,b)=>a+b.kg,0);
+  let h='<thead><tr><th>'+rowLabel+'</th><th>'+aggName+' ผลผลิต</th></tr></thead><tbody>';
+  keys.forEach((k,i)=>{h+='<tr><td>'+k+'</td><td class="hl">'+fmt(vals[i])+'</td></tr>';});
+  h+='<tr><td style="font-weight:800;background:#1e293b;color:#fff">Grand Total</td><td style="font-weight:800;background:#1e293b;color:#fde047">'+fmt(total)+'</td></tr></tbody>';
+  document.getElementById('pvTable').innerHTML=h;
+  const ctx=document.getElementById('pvChart');
+  if(pvChart) pvChart.destroy();
+  pvChart=new Chart(ctx,{type:'bar',
+    data:{labels:keys,datasets:[{label:aggName+' ผลผลิต ('+rowLabel+')',data:vals,backgroundColor:'rgba(22,163,74,.75)',borderColor:'#15803d',borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'PivotChart'}},scales:{y:{beginAtZero:true}}}
+  });
+}
+['pvRow','pvAgg','pvFilter'].forEach(id=>document.getElementById(id).addEventListener('change',buildPivot));
+
+/* ===== Page 7: Quiz ===== */
+const quiz=[
+  {q:'ต้องการหา "ผลรวมผลผลิต" เฉพาะพืช = เมล่อน และเกรด = A ควรใช้ฟังก์ชันใด?',
+   opts:['SUMIF','SUMIFS','COUNTIFS','VLOOKUP'],a:1,
+   e:'มี 2 เงื่อนไข (พืชและเกรด) จึงต้องใช้ SUMIFS (มี S ท้าย = หลายเงื่อนไข) · SUMIF รองรับเงื่อนไขเดียว'},
+  {q:'=TRIM("  ผักสลัด  ") จะได้ผลลัพธ์ใด?',
+   opts:['"  ผักสลัด  "','"ผักสลัด"','"ผัก สลัด"','เกิด error'],a:1,
+   e:'TRIM ลบช่องว่างส่วนเกินหน้า-หลัง (และช่องว่างซ้ำระหว่างคำ) เหลือ "ผักสลัด"'},
+  {q:'=LEFT("MEL-A1-2026",3) คืนค่าอะไร?',
+   opts:['"MEL"','"026"','"A1"','"MEL-A1-2026"'],a:0,
+   e:'LEFT ตัดจากด้านซ้าย 3 ตัวอักษร → "MEL"'},
+  {q:'ต้องการนับเฉพาะ "วันทำงาน" (จ.–ศ.) ระหว่างวันเพาะปลูกถึงวันเก็บเกี่ยว ใช้ฟังก์ชันใด?',
+   opts:['TODAY()','WEEKNUM()','NETWORKDAYS()','WEEKDAY()'],a:2,
+   e:'NETWORKDAYS นับจำนวนวันทำงานระหว่างสองวันที่ โดยไม่รวมเสาร์-อาทิตย์ (และวันหยุดที่กำหนด)'},
+  {q:'ข้อใดคือข้อดีหลักของ XLOOKUP เมื่อเทียบกับ VLOOKUP?',
+   opts:['ทำงานได้เฉพาะ Excel รุ่นเก่า','ค้นได้ทุกทิศและไม่ต้องนับเลขคอลัมน์','ใช้ได้กับตัวเลขเท่านั้น','ต้องเรียงข้อมูลก่อนเสมอ'],a:1,
+   e:'XLOOKUP ยืดหยุ่นกว่า — ค้นได้ทั้งซ้าย/ขวา ไม่ต้องระบุเลขคอลัมน์ และไม่ต้องเรียงข้อมูลก่อน'},
+  {q:'=UNIQUE() ในกลุ่ม Dynamic Arrays ทำหน้าที่อะไร?',
+   opts:['เรียงข้อมูลจากน้อยไปมาก','กรองแถวตามเงื่อนไข','ดึงเฉพาะค่าที่ไม่ซ้ำกัน','นับจำนวนเซลล์ว่าง'],a:2,
+   e:'UNIQUE ดึงเฉพาะค่าที่ไม่ซ้ำ · SORT = เรียง · FILTER = กรอง — ทั้งสามคือ Dynamic Arrays ที่ "spill" หลายค่า'},
+  {q:'ใน PivotTable ถ้าลากฟิลด์ "พืช" ลงโซน Rows และ "ผลผลิต (Sum)" ลง Values จะได้อะไร?',
+   opts:['รายการทุกแถวแบบไม่สรุป','ผลรวมผลผลิตแยกตามชนิดพืช','กราฟเส้นอย่างเดียว','ค่าเฉลี่ยของทุกคอลัมน์'],a:1,
+   e:'Rows = จัดกลุ่มตามพืช, Values(Sum) = ผลรวมผลผลิตของแต่ละกลุ่ม → ตารางสรุปผลผลิตรวมแยกตามชนิดพืช'}
+];
+let answered=Array(quiz.length).fill(false), score=0;
+function renderQuiz(){
+  const box=document.getElementById('quiz'); box.innerHTML='';
+  quiz.forEach((item,qi)=>{
+    const div=document.createElement('div'); div.className='quiz-q';
+    div.innerHTML='<div class="qhead">ข้อ '+(qi+1)+'. '+item.q+'</div>';
+    item.opts.forEach((op,oi)=>{const btn=document.createElement('button');btn.className='opt';btn.textContent=op;btn.onclick=()=>pick(qi,oi,div);div.appendChild(btn);});
+    const ex=document.createElement('div'); ex.className='explain'; ex.id='ex'+qi; ex.textContent='💡 '+item.e; div.appendChild(ex);
+    box.appendChild(div);
+  });
+}
+function pick(qi,oi,div){
+  if(answered[qi])return; answered[qi]=true;
+  const opts=[...div.querySelectorAll('.opt')];
+  opts.forEach((b,i)=>{b.classList.add('disabled');if(i===quiz[qi].a)b.classList.add('correct');if(i===oi&&oi!==quiz[qi].a)b.classList.add('wrong');});
+  if(oi===quiz[qi].a)score++;
+  document.getElementById('ex'+qi).classList.add('show');
+  if(answered.every(x=>x))showScore();
+}
+function showScore(){
+  const sb=document.getElementById('scorebox'); sb.classList.add('show');
+  document.getElementById('scoreBig').textContent=score+'/'+quiz.length;
+  let msg;
+  if(score===quiz.length)msg='🎉 ยอดเยี่ยม! พร้อมลุยแบบฝึกหัด Excel แล้ว';
+  else if(score>=5)msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็ครบ';
+  else msg='📖 ลองกลับไปเล่นเครื่องมือแต่ละหน้าอีกครั้งนะ จะเข้าใจง่ายขึ้น';
+  document.getElementById('scoreMsg').textContent=msg;
+  sb.scrollIntoView({behavior:'smooth'});
+}
+function resetQuiz(){
+  answered=Array(quiz.length).fill(false); score=0;
+  document.getElementById('scorebox').classList.remove('show');
+  renderQuiz(); document.getElementById('p7').scrollIntoView({behavior:'smooth'});
+}
+renderQuiz();
+
+document.getElementById('pbar').style.width=(1/TOTAL*100)+'%';
+</script>
+</body>
+</html>

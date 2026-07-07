@@ -55,6 +55,12 @@
   .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
   .hero h1{font-size:34px}
   .hero .muted{color:#cbd5e1}
+  .hero-flex{display:flex; gap:22px; align-items:flex-start}
+  .hero-main{flex:1; min-width:0}
+  .qr-box{flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:6px; background:#fff; border-radius:14px; padding:10px 10px 8px; text-decoration:none; box-shadow:0 6px 18px rgba(0,0,0,.25)}
+  .qr-box img{display:block; width:112px; height:112px; border-radius:6px}
+  .qr-cap{font-size:11.5px; font-weight:700; color:#15803d; white-space:nowrap}
+  @media(max-width:640px){.hero-flex{flex-direction:column} .qr-box{flex-direction:row; align-self:flex-start}}
   .grid{display:grid; gap:16px}
   .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
   .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
@@ -74,6 +80,9 @@
   .flow .step .t{font-weight:800; margin-top:6px}
   .flow-detail{margin-top:14px; padding:16px; border-left:4px solid var(--brand); background:#f0fdf4; border-radius:0 12px 12px 0; min-height:60px}
   /* ---------- 4 levels ---------- */
+  .da-map{margin:18px 0 6px; padding:14px; border:1px solid var(--line); border-radius:16px; background:#fff}
+  .da-map svg{display:block; width:100%; height:auto; max-width:760px; margin:0 auto}
+  .da-map figcaption{margin-top:8px; font-size:13.5px; color:var(--muted); text-align:center}
   .lvl-tabs{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px}
   .lvl-tab{border:2px solid var(--line); border-radius:14px; padding:14px 10px; cursor:pointer; text-align:center; transition:.18s; background:#fff}
   .lvl-tab:hover{transform:translateY(-3px)}
@@ -148,6 +157,33 @@
   .calc-unit{font-size:13px; color:var(--muted)}
   .calc-msg{margin-top:12px; text-align:center; font-weight:600; font-size:14px; padding:8px; border-radius:10px}
   table.gtbl tr.on td{background:#dcfce7 !important; font-weight:700}
+  /* check-in */
+  .checkin{border:none; background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:2px solid var(--brand)}
+  .ci-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
+  .ci-field{flex:1 1 260px; display:flex; flex-direction:column; gap:6px}
+  .ci-field label{font-weight:700; font-size:13.5px; color:#334155}
+  .ci-field input, .ci-field select{padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; font-family:inherit; font-size:15px; background:#fff; width:100%}
+  .ci-field input:focus, .ci-field select:focus{outline:none; border-color:var(--brand)}
+  .ci-submit{margin-top:14px}
+  .ci-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .ci-msg.ok{color:var(--brand2)}
+  .ci-msg.err{color:var(--red)}
+  /* roadmap */
+  .roadmap{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:8px}
+  .rm-item{position:relative; border:1.5px solid var(--line); border-radius:14px; padding:14px; background:#fbfdfb; transition:.15s}
+  .rm-item:hover{transform:translateY(-3px); box-shadow:var(--shadow)}
+  .rm-num{width:30px; height:30px; border-radius:9px; display:grid; place-items:center; font-weight:800; font-size:14px; color:#fff; background:#94a3b8; margin-bottom:8px}
+  .rm-item .rm-title{font-weight:800; font-size:14.5px; line-height:1.35}
+  .rm-item .rm-tag{font-size:12px; color:var(--muted); margin-top:4px}
+  .rm-item.now{border-color:var(--brand); background:var(--brand-soft)}
+  .rm-item.now .rm-num{background:var(--brand)}
+  .rm-here{display:inline-block; margin-top:8px; font-size:11px; font-weight:800; color:#fff; background:var(--brand); padding:3px 9px; border-radius:999px}
+  /* enter lesson */
+  .enter-wrap{text-align:center; margin:8px 0 4px}
+  .enter-btn{display:inline-flex; flex-direction:column; align-items:center; gap:3px; background:linear-gradient(135deg,#16a34a,#15803d); color:#fff; border:none; border-radius:16px; padding:18px 40px; cursor:pointer; font-family:inherit; box-shadow:0 10px 24px rgba(22,163,74,.35); transition:.15s}
+  .enter-btn:hover{transform:translateY(-3px); box-shadow:0 14px 30px rgba(22,163,74,.45)}
+  .enter-btn .big{font-size:20px; font-weight:800}
+  .enter-btn small{font-size:12.5px; opacity:.9; font-weight:600}
   .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
   .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
   .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
@@ -174,7 +210,12 @@
 
 <!-- ============ PAGE 0 : OVERVIEW ============ -->
 <section class="page active" id="p0">
-  <div class="card hero">
+  <div class="card hero hero-flex">
+    <a class="qr-box" href="https://namchai48.github.io/ba-2026-1/class1" target="_blank" rel="noopener" title="เปิดหน้าเว็บบทเรียนครั้งที่ 1">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAXIAAAFyCAIAAABnRsZeAAAHoUlEQVR4nO3cwY1jRRhGUQZ1ACzJgfxDIQeWZGC2SEhP0HWLv8o+Z+9p+9lzVYtP9eP1ev0E0Pl5+g0A70ZWgJisADFZAWKyAsRkBYjJChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaAmKwAsa+VF//y62/V+zjEn3/8/u3XrjyNfX936hPt41n9P1aehtMKEJMVICYrQExWgJisADFZAWKyAsRkBYjJChBbWtk+W1np7bNvDfn8eadWmPu2v/sWqytW3tW+T/Rp/xecVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaA2MaV7bOpteuKG29C/bS165l71mfv9+07rQAxWQFisgLEZAWIyQoQkxUgJitATFaAmKwAsbGV7afZt8GdukP3zP0uJ3BaAWKyAsRkBYjJChCTFSAmK0BMVoCYrAAxWQFiVraZfTfd7nvt1H535T7aG28U/jROK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgJitAbGxlO3UT6pR9e9Z9T3Jqgzu1dp36Tb7f/wWnFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgtnFl+2k3g+5bna6YWsruM3U7r1ty/z2nFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgtrSyfb87OFfceHvr1C25z95v+/tpnFaAmKwAMVkBYrICxGQFiMkKEJMVICYrQExWgNjSyvbT7kmd+kRTt7c+m7r59czf1Y2/532cVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaA2I/X6/XtF9+4s9y30Xy/20ynvt8V+34bz/b9cqb2uytPw2kFiMkKEJMVICYrQExWgJisADFZAWKyAsRkBYgtrWyfvd8Gd8XUrvTZ1DbU1vnvbvw9P3NaAWKyAsRkBYjJChCTFSAmK0BMVoCYrAAxWQFiX1N/eGodOLXvnNrC3rh2XXlXUze/Pjvz3t99nFaAmKwAMVkBYrICxGQFiMkKEJMVICYrQExWgNjYyvbZvmXhmXd/nnnT7Zm35O577bOpvfKzM+/udVoBYrICxGQFiMkKEJMVICYrQExWgJisADFZAWJjK9uVVeKZy9Ez945T+86p5zz1ead+G2fud51WgJisADFZAWKyAsRkBYjJChCTFSAmK0BMVoDYj9frNf0e/rMzV5gr9r3nG7e/77dnnfpEU8/KaQWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiG28y/bMJeWZe9Yzd7Q37lnPXFHvc+b9yk4rQExWgJisADFZAWKyAsRkBYjJChCTFSAmK0Bs6S7bMxd+z25cjr7fkzzzlzN1W+2KM2+6dVoBYrICxGQFiMkKEJMVICYrQExWgJisADFZAWJLK9sp1pCVM9/Vs0+7jfjM5/zMaQWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiH1Nv4HejTvaKWc+jU97V+93K7DTChCTFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQ23iX7dRW8sbN4pn3lU69q2fWzP/e1K/daQWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiG1c2e5z5mZxn5XPu+/2Vpvj6rUrztwcO60AMVkBYrICxGQFiMkKEJMVICYrQExWgJisALGlle2Nt8aead+O9v0Wumf+6m78Bt1lC1xDVoCYrAAxWQFisgLEZAWIyQoQkxUgJitA7Gv6DXzHjTvL53/5zJ3l1J2yK3/3xh3tvtdObdmdVoCYrAAxWQFisgLEZAWIyQoQkxUgJitATFaA2Nhdtmfat999tu9fXnHmvvP9vqMzn/MKpxUgJitATFaAmKwAMVkBYrICxGQFiMkKEJMVIHblynbqLtupjeaZN7BO7Ur3mVozPzvz23/mtALEZAWIyQoQkxUgJitATFaAmKwAMVkBYrICxL5WXjy1lVz5u2fuO/c589bYG2/nnVqN73vtPk4rQExWgJisADFZAWKyAsRkBYjJChCTFSAmK0BsaWV75sJvxfOS8syF7tTtvCvO3P6umLrX+dnU33VaAWKyAsRkBYjJChCTFSAmK0BMVoCYrAAxWQFiSyvbZzduUve9dmW/e+MW9sy16z433nS77z07rQAxWQFisgLEZAWIyQoQkxUgJitATFaAmKwAsY0r22f71pA33hu6b787tbO88RM9/8tn3ty88qz2PUmnFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgNrayfT9Te9ZnU3fK7lu7vt+9v1Pfwr6/67QCxGQFiMkKEJMVICYrQExWgJisADFZAWKyAsSsbK+3skmd2obu29HeuO6duo923/LbaQWIyQoQkxUgJitATFaAmKwAMVkBYrICxGQFiI2tbKfudl1x5s5y35OcWp3uu2N135O8cd27j9MKEJMVICYrQExWgJisADFZAWKyAsRkBYjJChD78Xq9vv3iMxd+K/atXaeWsvvc+DT2/WLP/OVMPWenFSAmK0BMVoCYrAAxWQFisgLEZAWIyQoQkxUgtrSyBfgnpxUgJitATFaAmKwAMVkBYrICxGQFiMkKEJMVICYrQExWgJisADFZAWKyAsRkBYjJChCTFSAmK0BMVoDYX8aj/lyQxuAoAAAAAElFTkSuQmCC" alt="QR code เปิดบทเรียนครั้งที่ 1" width="112" height="112">
+      <span class="qr-cap">📱 สแกนเปิดในมือถือ</span>
+    </a>
+    <div class="hero-main">
     <span class="pill">Introduction &amp; Basic Excel</span>
     <h1>ครั้งที่ 1 — เริ่มต้นกับการวิเคราะห์ข้อมูล</h1>
     <p class="lead muted">สื่อประกอบการบรรยาย + ใช้ทบทวนเองได้ ถ้าเรียนในห้องไม่ทัน<br>
@@ -183,16 +224,6 @@
       <button class="btn" onclick="go(1)">เริ่มบทเรียน →</button>
       <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(5)">ลองทำแบบทดสอบ</button>
     </div>
-  </div>
-
-  <div class="card">
-    <span class="kicker">สิ่งที่จะได้เรียนวันนี้</span>
-    <h2>🌱 เนื้อหาคาบแรก</h2>
-    <div class="grid g4" style="margin-top:8px">
-      <div class="tile"><div class="n">1</div><b>Data Analytics คืออะไร</b><div class="muted" style="font-size:13.5px">ความหมายและกระบวนการวิเคราะห์ข้อมูล 4 ขั้น</div></div>
-      <div class="tile"><div class="n">2</div><b>ประเภท 4 ระดับ</b><div class="muted" style="font-size:13.5px">Descriptive → Diagnostic → Predictive → Prescriptive</div></div>
-      <div class="tile"><div class="n">3</div><b>กราฟข้อมูลฟาร์ม</b><div class="muted" style="font-size:13.5px">ลองปรับค่าและดูผลลัพธ์แบบโต้ตอบ</div></div>
-      <div class="tile"><div class="n">4</div><b>เครื่องมือ Excel</b><div class="muted" style="font-size:13.5px">SUM, AVERAGE, IF, COUNTIF และอื่น ๆ</div></div>
     </div>
   </div>
 
@@ -207,6 +238,82 @@
     <div class="example-box" style="margin-top:14px">
       <span class="lbl">คำอธิบายรายวิชา</span>
       <p style="margin:.4em 0 0">การประยุกต์ใช้เทคนิคทางด้านการวิเคราะห์ข้อมูลทางธุรกิจ เพื่อเพิ่มประสิทธิภาพในการจัดการโลจิสติกส์ ให้เกิดความได้เปรียบเชิงแข่งขัน และวิเคราะห์ธุรกิจที่ประสบความสำเร็จจากการนำกลยุทธ์ที่ได้จากข้อมูลมาปฏิบัติจริง</p>
+    </div>
+  </div>
+
+  <div class="card checkin">
+    <span class="kicker">ก่อนเริ่มเรียน</span>
+    <h2>✅ เช็คชื่อเข้าเรียน</h2>
+    <p class="muted" style="margin-top:0">เลือกชื่อ–รหัสนิสิตของคุณ แล้วกดส่ง — ข้อมูลจะถูกส่งเข้า Google Form ของอาจารย์ทันที (ไม่ต้องออกจากหน้านี้)</p>
+    <div class="ci-row">
+      <div class="ci-field">
+        <label>อีเมล (Email) *</label>
+        <input type="email" id="ci_email" placeholder="you@go.buu.ac.th" autocomplete="email">
+      </div>
+      <div class="ci-field">
+        <label>เลือกข้อมูลนิสิต (ชื่อ–รหัส) *</label>
+        <select id="ci_student"><option value="">— เลือกชื่อของคุณ —</option></select>
+      </div>
+    </div>
+    <button class="btn ci-submit" id="ci_btn" onclick="submitCheckin()">📩 ส่งเช็คชื่อ</button>
+    <div class="ci-msg" id="ci_msg"></div>
+
+    <iframe name="ci_target" id="ci_target" style="display:none" title="hidden"></iframe>
+    <form id="ci_form" action="https://docs.google.com/forms/d/e/1FAIpQLSdtirOECBM1oJTXNKpGKmxP2Q8Wr-lBjqgEXakcOQFYliFyJg/formResponse" method="POST" target="ci_target" style="display:none">
+      <input type="hidden" name="emailAddress" id="ci_f_email">
+      <input type="hidden" name="entry.893657035" id="ci_f_student">
+      <input type="hidden" name="fvv" value="1">
+      <input type="hidden" name="pageHistory" value="0">
+    </form>
+  </div>
+
+  <div class="card">
+    <span class="kicker">ภาพรวมรายวิชา</span>
+    <h2>🗺️ แผนการเรียน 6 ครั้งแรก (ครึ่งแรก)</h2>
+    <p class="muted" style="margin-top:0">ครึ่งแรกเน้นเครื่องมือ no-code / BI / SQL บนบริบทเกษตร · จบครั้งที่ 6 มีสอบกลางภาคและงานกลุ่ม (Assignment 1)</p>
+    <div class="roadmap">
+      <div class="rm-item now">
+        <div class="rm-num">1</div>
+        <div class="rm-title">Introduction + กรอบ Data Analytics + Basic Excel</div>
+        <div class="rm-tag">4 ระดับ · SUM/IF/COUNTIF · ธรรมาภิบาลข้อมูล</div>
+        <span class="rm-here">📍 คุณอยู่ที่นี่</span>
+      </div>
+      <div class="rm-item">
+        <div class="rm-num">2</div>
+        <div class="rm-title">Advanced Excel + Data Toolkit + PivotTable</div>
+        <div class="rm-tag">Text/Date/Lookup · Dynamic Arrays · PivotTable</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-num">3</div>
+        <div class="rm-title">Power Query (ETL)</div>
+        <div class="rm-tag">Extract → Transform → Load · รวม log เซนเซอร์หลายฟาร์ม</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-num">4</div>
+        <div class="rm-title">Power BI &amp; DAX — Farm Dashboard</div>
+        <div class="rm-tag">Measure · Time Intelligence · KPI โลจิสติกส์</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-num">5</div>
+        <div class="rm-title">Descriptive + Diagnostic + สถิติ + Storytelling</div>
+        <div class="rm-tag">5 Whys · Fishbone · Correlation · เล่าเรื่องด้วยข้อมูล</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-num">6</div>
+        <div class="rm-title">SQL for Agri Analytics</div>
+        <div class="rm-tag">SELECT/JOIN/GROUP BY · สคีมาเกษตร → 📌 สอบกลางภาค</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">สิ่งที่จะได้เรียนวันนี้</span>
+    <h2>🌱 เนื้อหาคาบแรก</h2>
+    <div class="grid g4" style="margin-top:8px">
+      <div class="tile"><div class="n">1</div><b>Data Analytics คืออะไร</b><div class="muted" style="font-size:13.5px">ความหมายและกระบวนการวิเคราะห์ข้อมูล 4 ขั้น</div></div>
+      <div class="tile"><div class="n">2</div><b>ประเภท 4 ระดับ</b><div class="muted" style="font-size:13.5px">Descriptive → Diagnostic → Predictive → Prescriptive</div></div>
+      <div class="tile"><div class="n">3</div><b>กราฟข้อมูลฟาร์ม</b><div class="muted" style="font-size:13.5px">ลองปรับค่าและดูผลลัพธ์แบบโต้ตอบ</div></div>
+      <div class="tile"><div class="n">4</div><b>เครื่องมือ Excel</b><div class="muted" style="font-size:13.5px">SUM, AVERAGE, IF, COUNTIF และอื่น ๆ</div></div>
     </div>
   </div>
 
@@ -268,6 +375,13 @@
       </div>
     </div>
   </div>
+
+  <div class="enter-wrap">
+    <button class="enter-btn" onclick="go(1)">
+      <span class="big">▶ เข้าสู่บทเรียน — ครั้งที่ 1</span>
+      <small>Data Analytics คืออะไร · 4 ระดับ · กราฟ · Excel · แบบทดสอบ</small>
+    </button>
+  </div>
 </section>
 
 <!-- ============ PAGE 1 : WHAT IS DA ============ -->
@@ -306,6 +420,49 @@
     <span class="kicker">กรอบแนวคิด</span>
     <h2>📊 ประเภทของ Data Analytics — 4 ระดับ</h2>
     <p class="muted">ยิ่งระดับสูงขึ้น ยิ่งให้ <b>คุณค่า</b> และ <b>ความซับซ้อน</b> มากขึ้น · คลิกแต่ละระดับเพื่อดูรายละเอียด (ตัวอย่างฟาร์มเมล่อน/ผัก)</p>
+
+    <figure class="da-map">
+      <svg viewBox="0 0 900 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="แผนภาพ 4 ระดับของ Data Analytics ตามแกน Value และ Complexity">
+        <!-- gridlines -->
+        <g stroke="#e2e8f0" stroke-width="1.5">
+          <line x1="170" y1="110" x2="860" y2="110"/>
+          <line x1="170" y1="200" x2="860" y2="200"/>
+          <line x1="170" y1="290" x2="860" y2="290"/>
+          <line x1="170" y1="380" x2="860" y2="380"/>
+          <line x1="170" y1="470" x2="860" y2="470"/>
+        </g>
+        <!-- Future box -->
+        <rect x="530" y="55" width="330" height="215" rx="4" fill="none" stroke="#8e1b5b" stroke-width="4"/>
+        <text x="845" y="300" text-anchor="end" font-family="Segoe UI,Sarabun,sans-serif" font-size="40" fill="#8e1b5b">Future</text>
+        <!-- Past box -->
+        <rect x="200" y="250" width="330" height="220" rx="4" fill="none" stroke="#f7941e" stroke-width="4"/>
+        <text x="515" y="440" text-anchor="end" font-family="Segoe UI,Sarabun,sans-serif" font-size="40" fill="#f7941e">Past</text>
+        <!-- Y axis (Value) -->
+        <line x1="150" y1="170" x2="150" y2="450" stroke="#4bbfc0" stroke-width="5" marker-start="url(#up)" marker-end="url(#down)"/>
+        <text x="120" y="150" text-anchor="middle" font-family="Segoe UI,Sarabun,sans-serif" font-size="26" font-weight="700" fill="#1e3a5f" transform="rotate(-90 120 150)">More</text>
+        <text x="120" y="470" text-anchor="middle" font-family="Segoe UI,Sarabun,sans-serif" font-size="26" font-weight="700" fill="#1e3a5f" transform="rotate(-90 120 470)">Less</text>
+        <text x="70" y="310" text-anchor="middle" font-family="Segoe UI,Sarabun,sans-serif" font-size="40" fill="#1e3a5f" transform="rotate(-90 70 310)">Value</text>
+        <!-- X axis (Complexity) -->
+        <line x1="250" y1="505" x2="820" y2="505" stroke="#4bbfc0" stroke-width="5" marker-start="url(#left)" marker-end="url(#right)"/>
+        <text x="215" y="514" text-anchor="middle" font-family="Segoe UI,Sarabun,sans-serif" font-size="26" font-weight="700" fill="#b91c1c">Less</text>
+        <text x="855" y="514" text-anchor="middle" font-family="Segoe UI,Sarabun,sans-serif" font-size="26" font-weight="700" fill="#b91c1c">More</text>
+        <text x="535" y="550" text-anchor="middle" font-family="Segoe UI,Sarabun,sans-serif" font-size="40" fill="#b91c1c">Complexity</text>
+        <!-- bubbles -->
+        <g font-family="Segoe UI,Sarabun,sans-serif" font-weight="700" fill="#fff" text-anchor="middle">
+          <circle cx="290" cy="415" r="58" fill="#1ca3de"/><text x="290" y="422" font-size="19">Descriptive</text>
+          <circle cx="430" cy="350" r="66" fill="#f7941e"/><text x="430" y="357" font-size="20">Diagnostic</text>
+          <circle cx="640" cy="205" r="66" fill="#8c8ce8"/><text x="640" y="212" font-size="20">Predictive</text>
+          <circle cx="780" cy="140" r="60" fill="#3aa6a0"/><text x="780" y="147" font-size="19">Prescriptive</text>
+        </g>
+        <defs>
+          <marker id="up" markerWidth="12" markerHeight="12" refX="6" refY="9" orient="auto"><path d="M6 0 L12 9 L0 9 Z" fill="#4bbfc0"/></marker>
+          <marker id="down" markerWidth="12" markerHeight="12" refX="6" refY="3" orient="auto"><path d="M6 12 L0 3 L12 3 Z" fill="#4bbfc0"/></marker>
+          <marker id="left" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M0 6 L9 0 L9 12 Z" fill="#4bbfc0"/></marker>
+          <marker id="right" markerWidth="12" markerHeight="12" refX="3" refY="6" orient="auto"><path d="M12 6 L3 0 L3 12 Z" fill="#4bbfc0"/></marker>
+        </defs>
+      </svg>
+      <figcaption>4 ระดับของการวิเคราะห์บนแกน <b>Value</b> (คุณค่า) และ <b>Complexity</b> (ความซับซ้อน) — กล่อง <b style="color:#f7941e">Past</b> มองอดีต ส่วนกล่อง <b style="color:#8e1b5b">Future</b> มองอนาคต</figcaption>
+    </figure>
 
     <div class="lvl-tabs" id="lvlTabs">
       <div class="lvl-tab on" data-l="1"><div class="lv" style="color:var(--blue)">ระดับ 1</div><div class="name">Descriptive</div><div class="q">เกิดอะไรขึ้น?</div></div>
@@ -434,10 +591,10 @@
   <div class="card">
     <span class="kicker">ทบทวนความเข้าใจ</span>
     <h2>📝 แบบทดสอบท้ายบท</h2>
-    <p class="muted">มี 6 ข้อ · เลือกคำตอบแล้วดูเฉลยและคำอธิบายทันที ทำได้เรื่อย ๆ ไม่จำกัดครั้ง</p>
+    <p class="muted">มี 10 ข้อ · เลือกคำตอบแล้วดูเฉลยและคำอธิบายทันที ทำได้เรื่อย ๆ ไม่จำกัดครั้ง</p>
     <div id="quiz"></div>
     <div class="scorebox" id="scorebox">
-      <div class="big" id="scoreBig">0/6</div>
+      <div class="big" id="scoreBig">0/10</div>
       <div id="scoreMsg"></div>
       <button class="btn ghost" style="margin-top:14px;background:#fff" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
     </div>
@@ -630,7 +787,19 @@ const quiz=[
    a:1,e:'COUNTIF ใช้ "นับแบบมีเงื่อนไข" — นับเฉพาะช่องที่ตรงกับเงื่อนไข "A"'},
   {q:'ในช่วง B2:B7 มีตัวเลข 5 ช่องและช่องว่าง 1 ช่อง ผลของ =COUNT(B2:B7) คือเท่าใด?',
    opts:['6','5','1','0'],
-   a:1,e:'COUNT นับเฉพาะช่องที่เป็น "ตัวเลข" เท่านั้น จึงได้ 5 (ช่องว่างไม่ถูกนับ) — ต่างจาก COUNTA ที่นับช่องไม่ว่างทั้งหมด'}
+   a:1,e:'COUNT นับเฉพาะช่องที่เป็น "ตัวเลข" เท่านั้น จึงได้ 5 (ช่องว่างไม่ถูกนับ) — ต่างจาก COUNTA ที่นับช่องไม่ว่างทั้งหมด'},
+  {q:'"พยากรณ์ว่าอีก 3 เดือนข้างหน้า ผลผลิตเมล่อนน่าจะได้ประมาณ 650 กก./เดือน จากข้อมูลย้อนหลัง 2 ปี" — เป็นการวิเคราะห์ระดับใด?',
+   opts:['Descriptive','Diagnostic','Predictive','Prescriptive'],
+   a:2,e:'การใช้ข้อมูลอดีตสร้างแบบจำลองเพื่อ "ทำนายอนาคต" (What will happen?) คือ Predictive Analytics'},
+  {q:'"ระบบแนะนำให้เพิ่มพื้นที่จัดเก็บ 20% และจองรถห้องเย็นเพิ่ม 2 คัน หลังพยากรณ์ว่าผลผลิตจะเพิ่มขึ้น" — เป็นการวิเคราะห์ระดับใด?',
+   opts:['Descriptive','Diagnostic','Predictive','Prescriptive'],
+   a:3,e:'การ "แนะนำว่าควรทำอย่างไร" (How to make it happen?) เพื่อผลลัพธ์ที่ดีที่สุด คือ Prescriptive Analytics — ระดับสูงสุด'},
+  {q:'ต้องการหาผลผลิตรวมเฉพาะแปลงที่ปลูก "มะเขือเทศ" (ชนิดพืชอยู่ใน B2:B11, ผลผลิตอยู่ใน D2:D11) ควรใช้สูตรใด?',
+   opts:['=SUM(D2:D11)','=SUMIF(B2:B11,"มะเขือเทศ",D2:D11)','=COUNTIF(B2:B11,"มะเขือเทศ")','=IF(B2="มะเขือเทศ",D2,0)'],
+   a:1,e:'SUMIF = รวมแบบมีเงื่อนไข: เช็คเงื่อนไขใน B2:B11 แล้วบวกค่าจาก D2:D11 เฉพาะแถวที่ตรงเงื่อนไข — ส่วน COUNTIF แค่ "นับ" ไม่ได้รวมค่า'},
+  {q:'แปลง A10 บันทึกผลผลิต = 0 (เสียหายทั้งแปลง) ข้อใดกล่าวถูกต้อง?',
+   opts:['ค่า 0 กับช่องว่าง (blank) มีความหมายเหมือนกัน','COUNTBLANK จะนับแปลง A10 ด้วย','ค่า 0 คือ "มีข้อมูลว่าผลผลิตเป็นศูนย์" ส่วนช่องว่างคือ "ไม่มีข้อมูล" — ความหมายต่างกัน','ควรลบแถว A10 ทิ้งก่อนวิเคราะห์เสมอ'],
+   a:2,e:'0 ≠ ว่าง! ค่า 0 คือข้อมูลจริง (เสียหายทั้งแปลง — เป็นประเด็นให้วิเคราะห์ต่อแบบ Diagnostic) ส่วนช่องว่างคือข้อมูลขาดหาย — การแยกแยะสองอย่างนี้คือหัวใจของ "คุณภาพข้อมูล"'}
 ];
 let answered=Array(quiz.length).fill(false), score=0;
 function renderQuiz(){
@@ -666,7 +835,7 @@ function showScore(){
   document.getElementById('scoreBig').textContent=score+'/'+quiz.length;
   let msg;
   if(score===quiz.length) msg='🎉 ยอดเยี่ยม! เข้าใจเนื้อหาครั้งที่ 1 ครบถ้วน';
-  else if(score>=4) msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็เพอร์เฟกต์';
+  else if(score>=7) msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็เพอร์เฟกต์';
   else msg='📖 ลองกลับไปทบทวนหัวข้อ 4 ระดับ และฟังก์ชัน Excel อีกครั้งนะ';
   document.getElementById('scoreMsg').textContent=msg;
   sb.scrollIntoView({behavior:'smooth'});
