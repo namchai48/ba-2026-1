@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 1 (สื่อทบทวน Interactive)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --bg2:#1e293b; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif;
+    color:var(--ink); background:#f1f5f9; line-height:1.65;
+  }
+  a{color:var(--brand2)}
+  /* ---------- Top bar ---------- */
+  header.top{
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+    background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{
+    background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 12px;
+    border-radius:999px; cursor:pointer; font-size:13.5px; font-weight:600; transition:.15s; font-family:inherit;
+  }
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  /* ---------- Layout ---------- */
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{
+    background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none;
+  }
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  /* ---------- Process flow ---------- */
+  .flow{display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin-top:10px}
+  .flow .step{flex:1; min-width:150px; text-align:center; padding:16px 12px; border:2px dashed var(--line); border-radius:14px; margin:6px; cursor:pointer; transition:.2s; background:#fff}
+  .flow .step:hover{border-color:var(--brand); transform:translateY(-3px)}
+  .flow .step.on{border-style:solid; border-color:var(--brand); background:var(--brand-soft)}
+  .flow .step .ic{font-size:30px}
+  .flow .step .t{font-weight:800; margin-top:6px}
+  .flow-detail{margin-top:14px; padding:16px; border-left:4px solid var(--brand); background:#f0fdf4; border-radius:0 12px 12px 0; min-height:60px}
+  /* ---------- 4 levels ---------- */
+  .lvl-tabs{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px}
+  .lvl-tab{border:2px solid var(--line); border-radius:14px; padding:14px 10px; cursor:pointer; text-align:center; transition:.18s; background:#fff}
+  .lvl-tab:hover{transform:translateY(-3px)}
+  .lvl-tab .lv{font-size:11px; font-weight:800; letter-spacing:.5px}
+  .lvl-tab .name{font-weight:800; font-size:15px; margin-top:2px}
+  .lvl-tab .q{font-size:12px; color:var(--muted)}
+  .lvl-tab[data-l="1"].on{border-color:var(--blue); background:#eff6ff}
+  .lvl-tab[data-l="2"].on{border-color:var(--amber); background:#fffbeb}
+  .lvl-tab[data-l="3"].on{border-color:var(--violet); background:#f5f3ff}
+  .lvl-tab[data-l="4"].on{border-color:var(--brand); background:#f0fdf4}
+  .lvl-body{border:1px solid var(--line); border-radius:16px; padding:22px; background:#fff}
+  .lvl-body .tag{display:inline-block; font-weight:800; font-size:12px; padding:4px 12px; border-radius:999px; color:#fff}
+  .lvl-body ul{margin:.4em 0; padding-left:1.1em}
+  .lvl-body li{margin:.25em 0}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .valuebar{height:10px; border-radius:999px; background:#e2e8f0; margin-top:16px; overflow:hidden}
+  .valuebar > div{height:100%; border-radius:999px; transition:width .5s}
+  /* ---------- Excel explorer ---------- */
+  .xl-wrap{display:grid; grid-template-columns:1.1fr 1fr; gap:20px}
+  @media(max-width:720px){.xl-wrap{grid-template-columns:1fr}}
+  table.xl{border-collapse:collapse; width:100%; font-size:14px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 10px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700}
+  table.xl td.rowh{background:#f1f5f9; font-weight:700}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .fx{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px; font-family:"Consolas",monospace; font-size:14px; margin-top:10px}
+  .fx .formula{color:#4ade80}
+  .fx .res{color:#fde047; font-weight:700; font-size:18px}
+  .fx .desc{color:#94a3b8; font-size:13px; margin-top:8px; font-family:inherit}
+  /* ---------- Quiz ---------- */
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .controls-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px}
+  .slider-row{display:flex; align-items:center; gap:14px; margin:10px 0}
+  .slider-row label{min-width:170px; font-weight:600; font-size:14px}
+  input[type=range]{flex:1; accent-color:var(--brand)}
+  .val{font-weight:800; color:var(--brand2); min-width:70px; text-align:right}
+  .note{font-size:13px; color:var(--muted)}
+  .nav-next{display:flex; justify-content:flex-end; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  /* grading */
+  .revise-note{background:#fffbeb; border:1px solid #fde68a; border-left:4px solid var(--amber); border-radius:10px; padding:11px 14px; font-size:14px; color:#92400e; margin-bottom:16px}
+  .grade-grid{display:grid; grid-template-columns:1fr 1.2fr; gap:20px; align-items:start}
+  @media(max-width:720px){.grade-grid{grid-template-columns:1fr}}
+  table.gtbl{border-collapse:collapse; width:100%; font-size:14px}
+  table.gtbl th, table.gtbl td{border:1px solid #cbd5e1; padding:8px 12px; text-align:left}
+  table.gtbl th{background:#3b7a8c; color:#fff; font-weight:700}
+  table.gtbl td:nth-child(2){text-align:center; font-weight:600}
+  table.gtbl tr:nth-child(even) td{background:#f8fafc}
+  table.gtbl tr.tot td{background:var(--brand-soft); font-weight:800; color:var(--brand2)}
+  .checkin-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; margin-top:6px}
+  @media(max-width:720px){.checkin-grid{grid-template-columns:1fr}}
+  .checkin-calc{border:1px solid var(--line); border-radius:14px; padding:18px; background:#fbfdfb}
+  .checkin-calc .fld{font-weight:600; font-size:14px; margin-bottom:8px; display:block; color:#334155}
+  .checkin-calc input[type=range]{width:100%; accent-color:var(--brand)}
+  .calc-out{text-align:center; margin-top:14px}
+  .calc-score{font-size:52px; font-weight:800; line-height:1; color:var(--brand2)}
+  .calc-unit{font-size:13px; color:var(--muted)}
+  .calc-msg{margin-top:12px; text-align:center; font-weight:600; font-size:14px; padding:8px; border-radius:10px}
+  table.gtbl tr.on td{background:#dcfce7 !important; font-weight:700}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 1</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">Analytics คืออะไร</button>
+      <button data-p="2">4 ระดับ</button>
+      <button data-p="3">กราฟโต้ตอบ</button>
+      <button data-p="4">Excel</button>
+      <button data-p="5">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ============ PAGE 0 : OVERVIEW ============ -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">Introduction &amp; Basic Excel</span>
+    <h1>ครั้งที่ 1 — เริ่มต้นกับการวิเคราะห์ข้อมูล</h1>
+    <p class="lead muted">สื่อประกอบการบรรยาย + ใช้ทบทวนเองได้ ถ้าเรียนในห้องไม่ทัน<br>
+    ปรับตัวอย่างให้เข้ากับบริบท <b style="color:#bbf7d0">Smart Farm / เกษตรอัจฉริยะ</b></p>
+    <div class="controls-row" style="margin-top:18px">
+      <button class="btn" onclick="go(1)">เริ่มบทเรียน →</button>
+      <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(5)">ลองทำแบบทดสอบ</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">สิ่งที่จะได้เรียนวันนี้</span>
+    <h2>🌱 เนื้อหาคาบแรก</h2>
+    <div class="grid g4" style="margin-top:8px">
+      <div class="tile"><div class="n">1</div><b>Data Analytics คืออะไร</b><div class="muted" style="font-size:13.5px">ความหมายและกระบวนการวิเคราะห์ข้อมูล 4 ขั้น</div></div>
+      <div class="tile"><div class="n">2</div><b>ประเภท 4 ระดับ</b><div class="muted" style="font-size:13.5px">Descriptive → Diagnostic → Predictive → Prescriptive</div></div>
+      <div class="tile"><div class="n">3</div><b>กราฟข้อมูลฟาร์ม</b><div class="muted" style="font-size:13.5px">ลองปรับค่าและดูผลลัพธ์แบบโต้ตอบ</div></div>
+      <div class="tile"><div class="n">4</div><b>เครื่องมือ Excel</b><div class="muted" style="font-size:13.5px">SUM, AVERAGE, IF, COUNTIF และอื่น ๆ</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">ผู้สอน</span>
+    <h2>👨‍🏫 Namchai Sokai (P'Jack)</h2>
+    <p class="muted" style="margin-top:0">Lecturer, Faculty of Logistics — Burapha University · <a href="mailto:namchai.so@go.buu.ac.th">namchai.so@go.buu.ac.th</a></p>
+    <div class="grid g2">
+      <div class="tile"><b>การศึกษา</b><div class="muted" style="font-size:13.5px">วท.บ. วิศวกรรมซอฟต์แวร์ · วท.ม. การจัดการโลจิสติกส์และโซ่อุปทาน — ม.บูรพา</div></div>
+      <div class="tile"><b>ประสบการณ์ต่างประเทศ</b><div class="muted" style="font-size:13.5px">IIPP, Lean Smart Manufacturing Lab — National Formosa University, ไต้หวัน</div></div>
+    </div>
+    <div class="example-box" style="margin-top:14px">
+      <span class="lbl">คำอธิบายรายวิชา</span>
+      <p style="margin:.4em 0 0">การประยุกต์ใช้เทคนิคทางด้านการวิเคราะห์ข้อมูลทางธุรกิจ เพื่อเพิ่มประสิทธิภาพในการจัดการโลจิสติกส์ ให้เกิดความได้เปรียบเชิงแข่งขัน และวิเคราะห์ธุรกิจที่ประสบความสำเร็จจากการนำกลยุทธ์ที่ได้จากข้อมูลมาปฏิบัติจริง</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">เกณฑ์การประเมิน</span>
+    <h2>📋 เกณฑ์การให้คะแนน</h2>
+    <div class="revise-note">⚠️ หมายเหตุ: สัดส่วนคะแนนและเกณฑ์นี้เป็นค่าเริ่มต้น <b>อาจมีการปรับแก้ไขได้ในอนาคต</b> ผู้สอนจะแจ้งให้ทราบล่วงหน้า</div>
+
+    <div class="grade-grid">
+      <div>
+        <h3>สัดส่วนคะแนน (Grading Rubric)</h3>
+        <table class="gtbl">
+          <thead><tr><th>องค์ประกอบ</th><th>สัดส่วน</th></tr></thead>
+          <tbody>
+            <tr><td>Attendance (เข้าเรียน)</td><td>5%</td></tr>
+            <tr><td>Assignment</td><td>10%</td></tr>
+            <tr><td>Project 1</td><td>15%</td></tr>
+            <tr><td>Project 2</td><td>25%</td></tr>
+            <tr><td>Mid-Term Examination</td><td>25%</td></tr>
+            <tr><td>Final Examination</td><td>20%</td></tr>
+            <tr class="tot"><td>รวม</td><td>100%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3>เกณฑ์ตัดเกรด (Score → Grade)</h3>
+        <table class="gtbl">
+          <thead><tr><th>Score (%)</th><th>Grade</th><th>Score (%)</th><th>Grade</th></tr></thead>
+          <tbody>
+            <tr><td>&ge; 80</td><td><b>A</b></td><td>&ge; 60</td><td><b>C</b></td></tr>
+            <tr><td>&ge; 75</td><td><b>B+</b></td><td>&ge; 55</td><td><b>D+</b></td></tr>
+            <tr><td>&ge; 70</td><td><b>B</b></td><td>&ge; 50</td><td><b>D</b></td></tr>
+            <tr><td>&ge; 65</td><td><b>C+</b></td><td>&lt; 50</td><td><b>F</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>🙋 เกณฑ์การเช็คชื่อเข้าชั้นเรียน (Check-in) — เต็ม 5 คะแนน</h3>
+    <p class="muted" style="margin-top:0">ขาดเรียนได้ไม่เกิน 2 ครั้งโดยไม่เสียคะแนน · เกินจากนั้นคะแนนจะลดตามตาราง — ลองปรับจำนวนครั้งที่ขาดเพื่อดูคะแนนที่เหลือ</p>
+    <div class="checkin-grid">
+      <table class="gtbl">
+        <thead><tr><th>จำนวนครั้งที่ขาด</th><th>คะแนนที่เหลือ</th></tr></thead>
+        <tbody>
+          <tr data-a="0"><td>0 – 2 ครั้ง</td><td>5 คะแนน (เต็ม)</td></tr>
+          <tr data-a="3"><td>ขาดครั้งที่ 3</td><td>3 คะแนน</td></tr>
+          <tr data-a="4"><td>ขาดครั้งที่ 4</td><td>1 คะแนน</td></tr>
+          <tr data-a="5"><td>ขาดตั้งแต่ 5 ครั้งขึ้นไป</td><td>0 คะแนน</td></tr>
+        </tbody>
+      </table>
+      <div class="checkin-calc">
+        <label class="fld">ลากเพื่อกำหนดจำนวนครั้งที่ขาด: <b id="absN">0</b> ครั้ง</label>
+        <input type="range" id="absRange" min="0" max="6" value="0" step="1">
+        <div class="calc-out">
+          <div class="calc-score" id="absScore">5</div>
+          <div class="calc-unit">คะแนน (จาก 5)</div>
+        </div>
+        <div class="calc-msg" id="absMsg"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PAGE 1 : WHAT IS DA ============ -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">แนวคิดหลัก</span>
+    <h2>🔍 Data Analytics คืออะไร?</h2>
+    <p class="lead">กระบวนการตั้งแต่การ <b>เก็บรวบรวม → แปลง → จัดการข้อมูล</b> เพื่อหาความสัมพันธ์หรือสรุปผลที่ช่วยในการ <b>ตัดสินใจ</b> โดยใช้เครื่องมือตั้งแต่กราฟ แผนภูมิ ไปจนถึง Machine Learning — วิเคราะห์ข้อมูลอดีตและปัจจุบันเพื่อคาดการณ์อนาคต</p>
+
+    <h3>👇 คลิกแต่ละขั้นเพื่อดูตัวอย่างในฟาร์ม</h3>
+    <div class="flow" id="flow">
+      <div class="step on" data-s="0"><div class="ic">📥</div><div class="t">1. เก็บรวบรวม</div></div>
+      <div class="step" data-s="1"><div class="ic">🔧</div><div class="t">2. แปลงข้อมูล</div></div>
+      <div class="step" data-s="2"><div class="ic">🔗</div><div class="t">3. หาความสัมพันธ์</div></div>
+      <div class="step" data-s="3"><div class="ic">✅</div><div class="t">4. สรุป &amp; ตัดสินใจ</div></div>
+    </div>
+    <div class="flow-detail" id="flowDetail"></div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">ทำไมต้องเรียน</span>
+    <h2>🚜 ข้อมูลอยู่รอบตัวเราในฟาร์ม</h2>
+    <p class="muted">ฟาร์มอัจฉริยะเต็มไปด้วยข้อมูลที่ยังไม่ถูกใช้ประโยชน์ การวิเคราะห์ช่วยเปลี่ยน "ตัวเลขดิบ" ให้เป็น "การตัดสินใจ"</p>
+    <div class="grid g3">
+      <div class="tile"><b>🌡️ เซนเซอร์ IoT</b><div class="muted" style="font-size:13.5px">อุณหภูมิ ความชื้นดิน ความชื้นอากาศ ทุก 5 นาที</div></div>
+      <div class="tile"><b>💧 การให้น้ำ/ปุ๋ย</b><div class="muted" style="font-size:13.5px">ปริมาณ เวลา ต้นทุนต่อรอบการปลูก</div></div>
+      <div class="tile"><b>📦 ผลผลิต &amp; ยอดขาย</b><div class="muted" style="font-size:13.5px">น้ำหนักเก็บเกี่ยว ราคาขาย ของเสีย</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn" onclick="go(2)">ถัดไป: 4 ระดับของ Analytics →</button></div>
+</section>
+
+<!-- ============ PAGE 2 : 4 LEVELS ============ -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">กรอบแนวคิด</span>
+    <h2>📊 ประเภทของ Data Analytics — 4 ระดับ</h2>
+    <p class="muted">ยิ่งระดับสูงขึ้น ยิ่งให้ <b>คุณค่า</b> และ <b>ความซับซ้อน</b> มากขึ้น · คลิกแต่ละระดับเพื่อดูรายละเอียด (ตัวอย่างฟาร์มเมล่อน/ผัก)</p>
+
+    <div class="lvl-tabs" id="lvlTabs">
+      <div class="lvl-tab on" data-l="1"><div class="lv" style="color:var(--blue)">ระดับ 1</div><div class="name">Descriptive</div><div class="q">เกิดอะไรขึ้น?</div></div>
+      <div class="lvl-tab" data-l="2"><div class="lv" style="color:var(--amber)">ระดับ 2</div><div class="name">Diagnostic</div><div class="q">ทำไมจึงเกิด?</div></div>
+      <div class="lvl-tab" data-l="3"><div class="lv" style="color:var(--violet)">ระดับ 3</div><div class="name">Predictive</div><div class="q">จะเกิดอะไรขึ้น?</div></div>
+      <div class="lvl-tab" data-l="4"><div class="lv" style="color:var(--brand)">ระดับ 4</div><div class="name">Prescriptive</div><div class="q">ควรทำอย่างไร?</div></div>
+    </div>
+
+    <div class="lvl-body" id="lvlBody"></div>
+
+    <div style="margin-top:16px" class="note">📈 แกนคุณค่า / ความสามารถในการวิเคราะห์ (Analytics Capability →)</div>
+    <div class="valuebar"><div id="valBar"></div></div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">สรุปให้จำง่าย</span>
+    <h2>🧠 4 คำถามที่ต้องจำ</h2>
+    <div class="grid g4">
+      <div class="tile" style="border-color:#bfdbfe"><b style="color:var(--blue)">What happened?</b><div class="muted" style="font-size:13px">Descriptive — สรุปอดีต</div></div>
+      <div class="tile" style="border-color:#fde68a"><b style="color:var(--amber)">Why?</b><div class="muted" style="font-size:13px">Diagnostic — หาสาเหตุ</div></div>
+      <div class="tile" style="border-color:#ddd6fe"><b style="color:var(--violet)">What will happen?</b><div class="muted" style="font-size:13px">Predictive — ทำนาย</div></div>
+      <div class="tile" style="border-color:#bbf7d0"><b style="color:var(--brand)">How to make it happen?</b><div class="muted" style="font-size:13px">Prescriptive — แนะนำ</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn" onclick="go(3)">ถัดไป: ห้องทดลองกราฟ →</button></div>
+</section>
+
+<!-- ============ PAGE 3 : INTERACTIVE CHART ============ -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">Descriptive Analytics ในทางปฏิบัติ</span>
+    <h2>📈 ห้องทดลองกราฟข้อมูลฟาร์ม</h2>
+    <p class="muted">ข้อมูลจำลอง: ผลผลิตเมล่อน (กก.) ราย 6 เดือนของฟาร์ม ลองเปลี่ยนมุมมองและปรับค่าดูว่ากราฟเปลี่ยนอย่างไร — นี่คือหัวใจของการ "อธิบายว่าเกิดอะไรขึ้น"</p>
+
+    <div class="controls-row">
+      <button class="btn sm chartbtn on" data-type="bar">📊 กราฟแท่ง</button>
+      <button class="btn sm ghost chartbtn" data-type="line">📈 กราฟเส้น</button>
+      <button class="btn sm ghost chartbtn" data-type="doughnut">🍩 สัดส่วน</button>
+    </div>
+
+    <div class="slider-row">
+      <label>ปรับผลผลิตเดือน มิ.ย. (กก.)</label>
+      <input type="range" id="sJun" min="0" max="1200" value="620" step="20">
+      <span class="val" id="vJun">620</span>
+    </div>
+    <div class="slider-row">
+      <label>ราคาขายเฉลี่ย (บาท/กก.)</label>
+      <input type="range" id="sPrice" min="20" max="120" value="65" step="5">
+      <span class="val" id="vPrice">65</span>
+    </div>
+
+    <div style="height:340px; margin-top:6px"><canvas id="farmChart"></canvas></div>
+
+    <div class="grid g4" style="margin-top:16px">
+      <div class="tile" style="text-align:center"><div class="muted" style="font-size:12px">ผลรวม (SUM)</div><div style="font-size:22px;font-weight:800;color:var(--brand2)" id="mSum">–</div><div class="note">กก.</div></div>
+      <div class="tile" style="text-align:center"><div class="muted" style="font-size:12px">เฉลี่ย (AVERAGE)</div><div style="font-size:22px;font-weight:800;color:var(--blue)" id="mAvg">–</div><div class="note">กก./เดือน</div></div>
+      <div class="tile" style="text-align:center"><div class="muted" style="font-size:12px">สูงสุด (MAX)</div><div style="font-size:22px;font-weight:800;color:var(--violet)" id="mMax">–</div><div class="note">กก.</div></div>
+      <div class="tile" style="text-align:center"><div class="muted" style="font-size:12px">รายได้รวมโดยประมาณ</div><div style="font-size:22px;font-weight:800;color:var(--amber)" id="mRev">–</div><div class="note">บาท</div></div>
+    </div>
+    <p class="note" style="margin-top:12px">💡 สังเกต: ตัวเลขสรุปเหล่านี้ (SUM, AVERAGE, MAX) คือสถิติพื้นฐานของ <b>Descriptive Analytics</b> — และเป็นฟังก์ชัน Excel ที่จะได้ฝึกในหัวข้อถัดไป</p>
+  </div>
+  <div class="nav-next"><button class="btn" onclick="go(4)">ถัดไป: เครื่องมือ Excel →</button></div>
+</section>
+
+<!-- ============ PAGE 4 : EXCEL ============ -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">เครื่องมือหลักของวิชานี้</span>
+    <h2>🟩 Excel — ฟังก์ชันพื้นฐานสำหรับวิเคราะห์ข้อมูล</h2>
+    <p class="muted">คลิกฟังก์ชันด้านล่าง เพื่อดูว่ามันคำนวณอะไรจากตารางข้อมูลฟาร์มจริง ๆ</p>
+
+    <div class="xl-wrap">
+      <div>
+        <table class="xl">
+          <thead><tr><th></th><th>A<br><span style="font-weight:400;font-size:11px">แปลง</span></th><th>B<br><span style="font-weight:400;font-size:11px">ผลผลิต(กก.)</span></th><th>C<br><span style="font-weight:400;font-size:11px">เกรด</span></th></tr></thead>
+          <tbody>
+            <tr><td class="rowh">2</td><td>A1</td><td>820</td><td>A</td></tr>
+            <tr><td class="rowh">3</td><td>A2</td><td>640</td><td>B</td></tr>
+            <tr><td class="rowh">4</td><td>A3</td><td>910</td><td>A</td></tr>
+            <tr><td class="rowh">5</td><td>A4</td><td>480</td><td>C</td></tr>
+            <tr><td class="rowh">6</td><td>A5</td><td>750</td><td>A</td></tr>
+            <tr><td class="rowh">7</td><td>A6</td><td>—</td><td>B</td></tr>
+          </tbody>
+        </table>
+        <p class="note" style="margin-top:8px">ช่วง <span class="badge">B2:B7</span> คือผลผลิต · <span class="badge">C2:C7</span> คือเกรด (A6 ยังไม่มีข้อมูลผลผลิต)</p>
+      </div>
+
+      <div>
+        <div class="fn-list" id="fnList">
+          <button class="on" data-f="SUM">SUM</button>
+          <button data-f="AVERAGE">AVERAGE</button>
+          <button data-f="MAX">MAX</button>
+          <button data-f="MIN">MIN</button>
+          <button data-f="COUNT">COUNT</button>
+          <button data-f="COUNTA">COUNTA</button>
+          <button data-f="COUNTBLANK">COUNTBLANK</button>
+          <button data-f="ROUND">ROUND</button>
+          <button data-f="IF">IF</button>
+          <button data-f="COUNTIF">COUNTIF</button>
+          <button data-f="SUMIF">SUMIF</button>
+        </div>
+        <div class="fx">
+          <div><span class="muted" style="color:#64748b">=</span> <span class="formula" id="fxFormula"></span></div>
+          <div style="margin-top:8px">ผลลัพธ์ → <span class="res" id="fxResult"></span></div>
+          <div class="desc" id="fxDesc"></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:22px">📚 หมวดฟังก์ชันที่ควรจำ</h3>
+    <div class="grid g3">
+      <div class="tile"><b>Basic Math</b><div class="badge-row"><span class="badge">SUM</span><span class="badge">AVERAGE</span><span class="badge">MAX</span><span class="badge">MIN</span><span class="badge">ROUND</span></div></div>
+      <div class="tile"><b>Counting</b><div class="badge-row"><span class="badge">COUNT</span><span class="badge">COUNTA</span><span class="badge">COUNTBLANK</span><span class="badge">SUBTOTAL</span></div></div>
+      <div class="tile"><b>Logic &amp; Conditional</b><div class="badge-row"><span class="badge">IF</span><span class="badge">IFS</span><span class="badge">AND</span><span class="badge">OR</span><span class="badge">SUMIF(S)</span><span class="badge">COUNTIF(S)</span></div></div>
+    </div>
+    <div class="example-box" style="margin-top:16px">
+      <span class="lbl">แบบฝึกหัด</span>
+      <p style="margin:.4em 0 0">ดาวน์โหลดไฟล์ <b>BDA_class1</b> จาก Google Classroom แล้วทำตามที่โจทย์กำหนด — ลองใช้ฟังก์ชันข้างบนกับข้อมูลจริง</p>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn" onclick="go(5)">ถัดไป: ทำแบบทดสอบ →</button></div>
+</section>
+
+<!-- ============ PAGE 5 : QUIZ ============ -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">ทบทวนความเข้าใจ</span>
+    <h2>📝 แบบทดสอบท้ายบท</h2>
+    <p class="muted">มี 6 ข้อ · เลือกคำตอบแล้วดูเฉลยและคำอธิบายทันที ทำได้เรื่อย ๆ ไม่จำกัดครั้ง</p>
+    <div id="quiz"></div>
+    <div class="scorebox" id="scorebox">
+      <div class="big" id="scoreBig">0/6</div>
+      <div id="scoreMsg"></div>
+      <button class="btn ghost" style="margin-top:14px;background:#fff" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
+    </div>
+  </div>
+</section>
+
+<div class="foot">Business Data Analytics · ครั้งที่ 1 — Introduction &amp; Basic Excel · สื่อทบทวนสำหรับนิสิต Smart Farm<br>
+ผู้สอน Namchai Sokai (P'Jack) · คณะโลจิสติกส์ มหาวิทยาลัยบูรพา</div>
+</main>
+
+<script>
+/* ---------- Navigation ---------- */
+const pages=[...document.querySelectorAll('.page')];
+const tabBtns=[...document.querySelectorAll('#tabs button')];
+let visited=new Set([0]);
+function go(i){
+  pages.forEach(p=>p.classList.remove('active'));
+  tabBtns.forEach(b=>b.classList.remove('active'));
+  document.getElementById('p'+i).classList.add('active');
+  tabBtns[i].classList.add('active');
+  visited.add(i);
+  document.getElementById('pbar').style.width=(visited.size/6*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(i===3) buildChart();
+}
+tabBtns.forEach(b=>b.addEventListener('click',()=>go(+b.dataset.p)));
+
+/* ---------- Page 0: attendance calculator ---------- */
+(function(){
+  const rng=document.getElementById('absRange');
+  if(!rng) return;
+  const rows=[...document.querySelectorAll('.checkin-grid tr[data-a]')];
+  function score(a){ if(a<=2)return 5; if(a===3)return 3; if(a===4)return 1; return 0; }
+  function upd(){
+    const a=+rng.value, s=score(a);
+    document.getElementById('absN').textContent=a;
+    document.getElementById('absScore').textContent=s;
+    const msgEl=document.getElementById('absMsg');
+    let msg,bg,col;
+    if(a<=2){msg='✅ ยังได้คะแนนเต็ม — ขาดได้อีก '+(2-a)+' ครั้ง';bg='#dcfce7';col='#15803d';}
+    else if(a===3){msg='⚠️ เริ่มโดนหักแล้ว เหลือ 3 คะแนน';bg='#fef9c3';col='#a16207';}
+    else if(a===4){msg='⚠️ เหลือเพียง 1 คะแนน ระวังให้มาก';bg='#ffedd5';col='#c2410c';}
+    else{msg='❌ ขาดเกินเกณฑ์ คะแนนเข้าเรียนเป็น 0';bg='#fee2e2';col='#b91c1c';}
+    msgEl.textContent=msg; msgEl.style.background=bg; msgEl.style.color=col;
+    document.getElementById('absScore').style.color= s>=5?'#15803d': s>=1?'#c2410c':'#b91c1c';
+    // highlight matching table row
+    const key=a<=2?0:(a>=5?5:a);
+    rows.forEach(r=>r.classList.toggle('on',+r.dataset.a===key));
+  }
+  rng.addEventListener('input',upd); upd();
+})();
+
+/* ---------- Page 1: process flow ---------- */
+const flowData=[
+  {t:'📥 เก็บรวบรวมข้อมูล (Collect)',d:'เซนเซอร์ IoT ในโรงเรือนบันทึกอุณหภูมิ ความชื้นดิน และแสง ทุก 5 นาที รวมถึงบันทึกการให้น้ำ ปุ๋ย และน้ำหนักผลผลิตที่เก็บเกี่ยว → ได้ "ข้อมูลดิบ" จำนวนมาก'},
+  {t:'🔧 แปลงข้อมูล (Transform / Clean)',d:'จัดข้อมูลให้อยู่ในรูปตาราง ลบค่าที่ผิดพลาด (เช่น เซนเซอร์อ่านค่า -99) เติมค่าที่ขาด แปลงหน่วยให้ตรงกัน เพื่อให้พร้อมนำไปวิเคราะห์'},
+  {t:'🔗 จัดการและหาความสัมพันธ์ (Analyze)',d:'หาความเชื่อมโยง เช่น "ความชื้นดินต่ำเกินไปสัมพันธ์กับผลผลิตที่ลดลงหรือไม่" ด้วยกราฟ ตาราง หรือค่าสถิติ'},
+  {t:'✅ สรุปผลและตัดสินใจ (Decide)',d:'เปลี่ยนผลวิเคราะห์เป็นการตัดสินใจ เช่น "ควรตั้งเวลารดน้ำเพิ่มช่วงบ่าย" หรือ "โรงเรือน 3 ให้ผลผลิตดีสุด ควรขยายรูปแบบนี้"'}
+];
+const flowSteps=[...document.querySelectorAll('#flow .step')];
+function showFlow(s){
+  flowSteps.forEach(x=>x.classList.toggle('on',+x.dataset.s===s));
+  document.getElementById('flowDetail').innerHTML='<b>'+flowData[s].t+'</b><br>'+flowData[s].d;
+}
+flowSteps.forEach(x=>x.addEventListener('click',()=>showFlow(+x.dataset.s)));
+showFlow(0);
+
+/* ---------- Page 2: 4 levels ---------- */
+const levels={
+  1:{name:'Descriptive Analytics',q:'"เกิดอะไรขึ้น?" (What happened?)',color:'#2563eb',bg:'#eff6ff',val:25,
+     desc:'สรุปและอธิบายข้อมูลในอดีต เพื่อเข้าใจสิ่งที่เกิดขึ้น — ระดับพื้นฐานที่สุดของการวิเคราะห์',
+     tech:['สถิติพื้นฐาน: ค่าเฉลี่ย, มัธยฐาน, ส่วนเบี่ยงเบนมาตรฐาน','Data Visualization: กราฟแท่ง/เส้น, Pie Chart, Heat Map','Dashboard และ Report แบบเรียลไทม์'],
+     ex:'ผลผลิตเมล่อนเดือนนี้ 3,600 กก. ลดลง 10% จากเดือนก่อน · โรงเรือนที่ 3 ให้ผลผลิตสูงสุด'},
+  2:{name:'Diagnostic Analytics',q:'"ทำไมจึงเกิด?" (Why did it happen?)',color:'#d97706',bg:'#fffbeb',val:50,
+     desc:'วิเคราะห์ความสัมพันธ์ระหว่างตัวแปร เพื่อเข้าใจว่าอะไรเป็นตัวทำให้เกิดผลลัพธ์นั้น',
+     tech:['Correlation Analysis — วิเคราะห์ความสัมพันธ์ของตัวแปร','Root Cause Analysis — หาต้นตอของปัญหา','Drill-down Analysis — เจาะลึกข้อมูลแต่ละมิติ'],
+     ex:'ผลผลิตลดลง 10% เพราะช่วงต้นเดือนความชื้นดินต่ำกว่ามาตรฐาน 3 วันติด ทำให้ผลไม่โต'},
+  3:{name:'Predictive Analytics',q:'"จะเกิดอะไรขึ้น?" (What will happen?)',color:'#7c3aed',bg:'#f5f3ff',val:75,
+     desc:'ใช้ข้อมูลอดีตและปัจจุบันสร้างแบบจำลองทางคณิตศาสตร์ เพื่อทำนายสิ่งที่อาจเกิดในอนาคต',
+     tech:['Time Series Forecasting — พยากรณ์อนุกรมเวลา','Machine Learning: Regression, Classification, Clustering'],
+     ex:'พยากรณ์ว่าเดือนหน้าผลผลิตจะได้ราว 3,900 กก. · คาดว่าราคาตลาดจะขึ้นช่วงเทศกาล'},
+  4:{name:'Prescriptive Analytics',q:'"ควรทำอย่างไร?" (How to make it happen?)',color:'#16a34a',bg:'#f0fdf4',val:100,
+     desc:'ระดับสูงสุด — แนะนำแนวทางที่ควรทำเพื่อให้ได้ผลลัพธ์ที่ดีที่สุด หรือป้องกันผลลัพธ์ที่ไม่พึงประสงค์',
+     tech:['Optimization — หาคำตอบที่ดีที่สุด','Simulation — จำลองสถานการณ์','Decision Analysis & Constraint Programming'],
+     ex:'เมื่อพยากรณ์ว่าผลผลิตจะเพิ่ม 20% ระบบแนะนำให้เพิ่มรอบการให้น้ำ 1 ครั้ง/วัน และจองแรงงานเก็บเกี่ยวล่วงหน้า 5 คน'}
+};
+const lvlTabs=[...document.querySelectorAll('.lvl-tab')];
+function showLevel(l){
+  lvlTabs.forEach(t=>t.classList.toggle('on',+t.dataset.l===l));
+  const d=levels[l];
+  document.getElementById('lvlBody').innerHTML=
+    '<span class="tag" style="background:'+d.color+'">ระดับที่ '+l+' จาก 4</span> '+
+    '<h3 style="margin:.4em 0 .1em;color:'+d.color+'">'+d.name+'</h3>'+
+    '<div class="muted" style="font-weight:700;margin-bottom:8px">'+d.q+'</div>'+
+    '<p style="margin:.2em 0">'+d.desc+'</p>'+
+    '<b>เทคนิคและเครื่องมือที่ใช้</b><ul>'+d.tech.map(t=>'<li>'+t+'</li>').join('')+'</ul>'+
+    '<div class="example-box"><span class="lbl">🌱 ตัวอย่างในฟาร์ม</span><p style="margin:.3em 0 0">'+d.ex+'</p></div>';
+  const vb=document.getElementById('valBar');
+  vb.style.width=d.val+'%'; vb.style.background=d.color;
+}
+lvlTabs.forEach(t=>t.addEventListener('click',()=>showLevel(+t.dataset.l)));
+showLevel(1);
+
+/* ---------- Page 3: chart ---------- */
+const months=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.'];
+let baseData=[540,610,700,650,720,620];
+let chart=null, chartType='bar';
+const palette=['#16a34a','#2563eb','#7c3aed','#d97706','#0891b2','#db2777'];
+function currentData(){const d=baseData.slice(); d[5]=+document.getElementById('sJun').value; return d;}
+function buildChart(){
+  const ctx=document.getElementById('farmChart'); if(!ctx) return;
+  const data=currentData();
+  if(chart) chart.destroy();
+  const isPie=chartType==='doughnut';
+  chart=new Chart(ctx,{
+    type:chartType,
+    data:{labels:months,datasets:[{
+      label:'ผลผลิตเมล่อน (กก.)',data:data,
+      backgroundColor:isPie?palette:'rgba(22,163,74,.75)',
+      borderColor:'#15803d',borderWidth:isPie?2:1,
+      fill:chartType==='line'?false:true,tension:.35,pointRadius:5
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:isPie}},
+      scales:isPie?{}:{y:{beginAtZero:true,title:{display:true,text:'กิโลกรัม'}}}
+    }
+  });
+  updateStats(data);
+}
+function updateStats(data){
+  const sum=data.reduce((a,b)=>a+b,0);
+  const avg=Math.round(sum/data.length);
+  const max=Math.max(...data);
+  const price=+document.getElementById('sPrice').value;
+  document.getElementById('mSum').textContent=sum.toLocaleString();
+  document.getElementById('mAvg').textContent=avg.toLocaleString();
+  document.getElementById('mMax').textContent=max.toLocaleString();
+  document.getElementById('mRev').textContent=(sum*price).toLocaleString();
+}
+document.querySelectorAll('.chartbtn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.chartbtn').forEach(x=>{x.classList.remove('on');x.classList.add('ghost')});
+  b.classList.add('on'); b.classList.remove('ghost');
+  chartType=b.dataset.type; buildChart();
+}));
+document.getElementById('sJun').addEventListener('input',e=>{document.getElementById('vJun').textContent=e.target.value; buildChart();});
+document.getElementById('sPrice').addEventListener('input',e=>{document.getElementById('vPrice').textContent=e.target.value; updateStats(currentData());});
+
+/* ---------- Page 4: Excel explorer ---------- */
+const B=[820,640,910,480,750]; // B2:B6 (B7 blank)
+const grades=['A','B','A','C','A','B'];
+const fns={
+  SUM:{f:'SUM(B2:B7)',r:B.reduce((a,b)=>a+b,0),d:'บวกผลผลิตทุกแปลงที่มีตัวเลข (ช่องว่างถูกข้าม) → รวมได้เท่านี้'},
+  AVERAGE:{f:'AVERAGE(B2:B7)',r:Math.round(B.reduce((a,b)=>a+b,0)/B.length),d:'ค่าเฉลี่ยจาก 5 แปลงที่มีข้อมูล (หารด้วย 5 ไม่ใช่ 6 เพราะ B7 ว่าง)'},
+  MAX:{f:'MAX(B2:B7)',r:Math.max(...B),d:'ผลผลิตสูงสุดในกลุ่ม'},
+  MIN:{f:'MIN(B2:B7)',r:Math.min(...B),d:'ผลผลิตต่ำสุดในกลุ่ม'},
+  COUNT:{f:'COUNT(B2:B7)',r:5,d:'นับเฉพาะช่องที่เป็น "ตัวเลข" → ได้ 5 (B7 ว่างจึงไม่ถูกนับ)'},
+  COUNTA:{f:'COUNTA(C2:C7)',r:6,d:'นับช่องที่ "ไม่ว่าง" ทั้งหมด รวมข้อความ → เกรดมีครบ 6 ช่อง'},
+  COUNTBLANK:{f:'COUNTBLANK(B2:B7)',r:1,d:'นับช่องที่ "ว่าง" → มี 1 ช่อง (B7)'},
+  ROUND:{f:'ROUND(AVERAGE(B2:B7),0)',r:Math.round(B.reduce((a,b)=>a+b,0)/B.length),d:'ปัดค่าเฉลี่ยให้เป็นจำนวนเต็ม (ทศนิยม 0 ตำแหน่ง)'},
+  IF:{f:'IF(B2>=700,"ผ่าน","ต่ำ")',r:'"ผ่าน"',d:'ตรวจเงื่อนไข: B2=820 มากกว่า 700 จึงคืนค่า "ผ่าน"'},
+  COUNTIF:{f:'COUNTIF(C2:C7,"A")',r:3,d:'นับจำนวนแปลงที่ได้เกรด A → มี 3 แปลง'},
+  SUMIF:{f:'SUMIF(C2:C7,"A",B2:B7)',r:820+910+750,d:'บวกเฉพาะผลผลิตของแปลงที่ได้เกรด A (820+910+750)'}
+};
+function showFn(name){
+  document.querySelectorAll('#fnList button').forEach(b=>b.classList.toggle('on',b.dataset.f===name));
+  const o=fns[name];
+  document.getElementById('fxFormula').textContent=o.f;
+  document.getElementById('fxResult').textContent=(typeof o.r==='number')?o.r.toLocaleString():o.r;
+  document.getElementById('fxDesc').textContent=o.d;
+}
+document.querySelectorAll('#fnList button').forEach(b=>b.addEventListener('click',()=>showFn(b.dataset.f)));
+showFn('SUM');
+
+/* ---------- Page 5: Quiz ---------- */
+const quiz=[
+  {q:'Data Analytics คือกระบวนการหลัก ๆ เพื่ออะไร?',
+   opts:['ตกแต่งกราฟให้สวยงามอย่างเดียว','เก็บ แปลง จัดการข้อมูล เพื่อหาความสัมพันธ์และช่วยการตัดสินใจ','ลบข้อมูลเก่าทิ้งให้หมด','เขียนโปรแกรมเว็บไซต์'],
+   a:1,e:'Data Analytics คือกระบวนการตั้งแต่เก็บรวบรวม แปลง จัดการข้อมูล เพื่อหาความสัมพันธ์/สรุปผลที่ช่วย "การตัดสินใจ"'},
+  {q:'การวิเคราะห์ระดับใดตอบคำถามว่า "เกิดอะไรขึ้น?" (What happened?)',
+   opts:['Predictive','Prescriptive','Descriptive','Diagnostic'],
+   a:2,e:'Descriptive Analytics = สรุป/อธิบายข้อมูลในอดีต เป็นระดับพื้นฐานที่สุด'},
+  {q:'"ผลผลิตลดลง 10% เพราะความชื้นดินต่ำกว่ามาตรฐาน 3 วันติด" — เป็นการวิเคราะห์ระดับใด?',
+   opts:['Descriptive','Diagnostic','Predictive','Prescriptive'],
+   a:1,e:'การหา "สาเหตุ (ทำไม)" ของสิ่งที่เกิดขึ้น คือ Diagnostic Analytics'},
+  {q:'ลำดับของการวิเคราะห์ 4 ระดับจากพื้นฐานไปสูงสุดคือข้อใด?',
+   opts:['Predictive → Descriptive → Diagnostic → Prescriptive','Descriptive → Diagnostic → Predictive → Prescriptive','Diagnostic → Descriptive → Prescriptive → Predictive','Prescriptive → Predictive → Diagnostic → Descriptive'],
+   a:1,e:'ลำดับที่ถูกต้อง: Descriptive → Diagnostic → Predictive → Prescriptive (ยิ่งสูงยิ่งซับซ้อนและให้คุณค่ามากขึ้น)'},
+  {q:'ถ้าต้องการนับจำนวนแปลงที่ได้ "เกรด A" ในช่วง C2:C7 ควรใช้ฟังก์ชันใด?',
+   opts:['SUM(C2:C7)','COUNTIF(C2:C7,"A")','AVERAGE(C2:C7)','COUNTBLANK(C2:C7)'],
+   a:1,e:'COUNTIF ใช้ "นับแบบมีเงื่อนไข" — นับเฉพาะช่องที่ตรงกับเงื่อนไข "A"'},
+  {q:'ในช่วง B2:B7 มีตัวเลข 5 ช่องและช่องว่าง 1 ช่อง ผลของ =COUNT(B2:B7) คือเท่าใด?',
+   opts:['6','5','1','0'],
+   a:1,e:'COUNT นับเฉพาะช่องที่เป็น "ตัวเลข" เท่านั้น จึงได้ 5 (ช่องว่างไม่ถูกนับ) — ต่างจาก COUNTA ที่นับช่องไม่ว่างทั้งหมด'}
+];
+let answered=Array(quiz.length).fill(false), score=0;
+function renderQuiz(){
+  const box=document.getElementById('quiz'); box.innerHTML='';
+  quiz.forEach((item,qi)=>{
+    const div=document.createElement('div'); div.className='quiz-q';
+    div.innerHTML='<div class="qhead">ข้อ '+(qi+1)+'. '+item.q+'</div>';
+    item.opts.forEach((op,oi)=>{
+      const btn=document.createElement('button'); btn.className='opt'; btn.textContent=op;
+      btn.onclick=()=>pick(qi,oi,div);
+      div.appendChild(btn);
+    });
+    const ex=document.createElement('div'); ex.className='explain'; ex.id='ex'+qi; ex.textContent='💡 '+item.e;
+    div.appendChild(ex);
+    box.appendChild(div);
+  });
+}
+function pick(qi,oi,div){
+  if(answered[qi]) return;
+  answered[qi]=true;
+  const opts=[...div.querySelectorAll('.opt')];
+  opts.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===quiz[qi].a) b.classList.add('correct');
+    if(i===oi && oi!==quiz[qi].a) b.classList.add('wrong');
+  });
+  if(oi===quiz[qi].a) score++;
+  document.getElementById('ex'+qi).classList.add('show');
+  if(answered.every(x=>x)) showScore();
+}
+function showScore(){
+  const sb=document.getElementById('scorebox'); sb.classList.add('show');
+  document.getElementById('scoreBig').textContent=score+'/'+quiz.length;
+  let msg;
+  if(score===quiz.length) msg='🎉 ยอดเยี่ยม! เข้าใจเนื้อหาครั้งที่ 1 ครบถ้วน';
+  else if(score>=4) msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็เพอร์เฟกต์';
+  else msg='📖 ลองกลับไปทบทวนหัวข้อ 4 ระดับ และฟังก์ชัน Excel อีกครั้งนะ';
+  document.getElementById('scoreMsg').textContent=msg;
+  sb.scrollIntoView({behavior:'smooth'});
+}
+function resetQuiz(){
+  answered=Array(quiz.length).fill(false); score=0;
+  document.getElementById('scorebox').classList.remove('show');
+  renderQuiz();
+  document.getElementById('p5').scrollIntoView({behavior:'smooth'});
+}
+renderQuiz();
+
+/* init progress */
+document.getElementById('pbar').style.width=(1/6*100)+'%';
+</script>
+</body>
+</html>
