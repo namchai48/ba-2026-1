@@ -129,6 +129,10 @@
   .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
   .scorebox.show{display:block}
   .scorebox .big{font-size:46px; font-weight:800}
+  .qz-submit-wrap{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+  .qz-msg{margin-top:12px; font-weight:700; font-size:14px; min-height:18px}
+  .qz-msg.ok{color:#bbf7d0}
+  .qz-msg.err{color:#fecaca}
   .controls-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px}
   .slider-row{display:flex; align-items:center; gap:14px; margin:10px 0}
   .slider-row label{min-width:170px; font-weight:600; font-size:14px}
@@ -330,9 +334,9 @@
           <tbody>
             <tr><td>Attendance (เข้าเรียน)</td><td>5%</td></tr>
             <tr><td>Assignment</td><td>10%</td></tr>
-            <tr><td>Project 1</td><td>15%</td></tr>
+            <tr><td>Project 1</td><td>20%</td></tr>
             <tr><td>Project 2</td><td>25%</td></tr>
-            <tr><td>Mid-Term Examination</td><td>25%</td></tr>
+            <tr><td>Mid-Term Examination</td><td>20%</td></tr>
             <tr><td>Final Examination</td><td>20%</td></tr>
             <tr class="tot"><td>รวม</td><td>100%</td></tr>
           </tbody>
@@ -580,7 +584,8 @@
     </div>
     <div class="example-box" style="margin-top:16px">
       <span class="lbl">แบบฝึกหัด</span>
-      <p style="margin:.4em 0 0">ดาวน์โหลดไฟล์ <b>BDA_class1</b> จาก Google Classroom แล้วทำตามที่โจทย์กำหนด — ลองใช้ฟังก์ชันข้างบนกับข้อมูลจริง</p>
+      <p style="margin:.4em 0 0">ดาวน์โหลดไฟล์ <b>BDA_class1</b> จากลิงก์ด้านล่าง แล้วทำตามที่โจทย์กำหนด — ลองใช้ฟังก์ชันข้างบนกับข้อมูลจริง</p>
+      <p style="margin:.8em 0 0"><a class="btn" style="text-decoration:none;display:inline-block" href="https://drive.google.com/drive/folders/1hRPxN1vW9zIndTITzqEL1E9fhKE9i_I0?usp=sharing" target="_blank" rel="noopener">📥 ดาวน์โหลดไฟล์แบบฝึกหัด (Google Drive)</a></p>
     </div>
   </div>
   <div class="nav-next"><button class="btn" onclick="go(5)">ถัดไป: ทำแบบทดสอบ →</button></div>
@@ -596,7 +601,18 @@
     <div class="scorebox" id="scorebox">
       <div class="big" id="scoreBig">0/10</div>
       <div id="scoreMsg"></div>
-      <button class="btn ghost" style="margin-top:14px;background:#fff" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
+      <div class="qz-submit-wrap">
+        <button class="btn" id="qz_btn" style="background:#fff;color:#15803d" onclick="submitQuizScore()">📤 ส่งคะแนนเข้า Google Form</button>
+        <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
+      </div>
+      <div class="qz-msg" id="qz_msg"></div>
+      <iframe name="qz_target" id="qz_target" style="display:none" title="hidden"></iframe>
+      <form id="qz_form" action="https://docs.google.com/forms/d/e/1FAIpQLSf_zDvPCsGeSKNJXP_FRjAVoPC99kypumj6y3IEOKyon4E8NA/formResponse" method="POST" target="qz_target" style="display:none">
+        <input type="hidden" name="entry.893657035" id="qz_f_student">
+        <input type="hidden" name="entry.1362746898" id="qz_f_score">
+        <input type="hidden" name="fvv" value="1">
+        <input type="hidden" name="pageHistory" value="0">
+      </form>
     </div>
   </div>
 </section>
@@ -838,7 +854,26 @@ function showScore(){
   else if(score>=7) msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็เพอร์เฟกต์';
   else msg='📖 ลองกลับไปทบทวนหัวข้อ 4 ระดับ และฟังก์ชัน Excel อีกครั้งนะ';
   document.getElementById('scoreMsg').textContent=msg;
+  // reset submit button state for a fresh attempt
+  var qb=document.getElementById('qz_btn');
+  if(qb){ qb.disabled=false; qb.style.opacity=''; qb.style.cursor='pointer'; }
+  var qm=document.getElementById('qz_msg');
+  if(qm){
+    var sName=(document.getElementById('ci_student')||{}).value||'';
+    qm.className='qz-msg'; qm.textContent = sName ? ('พร้อมส่งในชื่อ: '+sName) : 'ℹ️ ยังไม่ได้เช็คชื่อ — ไปเลือกชื่อที่หน้าแรกก่อนส่งคะแนน';
+  }
   sb.scrollIntoView({behavior:'smooth'});
+}
+function submitQuizScore(){
+  var student=(document.getElementById('ci_student')||{}).value||'';
+  var msg=document.getElementById('qz_msg');
+  if(!student){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาไปที่หน้าแรก แล้วเลือกชื่อของคุณในส่วน "เช็คชื่อเข้าเรียน" ก่อนส่งคะแนน'; return; }
+  document.getElementById('qz_f_student').value=student;
+  document.getElementById('qz_f_score').value=score;
+  document.getElementById('qz_form').submit();
+  var btn=document.getElementById('qz_btn'); btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='default';
+  msg.className='qz-msg ok'; msg.textContent='✅ ส่งคะแนนแล้ว: '+student+' — '+score+'/'+quiz.length+' คะแนน';
+  try{ localStorage.setItem('bda1_quiz', student+' : '+score+'/'+quiz.length+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
 }
 function resetQuiz(){
   answered=Array(quiz.length).fill(false); score=0;
