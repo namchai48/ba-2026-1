@@ -883,6 +883,30 @@ function resetQuiz(){
 }
 renderQuiz();
 
+/* ---------- Page 0: Check-in (Google Form) ---------- */
+var ROSTER=["67090218 นางสาวเบญจรัตน์ กาศา","67090219 นางสาวมาริษา ชินสุข","67090220 นางสาวริลลดา อัตรา","67090221 นางสาววิจิตรา แนวคำพา","67090379 นางสาวจิรนันท์ ทองดอนน้อย","67090380 นางสาวชรินพัชร พรมกุล","67090382 นายธัญวิชญ์ แอบศรีหาด","67090383 นางสาวนิศากร จะคำรัมย์","67090384 นายบริรักษ์ ปัตตานัง","67090385 นางสาวปาลิดา อินทรคุ้มวงค์","67090386 นางสาวรุจิรดา ยอดทอง","67090387 นายวุฒิชัย ปัญจกะบุตร","67090388 นางสาวศุพิชญ์ทิญา เครือแก้ว","67090389 นางสาวสาธิดา ฤกษมงคล","67090390 นางสาวสิฐิตา บุญโยประการ","67090391 นางสาวอนัญพร ทวีพจน์","67090392 นายอนุพล นามสาม","67090393 นายก้องภพ เทินสระเกษ","67090394 นางสาวขวัญข้าว พุ่มทอง","67090395 นางสาวจิรัศยา พันธุ์ครุฑ","67090396 นายณฐนนท์ กองสุข","67090397 นายณภัทร ศิริโชติรุ่งขจร","67090398 นายณัฏฐวุฒิ พงศ์ภัคพันธุ์","67090401 นายธีรเดช โซว","67090403 นายนันทกร ธรรมวงศ์","67090404 นางสาวใบเฟิร์น บุญทูล","67090405 นางสาวปานไพลิน ชานาเมือง","67090407 นางสาวภนิดา สุทธิธรรมานันต์","67090408 นายรวิช ทองมี","67090409 นางสาวสิวพร หิรัญโท","67090410 นางสาวสุธาสินี อู่นอก","67090412 นางสาวสุภาพร แก่นการ","67090413 นางสาวหทัยภัทร รัตนรุ่งเรือง","67090414 นายอภิสิทธิ์ ตรงต่อกิจ","67090434 นายกฤตภัค ห้วยลำดวน","67090436 นายศิวนาถ ราศรีจันทร์","67090437 นางสาวกรณิศ กลั่นอักโข","67090441 นางสาวนันทิกา สะอาดประโคน","67090443 นางสาวปวีณอร เพ็งวิสาภาพพงษ์","67090445 นายรัฐภูมิ สว่างภพ"];
+(function(){
+  var sel=document.getElementById('ci_student'); if(!sel) return;
+  ROSTER.forEach(function(name){var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);});
+  // คืนค่าที่เคยเลือกไว้ เพื่อให้ค้างไว้ใช้ส่งคะแนน Quiz แม้จะรีเฟรชหน้า
+  try{ var s=localStorage.getItem('bda1_student'); if(s){ sel.value=s; } }catch(e){}
+  try{ var em=localStorage.getItem('bda1_email'); if(em){ var e=document.getElementById('ci_email'); if(e) e.value=em; } }catch(e){}
+  try{ var prev=localStorage.getItem('bda1_checkin'); if(prev){ var m=document.getElementById('ci_msg'); if(m){ m.className='ci-msg ok'; m.textContent='ℹ️ เคยเช็คชื่อจากเครื่องนี้: '+prev; } } }catch(e){}
+})();
+function submitCheckin(){
+  var email=(document.getElementById('ci_email').value||'').trim();
+  var student=document.getElementById('ci_student').value;
+  var msg=document.getElementById('ci_msg');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณากรอกอีเมลให้ถูกต้อง'; return; }
+  if(!student){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณาเลือกชื่อ–รหัสนิสิตของคุณ'; return; }
+  document.getElementById('ci_f_email').value=email;
+  document.getElementById('ci_f_student').value=student;
+  document.getElementById('ci_form').submit();
+  msg.className='ci-msg ok'; msg.textContent='✅ ส่งเช็คชื่อแล้ว: '+student+' — ค่านี้จะถูกเก็บไว้ใช้ส่งคะแนนแบบทดสอบ';
+  // ไม่เคลียร์ค่าใน input — คงค่าไว้เพื่อนำไปใช้ตอนส่ง Quiz
+  try{ localStorage.setItem('bda1_student', student); localStorage.setItem('bda1_email', email); localStorage.setItem('bda1_checkin', student+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
+
 /* init progress */
 document.getElementById('pbar').style.width=(1/6*100)+'%';
 </script>
