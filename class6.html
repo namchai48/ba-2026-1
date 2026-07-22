@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 6 (SQL for Agri Analytics · สื่อ Interactive)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.65}
+  a{color:var(--brand2)}
+  header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 11px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; transition:.15s; font-family:inherit}
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none}
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  select, input[type=text], input[type=date], input[type=number], textarea{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink)}
+  select:focus, input:focus, textarea:focus{outline:none; border-color:var(--brand)}
+  label.fld{display:block; font-weight:700; font-size:13.5px; margin-bottom:5px; color:#334155}
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row > div{flex:1; min-width:150px}
+  input[type=range]{width:100%; accent-color:var(--brand)}
+  .fx{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px 16px; font-family:"Consolas",monospace; font-size:14px; margin-top:12px; overflow-x:auto}
+  .fx .formula{color:#4ade80; white-space:pre-wrap}
+  .fx .res{color:#fde047; font-weight:700; font-size:18px}
+  .fx .desc{color:#94a3b8; font-size:13px; margin-top:8px; font-family:inherit}
+  table.xl{border-collapse:collapse; width:100%; font-size:13.5px; margin-top:10px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 9px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700; position:sticky; top:0}
+  table.xl tr:nth-child(even) td{background:#f8fafc}
+  table.xl td.hl{background:#dcfce7 !important; font-weight:700}
+  table.xl td.warn{background:#fef2f2 !important; color:#b91c1c; font-weight:700}
+  .scroll{max-height:340px; overflow:auto; border-radius:10px; border:1px solid var(--line)}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .note{font-size:13px; color:var(--muted)}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .kv .box{flex:1; min-width:120px; text-align:center; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb}
+  .kv .box .v{font-size:22px; font-weight:800; color:var(--brand2)}
+  .kv .box .l{font-size:12px; color:var(--muted)}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .steps{counter-reset:s; padding-left:0; list-style:none}
+  .steps li{position:relative; padding:10px 0 10px 42px; border-bottom:1px dashed var(--line)}
+  .steps li:before{counter-increment:s; content:counter(s); position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:9px; background:var(--brand-soft); color:var(--brand2); font-weight:800; display:grid; place-items:center; font-size:13px}
+  code{background:#f1f5f9; padding:2px 6px; border-radius:6px; font-family:"Consolas",monospace; font-size:.92em; color:#0f172a}
+  .cols2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+  .callout{border-left:4px solid var(--amber); background:#fffbeb; padding:12px 16px; border-radius:0 12px 12px 0; margin-top:14px; font-size:14.5px}
+  .callout.good{border-color:var(--brand); background:#f0fdf4}
+  .callout.bad{border-color:var(--red); background:#fef2f2}
+  .chartbox{position:relative; height:300px; margin-top:14px}
+</style>
+</head>
+<body>
+<script>
+function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th-TH',{minimumFractionDigits:d, maximumFractionDigits:d}); }
+</script>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 6</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">ฐานข้อมูล &amp; สคีมา</button>
+      <button data-p="2">SELECT / WHERE</button>
+      <button data-p="3">GROUP BY</button>
+      <button data-p="4">JOIN</button>
+      <button data-p="5">ห้องทดลองคิวรี</button>
+      <button data-p="6">ลำดับ &amp; Assignment</button>
+      <button data-p="7">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ===== PAGE 0 ===== -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">SQL for Agri Analytics</span>
+    <h1>ครั้งที่ 6 — SQL: ถามคำถามกับฐานข้อมูลฟาร์มโดยตรง</h1>
+    <p class="lead muted">Excel ไหวถึงหลักแสนแถว · Power BI ไหวถึงหลักล้าน · แต่ข้อมูลเซนเซอร์ฟาร์มจริงมี <b style="color:#bbf7d0">หลายสิบล้านแถว</b> — ต้องดึงมาเฉพาะที่ต้องการด้วย SQL<br>
+    และ SQL คือทักษะที่ปรากฏในประกาศรับสมัครงานนักวิเคราะห์ข้อมูลมากที่สุด</p>
+    <div class="row" style="margin-top:18px">
+      <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(5)">ไปห้องทดลองคิวรี</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">เป้าหมาย</span>
+    <h2>จบคาบนี้แล้วต้องเขียนได้</h2>
+    <div class="grid g2">
+      <div class="tile"><div class="n">1</div><b>อ่านสคีมาเป็น</b><div class="note">แยก Primary Key / Foreign Key และรู้ว่าตารางไหนเชื่อมกับตารางไหน</div></div>
+      <div class="tile"><div class="n">2</div><b>SELECT · WHERE · ORDER BY · LIMIT</b><div class="note">ดึงเฉพาะคอลัมน์และแถวที่ต้องการ</div></div>
+      <div class="tile"><div class="n">3</div><b>Aggregate + GROUP BY + HAVING</b><div class="note">สรุปผลผลิตรายแปลง/รายพืช/รายเดือน</div></div>
+      <div class="tile"><div class="n">4</div><b>JOIN</b><div class="note">รวมข้อมูลข้ามตาราง — เทียบเท่า Merge ใน Power Query</div></div>
+      <div class="tile"><div class="n">5</div><b>ลำดับการทำงานของ SQL</b><div class="note">รู้ว่าทำไม WHERE ใช้ alias ไม่ได้ แต่ ORDER BY ใช้ได้</div></div>
+      <div class="tile"><div class="n">6</div><b>ตอบโจทย์ธุรกิจฟาร์ม</b><div class="note">Top 5 สินค้าขายดี · อัตราส่งตรงเวลา · ล็อตของเสียเกินเกณฑ์</div></div>
+    </div>
+    <div class="callout">🛠️ <b>เครื่องมือที่ใช้ในคาบ:</b> DuckDB (ติดตั้งง่ายที่สุด รันบนเครื่องได้เลย) · SQLite Online (ไม่ต้องติดตั้ง) · BigQuery free tier (ถ้าอยากลองระดับคลาวด์)</div>
+  </div>
+
+  <div class="card">
+    <h2>ทำไมนักวิเคราะห์เกษตรต้องใช้ SQL</h2>
+    <table class="xl">
+      <tr><th>สถานการณ์</th><th>Excel</th><th>Power BI</th><th>SQL</th></tr>
+      <tr><td style="text-align:left">ข้อมูลเซนเซอร์ 40 ล้านแถว</td><td class="warn">เปิดไม่ได้</td><td>ช้ามาก</td><td class="hl">ดึงเฉพาะที่ต้องการใน 2 วินาที</td></tr>
+      <tr><td style="text-align:left">ข้อมูลอยู่บนเซิร์ฟเวอร์บริษัท</td><td class="warn">ต้อง export ก่อน</td><td>ต่อได้</td><td class="hl">ถามตรงจากต้นทาง</td></tr>
+      <tr><td style="text-align:left">ทำรายงานซ้ำทุกสัปดาห์</td><td class="warn">ทำมือใหม่</td><td>Refresh</td><td class="hl">รันสคริปต์เดิม</td></tr>
+      <tr><td style="text-align:left">ตรวจสอบว่าตัวเลขมาจากไหน</td><td class="warn">ตามรอยสูตรยาก</td><td>ปานกลาง</td><td class="hl">อ่านคิวรีก็รู้ทันที</td></tr>
+    </table>
+  </div>
+  <div class="nav-next"><span></span><button class="btn" onclick="go(1)">ถัดไป: ฐานข้อมูล &amp; สคีมา →</button></div>
+</section>
+
+<!-- ===== PAGE 1 : SCHEMA ===== -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">รู้จักข้อมูลก่อนเขียนคิวรี</span>
+    <h2>🗂️ สคีมาฐานข้อมูลฟาร์ม (agri_db)</h2>
+    <p class="lead">คลิกชื่อตารางเพื่อดูโครงสร้างและข้อมูลตัวอย่าง — คิวรีทั้งคาบใช้ฐานข้อมูลนี้</p>
+    <div class="fn-list" id="tblBtns"></div>
+    <div class="example-box">
+      <div class="lbl" id="schTitle"></div>
+      <div id="schDesc" class="note" style="margin-bottom:10px"></div>
+      <div class="scroll"><table class="xl" id="schTbl"></table></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>คีย์และความสัมพันธ์</h2>
+    <div class="fx"><div class="formula">crop (crop_id 🔑)
+   └─&lt; plot (plot_id 🔑, crop_id 🔗)
+          └─&lt; harvest (harvest_id 🔑, plot_id 🔗)
+
+customer (cust_id 🔑)
+   └─&lt; orders (order_id 🔑, cust_id 🔗)
+          └─&lt; shipment (ship_id 🔑, order_id 🔗)</div>
+      <div class="desc">🔑 Primary Key = ระบุแถวได้ไม่ซ้ำ · 🔗 Foreign Key = ชี้ไปหา Primary Key ของอีกตาราง · <code>└─&lt;</code> อ่านว่า "หนึ่งต่อหลาย"</div></div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="tile"><b>ทำไมต้องแยกตาราง?</b><div class="note">ถ้าเก็บชื่อพืชซ้ำในทุกแถวของ harvest (40 ล้านแถว) จะเปลืองพื้นที่มหาศาล และถ้าแก้ชื่อพืชต้องแก้ทุกแถว — การแยกตารางเรียกว่า <b>Normalization</b></div></div>
+      <div class="tile"><b>แล้วทำไม Power BI ถึงชอบ Star Schema?</b><div class="note">เพราะเป็นการ Normalize แบบพอดี ๆ — แยกพอให้ไม่ซ้ำซ้อน แต่ไม่แยกจนต้อง JOIN 8 ชั้น ซึ่งจะช้า</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← ย้อนกลับ</button><button class="btn" onclick="go(2)">ถัดไป: SELECT / WHERE →</button></div>
+</section>
+
+<!-- ===== PAGE 2 : SELECT ===== -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">คำสั่งพื้นฐาน</span>
+    <h2>📄 SELECT · WHERE · ORDER BY · LIMIT</h2>
+    <div class="fx"><div class="formula">SELECT   คอลัมน์ที่ต้องการ      -- เอาอะไรมาบ้าง
+FROM     ชื่อตาราง             -- จากตารางไหน
+WHERE    เงื่อนไข               -- เอาเฉพาะแถวไหน
+ORDER BY คอลัมน์ [DESC]         -- เรียงอย่างไร
+LIMIT    จำนวน                  -- เอากี่แถว</div></div>
+    <p style="margin-top:14px">กดตัวอย่างด้านล่างเพื่อรันคิวรีจริงกับตาราง <code>harvest</code></p>
+    <div class="fn-list" id="selBtns"></div>
+    <div class="fx"><div class="formula" id="selCode"></div></div>
+    <div class="scroll"><table class="xl" id="selTbl"></table></div>
+    <div class="callout" id="selNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>ตัวดำเนินการใน WHERE ที่ใช้บ่อย</h2>
+    <table class="xl">
+      <tr><th>ตัวดำเนินการ</th><th>ตัวอย่าง</th><th>ความหมายในบริบทฟาร์ม</th></tr>
+      <tr><td><code>= &lt;&gt; &gt; &lt; &gt;= &lt;=</code></td><td style="text-align:left"><code>WHERE qty_kg &gt;= 500</code></td><td style="text-align:left">ล็อตที่เก็บได้ตั้งแต่ 500 กก. ขึ้นไป</td></tr>
+      <tr><td><code>AND / OR / NOT</code></td><td style="text-align:left"><code>WHERE qty_kg &gt; 500 AND waste_kg &gt; 30</code></td><td style="text-align:left">ล็อตใหญ่ที่ของเสียก็เยอะด้วย</td></tr>
+      <tr><td><code>BETWEEN</code></td><td style="text-align:left"><code>WHERE harvest_date BETWEEN '2026-04-01' AND '2026-06-30'</code></td><td style="text-align:left">เฉพาะไตรมาส 2</td></tr>
+      <tr><td><code>IN</code></td><td style="text-align:left"><code>WHERE plot_id IN ('P01','P02','P05')</code></td><td style="text-align:left">เฉพาะแปลงที่สนใจ</td></tr>
+      <tr><td><code>LIKE</code></td><td style="text-align:left"><code>WHERE crop_name LIKE 'ผักสลัด%'</code></td><td style="text-align:left">ชื่อพืชที่ขึ้นต้นด้วย "ผักสลัด"</td></tr>
+      <tr><td><code>IS NULL</code></td><td style="text-align:left"><code>WHERE waste_kg IS NULL</code></td><td style="text-align:left">ล็อตที่ยังไม่ได้บันทึกของเสีย</td></tr>
+    </table>
+    <div class="callout bad">⚠️ <b>ผิดบ่อยมาก:</b> <code>WHERE waste_kg = NULL</code> จะไม่คืนแถวใด ๆ เลย เพราะ NULL เทียบเท่ากับอะไรไม่ได้ ต้องใช้ <code>IS NULL</code> เท่านั้น</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: GROUP BY →</button></div>
+</section>
+
+<!-- ===== PAGE 3 : GROUP BY ===== -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">สรุปข้อมูล</span>
+    <h2>📊 Aggregate + GROUP BY + HAVING</h2>
+    <div class="grid g3">
+      <div class="tile"><b><code>COUNT(*)</code></b><div class="note">นับจำนวนแถว</div></div>
+      <div class="tile"><b><code>SUM(qty_kg)</code></b><div class="note">ผลรวมผลผลิต</div></div>
+      <div class="tile"><b><code>AVG(qty_kg)</code></b><div class="note">ค่าเฉลี่ยต่อครั้ง</div></div>
+      <div class="tile"><b><code>MIN / MAX</code></b><div class="note">ค่าต่ำสุด/สูงสุด</div></div>
+      <div class="tile"><b><code>ROUND(x, 2)</code></b><div class="note">ปัดทศนิยม 2 ตำแหน่ง</div></div>
+      <div class="tile"><b><code>COUNT(DISTINCT plot_id)</code></b><div class="note">นับแปลงที่ไม่ซ้ำ</div></div>
+    </div>
+    <div class="fx" style="margin-top:14px"><div class="formula">SELECT   plot_id, SUM(qty_kg) AS total_kg
+FROM     harvest
+WHERE    harvest_date &gt;= '2026-04-01'    -- กรอง "ก่อน" จัดกลุ่ม
+GROUP BY plot_id
+HAVING   SUM(qty_kg) &gt; 1000              -- กรอง "หลัง" จัดกลุ่ม
+ORDER BY total_kg DESC
+LIMIT    5;</div>
+      <div class="desc"><b>WHERE กรองแถวดิบ · HAVING กรองผลสรุป</b> — นี่คือคำถามข้อสอบที่ออกแทบทุกครั้ง</div></div>
+    <div class="fn-list" id="grpBtns"></div>
+    <div class="fx"><div class="formula" id="grpCode"></div></div>
+    <div class="scroll"><table class="xl" id="grpTbl"></table></div>
+    <div class="callout" id="grpNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>กฎเหล็กของ GROUP BY</h2>
+    <div class="cols2">
+      <div>
+        <div class="fx"><div class="formula">-- ❌ ผิด
+SELECT plot_id, house, SUM(qty_kg)
+FROM   harvest
+GROUP BY plot_id;</div></div>
+        <div class="note">คอลัมน์ <code>house</code> อยู่ใน SELECT แต่ไม่อยู่ใน GROUP BY และไม่ได้ถูก aggregate → ฐานข้อมูลไม่รู้ว่าจะเอาค่าไหนของกลุ่ม</div>
+      </div>
+      <div>
+        <div class="fx"><div class="formula">-- ✅ ถูก
+SELECT plot_id, house, SUM(qty_kg)
+FROM   harvest
+GROUP BY plot_id, house;</div></div>
+        <div class="note">ทุกคอลัมน์ใน SELECT ต้อง <b>อยู่ใน GROUP BY</b> หรือ <b>ถูกห่อด้วยฟังก์ชัน aggregate</b> อย่างใดอย่างหนึ่งเสมอ</div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: JOIN →</button></div>
+</section>
+
+<!-- ===== PAGE 4 : JOIN ===== -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">รวมข้อมูลข้ามตาราง</span>
+    <h2>🔗 JOIN — เหมือน Merge ใน Power Query</h2>
+    <div class="fx"><div class="formula">SELECT p.plot_id, p.house, c.crop_name
+FROM   plot AS p
+<span style="color:#fde047">JOIN</span>   crop AS c  ON p.crop_id = c.crop_id;</div>
+      <div class="desc"><b>ON</b> บอกว่า "แถวไหนของสองตารางถือว่าเป็นเรื่องเดียวกัน" — มักเป็น Foreign Key = Primary Key</div></div>
+    <div class="row" style="margin-top:14px">
+      <div><label class="fld">เลือกชนิด JOIN</label>
+        <select id="joinKind">
+          <option value="inner">INNER JOIN — เฉพาะที่จับคู่ได้ทั้งสองฝั่ง</option>
+          <option value="left">LEFT JOIN — เก็บทุกแถวของตารางซ้าย</option>
+          <option value="right">RIGHT JOIN — เก็บทุกแถวของตารางขวา</option>
+          <option value="full">FULL OUTER JOIN — เก็บทุกแถวทั้งสองฝั่ง</option>
+        </select></div>
+    </div>
+    <div class="cols2" style="margin-top:14px">
+      <div><h3>plot (ซ้าย)</h3><table class="xl" id="jlTbl"></table></div>
+      <div><h3>crop (ขวา)</h3><table class="xl" id="jrTbl"></table></div>
+    </div>
+    <h3>ผลลัพธ์</h3>
+    <div class="fx"><div class="formula" id="joinCode"></div></div>
+    <div class="scroll"><table class="xl" id="joinTbl"></table></div>
+    <div class="callout" id="joinNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>JOIN หลายตาราง — โจทย์จริงของโซ่อุปทาน</h2>
+    <div class="fx"><div class="formula">-- อัตราส่งตรงเวลาแยกตามชนิดพืช
+SELECT   c.crop_name,
+         COUNT(*)                                        AS ships,
+         SUM(CASE WHEN s.on_time = 1 THEN 1 ELSE 0 END)  AS on_time_ships,
+         ROUND(100.0 * SUM(CASE WHEN s.on_time = 1 THEN 1 ELSE 0 END)
+               / COUNT(*), 1)                            AS otd_pct
+FROM     shipment s
+JOIN     orders   o ON s.order_id = o.order_id
+JOIN     crop     c ON o.crop_id  = c.crop_id
+WHERE    s.ship_date BETWEEN '2026-04-01' AND '2026-06-30'
+GROUP BY c.crop_name
+HAVING   COUNT(*) &gt;= 10
+ORDER BY otd_pct ASC;</div>
+      <div class="desc">อ่านจากล่างขึ้นบน: กรองไตรมาส 2 → รวมตาราง 3 ตาราง → จัดกลุ่มตามพืช → ตัดพืชที่ส่งน้อยกว่า 10 ครั้ง → เรียงจากแย่ที่สุดขึ้นก่อน (เพราะเราสนใจปัญหา)</div></div>
+    <div class="callout good">💡 <b>เทคนิค <code>SUM(CASE WHEN … THEN 1 ELSE 0 END)</code></b> คือวิธีมาตรฐานในการนับ "เฉพาะแถวที่เข้าเงื่อนไข" ใช้คำนวณ OTIF, Fill Rate, % ของเสีย ได้ทั้งหมด — จำแพตเทิร์นนี้ไว้ใช้ได้ตลอดชีวิตการทำงาน</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(3)">← ย้อนกลับ</button><button class="btn" onclick="go(5)">ถัดไป: ห้องทดลองคิวรี →</button></div>
+</section>
+
+<!-- ===== PAGE 5 : QUERY LAB ===== -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">ลงมือทำ</span>
+    <h2>🧪 ห้องทดลองคิวรี — ประกอบคิวรีแล้วรันจริง</h2>
+    <p class="lead">เลือกส่วนประกอบด้านล่าง ระบบจะสร้างคำสั่ง SQL ให้ดู พร้อมรันกับข้อมูลจริงในตาราง <code>harvest</code> ที่ JOIN กับ <code>plot</code> และ <code>crop</code> แล้ว</p>
+    <div class="row">
+      <div><label class="fld">จัดกลุ่มตาม (GROUP BY)</label>
+        <select id="qbGroup">
+          <option value="">— ไม่จัดกลุ่ม (ดูทั้งหมดรวมกัน) —</option>
+          <option value="house">house — โรงเรือน</option>
+          <option value="crop_name">crop_name — ชนิดพืช</option>
+          <option value="plot_id">plot_id — แปลง</option>
+          <option value="month">month — เดือน</option>
+        </select></div>
+      <div><label class="fld">คำนวณ (Aggregate)</label>
+        <select id="qbAgg">
+          <option value="sum_qty">SUM(qty_kg) — ผลผลิตรวม</option>
+          <option value="avg_qty">ROUND(AVG(qty_kg),1) — ผลผลิตเฉลี่ยต่อครั้ง</option>
+          <option value="cnt">COUNT(*) — จำนวนครั้งที่เก็บเกี่ยว</option>
+          <option value="sum_waste">SUM(waste_kg) — ของเสียรวม</option>
+          <option value="waste_pct">ROUND(100.0*SUM(waste_kg)/SUM(qty_kg),1) — % ของเสีย</option>
+          <option value="revenue">SUM(qty_kg*price_per_kg) — มูลค่าโดยประมาณ</option>
+        </select></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div><label class="fld">WHERE — กรองแถวดิบ</label>
+        <select id="qbWhere">
+          <option value="">— ไม่กรอง —</option>
+          <option value="q2">harvest_date อยู่ในไตรมาส 2</option>
+          <option value="kale">crop_name = 'เคล'</option>
+          <option value="big">qty_kg &gt;= 400</option>
+          <option value="houseB">house = 'B'</option>
+        </select></div>
+      <div><label class="fld">HAVING — กรองผลสรุป</label>
+        <select id="qbHaving">
+          <option value="">— ไม่กรอง —</option>
+          <option value="gt1000">ค่าที่คำนวณได้ &gt; 1000</option>
+          <option value="gt5">ค่าที่คำนวณได้ &gt; 5</option>
+          <option value="cnt3">COUNT(*) &gt;= 3</option>
+        </select></div>
+      <div><label class="fld">ORDER BY</label>
+        <select id="qbOrder">
+          <option value="desc">ค่าที่คำนวณได้ · มาก → น้อย</option>
+          <option value="asc">ค่าที่คำนวณได้ · น้อย → มาก</option>
+          <option value="key">ชื่อกลุ่ม (A → Z)</option>
+        </select></div>
+      <div><label class="fld">LIMIT</label>
+        <select id="qbLimit"><option value="0">ไม่จำกัด</option><option value="3">3</option><option value="5">5</option><option value="10">10</option></select></div>
+    </div>
+    <div class="fx" style="margin-top:16px"><div class="formula" id="qbCode"></div></div>
+    <div class="badge-row"><span class="badge" id="qbRows"></span><span class="badge" id="qbNote2"></span></div>
+    <div class="scroll" style="margin-top:10px"><table class="xl" id="qbTbl"></table></div>
+    <div class="callout" id="qbNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>🎯 โจทย์ท้าทาย — ลองประกอบคิวรีให้ตอบคำถามเหล่านี้</h2>
+    <ul class="steps">
+      <li><b>แปลงไหนให้ผลผลิตรวมสูงสุด 3 อันดับแรกในไตรมาส 2?</b><br><span class="note">ใบ้: GROUP BY plot_id · SUM(qty_kg) · WHERE ไตรมาส 2 · ORDER BY มาก→น้อย · LIMIT 3</span></li>
+      <li><b>ชนิดพืชใดมี % ของเสียสูงที่สุด?</b><br><span class="note">ใบ้: GROUP BY crop_name · % ของเสีย · ORDER BY มาก→น้อย</span></li>
+      <li><b>โรงเรือนไหนมีมูลค่าผลผลิตรวมมากที่สุด?</b><br><span class="note">ใบ้: GROUP BY house · SUM(qty_kg × price_per_kg)</span></li>
+      <li><b>เดือนไหนที่ % ของเสียเกิน 5?</b><br><span class="note">ใบ้: GROUP BY month · % ของเสีย · HAVING &gt; 5</span></li>
+    </ul>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: ลำดับ &amp; Assignment →</button></div>
+</section>
+
+<!-- ===== PAGE 6 : ORDER OF EXECUTION ===== -->
+<section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">เข้าใจข้อนี้แล้วดีบักได้เอง</span>
+    <h2>⚙️ SQL ทำงานตามลำดับไหน (ไม่ใช่ลำดับที่เราเขียน!)</h2>
+    <div class="cols2">
+      <div>
+        <h3>ลำดับที่เราเขียน</h3>
+        <div class="fx"><div class="formula">SELECT
+FROM
+JOIN
+WHERE
+GROUP BY
+HAVING
+ORDER BY
+LIMIT</div></div>
+      </div>
+      <div>
+        <h3>ลำดับที่ฐานข้อมูลทำงานจริง</h3>
+        <div class="fx"><div class="formula">1. FROM      เอาตารางมาก่อน
+2. JOIN      รวมตาราง
+3. WHERE     กรองแถวดิบ
+4. GROUP BY  จัดกลุ่ม
+5. HAVING    กรองกลุ่ม
+6. SELECT    เลือกคอลัมน์ + ตั้ง alias
+7. ORDER BY  เรียง
+8. LIMIT     ตัดจำนวน</div></div>
+      </div>
+    </div>
+    <div class="callout good">💡 <b>ข้อนี้อธิบายปริศนา 2 ข้อที่นักศึกษาเจอบ่อย</b><br>
+      1) ทำไม <code>WHERE total_kg &gt; 100</code> ถึง error? → เพราะ WHERE (ขั้น 3) ทำงาน <b>ก่อน</b> SELECT (ขั้น 6) ที่ตั้งชื่อ alias <code>total_kg</code> ตอนนั้น alias ยังไม่มีอยู่<br>
+      2) ทำไม <code>ORDER BY total_kg</code> ถึงใช้ได้? → เพราะ ORDER BY (ขั้น 7) ทำงาน <b>หลัง</b> SELECT alias จึงมีแล้ว</div>
+    <div class="fn-list" id="ordBtns"></div>
+    <div class="fx"><div class="formula" id="ordCode"></div></div>
+    <div class="callout" id="ordNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>📌 Assignment 1 (กลุ่ม · ส่งใน 7 วัน)</h2>
+    <p class="lead">ใช้ทักษะรวมของครึ่งเทอมแรก: Excel → Power Query → Power BI → SQL</p>
+    <ul class="steps">
+      <li><b>เตรียมข้อมูล (Power Query)</b> — รวมไฟล์เซนเซอร์ 3 โรงเรือน ทำความสะอาด และ Merge กับทะเบียนแปลง</li>
+      <li><b>คิวรี SQL อย่างน้อย 6 ข้อ</b> — ต้องมี GROUP BY, HAVING, JOIN อย่างน้อยอย่างละ 1 ข้อ พร้อมอธิบายว่าแต่ละคิวรีตอบคำถามธุรกิจอะไร</li>
+      <li><b>แดชบอร์ด Power BI 1 หน้า</b> — มี KPI การ์ด ≥ 4 ตัว (ต้องมี KPI โลจิสติกส์ ≥ 2), Time Intelligence ≥ 1 measure</li>
+      <li><b>บทวิเคราะห์ 1 หน้า</b> — เกิดอะไรขึ้น (พร้อมมูลค่าเป็นเงิน) → ทำไม (มีหลักฐานจากข้อมูล) → เสนอให้ทำอะไร</li>
+      <li><b>นำเสนอ 7 นาที</b> — เน้นข้อสรุปและข้อเสนอ ไม่ใช่การเดินชมเครื่องมือ</li>
+    </ul>
+    <div class="callout">📝 <b>เกณฑ์ให้คะแนน:</b> ความถูกต้องของข้อมูลและคิวรี 30% · การออกแบบแดชบอร์ด 25% · คุณภาพการวิเคราะห์และข้อเสนอ 30% · การนำเสนอ 15%</div>
+    <div class="callout bad">📝 <b>เตรียมสอบกลางภาค:</b> Excel (ฟังก์ชัน + PivotTable) · Power Query (ETL, Append, Merge, ลำดับขั้นตอน) · Power BI (Column vs Measure, DAX, Time Intelligence) · SQL (WHERE vs HAVING, GROUP BY, JOIN, ลำดับการทำงาน) · กรอบ Data Analytics 4 ระดับ — โจทย์ทั้งหมดอยู่ในบริบทฟาร์มและโซ่อุปทานเกษตร</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ทำแบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 7 : QUIZ ===== -->
+<section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">ทบทวน</span>
+    <h2>📝 แบบทดสอบครั้งที่ 6</h2>
+    <p class="lead">10 ข้อ · เลือกคำตอบแล้วดูเฉลยทันที</p>
+    <div id="quizWrap"></div>
+    <div class="scorebox" id="scorebox">
+      <div>คะแนนของคุณ</div>
+      <div class="big" id="scoreNum"></div>
+      <div id="scoreMsg"></div>
+      <button class="btn ghost" id="resetQuiz" style="margin-top:14px">ทำใหม่อีกครั้ง</button>
+    </div>
+  </div>
+  <div class="foot">Business Data Analytics · ครั้งที่ 6 — SQL for Agri Analytics · แขนงสมาร์ทฟาร์มมิ่งและโซ่อุปทานอัจฉริยะ</div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← กลับหน้าแรก</button><span></span></div>
+</section>
+
+</main>
+
+<script>
+/* ================= DATABASE ================= */
+var CROP = [
+ {crop_id:'C1', crop_name:'กรีนโอ๊ค', price_per_kg:78},
+ {crop_id:'C2', crop_name:'คอส',      price_per_kg:72},
+ {crop_id:'C3', crop_name:'เคล',      price_per_kg:95},
+ {crop_id:'C4', crop_name:'ร็อกเก็ต',  price_per_kg:110}
+];
+var PLOT = [
+ {plot_id:'P01', house:'A', area_rai:2.5, crop_id:'C1'},
+ {plot_id:'P02', house:'A', area_rai:1.8, crop_id:'C2'},
+ {plot_id:'P05', house:'B', area_rai:3.0, crop_id:'C3'},
+ {plot_id:'P06', house:'B', area_rai:2.2, crop_id:'C1'},
+ {plot_id:'P09', house:'C', area_rai:1.5, crop_id:'C2'},
+ {plot_id:'P12', house:'C', area_rai:2.0, crop_id:'C9'}
+];
+var HARVEST = [
+ {harvest_id:1,  plot_id:'P01', harvest_date:'2026-04-05', qty_kg:520, waste_kg:26},
+ {harvest_id:2,  plot_id:'P01', harvest_date:'2026-05-08', qty_kg:480, waste_kg:31},
+ {harvest_id:3,  plot_id:'P01', harvest_date:'2026-06-11', qty_kg:445, waste_kg:38},
+ {harvest_id:4,  plot_id:'P02', harvest_date:'2026-04-07', qty_kg:365, waste_kg:15},
+ {harvest_id:5,  plot_id:'P02', harvest_date:'2026-05-10', qty_kg:340, waste_kg:19},
+ {harvest_id:6,  plot_id:'P02', harvest_date:'2026-06-13', qty_kg:318, waste_kg:24},
+ {harvest_id:7,  plot_id:'P05', harvest_date:'2026-04-06', qty_kg:610, waste_kg:34},
+ {harvest_id:8,  plot_id:'P05', harvest_date:'2026-05-09', qty_kg:495, waste_kg:62},
+ {harvest_id:9,  plot_id:'P05', harvest_date:'2026-06-12', qty_kg:402, waste_kg:71},
+ {harvest_id:10, plot_id:'P06', harvest_date:'2026-04-08', qty_kg:455, waste_kg:25},
+ {harvest_id:11, plot_id:'P06', harvest_date:'2026-05-11', qty_kg:388, waste_kg:44},
+ {harvest_id:12, plot_id:'P06', harvest_date:'2026-06-14', qty_kg:305, waste_kg:52},
+ {harvest_id:13, plot_id:'P09', harvest_date:'2026-04-09', qty_kg:290, waste_kg:12},
+ {harvest_id:14, plot_id:'P09', harvest_date:'2026-05-12', qty_kg:276, waste_kg:14},
+ {harvest_id:15, plot_id:'P09', harvest_date:'2026-06-15', qty_kg:268, waste_kg:16},
+ {harvest_id:16, plot_id:'P12', harvest_date:'2026-04-10', qty_kg:410, waste_kg:21},
+ {harvest_id:17, plot_id:'P12', harvest_date:'2026-05-13', qty_kg:398, waste_kg:23},
+ {harvest_id:18, plot_id:'P12', harvest_date:'2026-07-02', qty_kg:376, waste_kg:27},
+ {harvest_id:19, plot_id:'P01', harvest_date:'2026-07-05', qty_kg:432, waste_kg:29},
+ {harvest_id:20, plot_id:'P05', harvest_date:'2026-07-08', qty_kg:388, waste_kg:58}
+];
+var SHIPMENT = [
+ {ship_id:1, order_id:'O101', ship_date:'2026-04-12', qty_kg:480, on_time:1},
+ {ship_id:2, order_id:'O102', ship_date:'2026-04-19', qty_kg:350, on_time:1},
+ {ship_id:3, order_id:'O103', ship_date:'2026-05-14', qty_kg:520, on_time:0},
+ {ship_id:4, order_id:'O104', ship_date:'2026-05-21', qty_kg:410, on_time:1},
+ {ship_id:5, order_id:'O105', ship_date:'2026-06-16', qty_kg:365, on_time:0}
+];
+var ORDERS = [
+ {order_id:'O101', cust_id:'K1', crop_id:'C1', order_date:'2026-04-08', qty_kg:500},
+ {order_id:'O102', cust_id:'K2', crop_id:'C2', order_date:'2026-04-15', qty_kg:350},
+ {order_id:'O103', cust_id:'K1', crop_id:'C3', order_date:'2026-05-10', qty_kg:550},
+ {order_id:'O104', cust_id:'K3', crop_id:'C1', order_date:'2026-05-17', qty_kg:410},
+ {order_id:'O105', cust_id:'K2', crop_id:'C3', order_date:'2026-06-12', qty_kg:400}
+];
+var TABLES = {
+ crop:    {desc:'ทะเบียนชนิดพืชและราคาขายมาตรฐาน · crop_id เป็น Primary Key', rows:CROP},
+ plot:    {desc:'ทะเบียนแปลงเพาะปลูก · plot_id เป็น Primary Key และ crop_id เป็น Foreign Key ชี้ไปตาราง crop', rows:PLOT},
+ harvest: {desc:'บันทึกการเก็บเกี่ยวแต่ละครั้ง — ตารางข้อเท็จจริงหลัก (Fact) ที่ใหญ่ที่สุด', rows:HARVEST},
+ orders:  {desc:'คำสั่งซื้อจากลูกค้า', rows:ORDERS},
+ shipment:{desc:'การจัดส่ง · on_time = 1 หมายถึงส่งตรงเวลา, 0 คือส่งช้า', rows:SHIPMENT}
+};
+/* join view: harvest + plot + crop */
+function joined(){
+  /* เทียบเท่า: harvest JOIN plot JOIN crop (INNER) — แถวที่จับคู่ไม่ได้จะถูกตัดออก
+     เช่น P12 ที่ crop_id = 'C9' ซึ่งไม่มีในตาราง crop */
+  return HARVEST.filter(function(h){
+    var p=PLOT.filter(function(x){return x.plot_id===h.plot_id;})[0];
+    return p && CROP.some(function(c){ return c.crop_id===p.crop_id; });
+  }).map(function(h){
+    var p=PLOT.filter(function(x){return x.plot_id===h.plot_id;})[0];
+    var c=p? CROP.filter(function(x){return x.crop_id===p.crop_id;})[0] : null;
+    return {plot_id:h.plot_id, house:p?p.house:null, area_rai:p?p.area_rai:null,
+            crop_name:c?c.crop_name:'(ไม่พบ)', price_per_kg:c?c.price_per_kg:0,
+            harvest_date:h.harvest_date, month:h.harvest_date.slice(0,7),
+            qty_kg:h.qty_kg, waste_kg:h.waste_kg};
+  });
+}
+function renderTable(elId, rows, cols, hlCol){
+  var t=document.getElementById(elId); t.innerHTML='';
+  if(!rows.length){ t.innerHTML='<tr><td class="warn">— ไม่มีแถวที่ตรงเงื่อนไข —</td></tr>'; return; }
+  cols = cols || Object.keys(rows[0]);
+  var tr=document.createElement('tr');
+  cols.forEach(function(c){ var th=document.createElement('th'); th.textContent=c; tr.appendChild(th); });
+  t.appendChild(tr);
+  rows.forEach(function(r){
+    var tr2=document.createElement('tr');
+    cols.forEach(function(c){
+      var td=document.createElement('td');
+      var v=r[c];
+      td.textContent = (v===null||v===undefined)? 'NULL' : v;
+      if(v===null||v===undefined) td.className='warn';
+      else if(c===hlCol) td.className='hl';
+      tr2.appendChild(td);
+    });
+    t.appendChild(tr2);
+  });
+}
+
+/* ================= PAGE 1 : schema browser ================= */
+var tb=document.getElementById('tblBtns');
+Object.keys(TABLES).forEach(function(name,i){
+  var b=document.createElement('button'); b.textContent=name;
+  if(i===0) b.classList.add('on');
+  b.addEventListener('click', function(){
+    tb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    document.getElementById('schTitle').textContent='ตาราง '+name+' ('+TABLES[name].rows.length+' แถว)';
+    document.getElementById('schDesc').innerHTML=TABLES[name].desc;
+    renderTable('schTbl', TABLES[name].rows);
+  });
+  tb.appendChild(b);
+  if(i===0) setTimeout(function(){ b.click(); },0);
+});
+
+/* ================= PAGE 2 : SELECT examples ================= */
+var SELS=[
+ {n:'ดูทุกคอลัมน์', code:'SELECT *\nFROM   harvest\nLIMIT  8;',
+  run:function(){ return HARVEST.slice(0,8); },
+  note:'<code>*</code> = ทุกคอลัมน์ · สะดวกตอนสำรวจข้อมูล แต่ <b>ในงานจริงควรระบุชื่อคอลัมน์</b> เพื่อความเร็วและความชัดเจน'},
+ {n:'เลือกบางคอลัมน์', code:'SELECT plot_id, harvest_date, qty_kg\nFROM   harvest\nLIMIT  8;',
+  run:function(){ return HARVEST.slice(0,8).map(function(r){ return {plot_id:r.plot_id, harvest_date:r.harvest_date, qty_kg:r.qty_kg}; }); },
+  note:'ดึงเฉพาะที่ต้องใช้ — ในตารางจริง 40 ล้านแถว การตัดคอลัมน์ทิ้งช่วยลดเวลาได้มาก'},
+ {n:'กรองด้วย WHERE', code:"SELECT plot_id, harvest_date, qty_kg\nFROM   harvest\nWHERE  qty_kg >= 450;",
+  run:function(){ return HARVEST.filter(function(r){return r.qty_kg>=450;}).map(function(r){ return {plot_id:r.plot_id, harvest_date:r.harvest_date, qty_kg:r.qty_kg}; }); },
+  note:'เหลือเฉพาะล็อตใหญ่ตั้งแต่ 450 กก. ขึ้นไป'},
+ {n:'เงื่อนไขซ้อนด้วย AND', code:"SELECT plot_id, harvest_date, qty_kg, waste_kg\nFROM   harvest\nWHERE  qty_kg >= 400\n  AND  waste_kg > 40;",
+  run:function(){ return HARVEST.filter(function(r){return r.qty_kg>=400 && r.waste_kg>40;}); },
+  note:'ล็อตใหญ่ที่ของเสียก็สูงด้วย — เป็นกลุ่มที่เสียหายเป็นมูลค่ามากที่สุด ควรตรวจสอบก่อน'},
+ {n:'BETWEEN (ช่วงวันที่)', code:"SELECT plot_id, harvest_date, qty_kg\nFROM   harvest\nWHERE  harvest_date BETWEEN '2026-04-01' AND '2026-06-30';",
+  run:function(){ return HARVEST.filter(function(r){return r.harvest_date>='2026-04-01' && r.harvest_date<='2026-06-30';})
+        .map(function(r){ return {plot_id:r.plot_id, harvest_date:r.harvest_date, qty_kg:r.qty_kg}; }); },
+  note:'BETWEEN รวมค่าปลายทั้งสองข้าง · สังเกตว่าล็อตเดือน ก.ค. หายไปแล้ว'},
+ {n:'IN (หลายค่า)', code:"SELECT plot_id, harvest_date, qty_kg\nFROM   harvest\nWHERE  plot_id IN ('P05','P06');",
+  run:function(){ return HARVEST.filter(function(r){return ['P05','P06'].indexOf(r.plot_id)>=0;})
+        .map(function(r){ return {plot_id:r.plot_id, harvest_date:r.harvest_date, qty_kg:r.qty_kg}; }); },
+  note:'สั้นกว่าการเขียน <code>plot_id = \'P05\' OR plot_id = \'P06\'</code> และอ่านง่ายกว่ามากเมื่อมีหลายค่า'},
+ {n:'ORDER BY + LIMIT', code:'SELECT plot_id, harvest_date, qty_kg\nFROM   harvest\nORDER BY qty_kg DESC\nLIMIT  5;',
+  run:function(){ return HARVEST.slice().sort(function(a,b){return b.qty_kg-a.qty_kg;}).slice(0,5)
+        .map(function(r){ return {plot_id:r.plot_id, harvest_date:r.harvest_date, qty_kg:r.qty_kg}; }); },
+  note:'แพตเทิร์น "Top N" ที่ใช้บ่อยที่สุด — <code>DESC</code> = มากไปน้อย, ไม่ใส่ = น้อยไปมาก (ASC)'}
+];
+var sb=document.getElementById('selBtns');
+SELS.forEach(function(s,i){
+  var b=document.createElement('button'); b.textContent=s.n;
+  if(i===0) b.classList.add('on');
+  b.addEventListener('click', function(){
+    sb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    document.getElementById('selCode').textContent=s.code;
+    var rows=s.run();
+    renderTable('selTbl', rows);
+    document.getElementById('selNote').innerHTML='คืนมา <b>'+rows.length+' แถว</b> · '+s.note;
+  });
+  sb.appendChild(b);
+  if(i===0) setTimeout(function(){ b.click(); },0);
+});
+
+/* ================= PAGE 3 : GROUP BY examples ================= */
+function groupBy(rows, key){
+  var m={}, order=[];
+  rows.forEach(function(r){ var k=r[key]; if(!(k in m)){ m[k]=[]; order.push(k); } m[k].push(r); });
+  return order.map(function(k){ return {key:k, rows:m[k]}; });
+}
+var GRPS=[
+ {n:'นับจำนวนแถว', code:'SELECT COUNT(*) AS n_harvest\nFROM   harvest;',
+  run:function(){ return [{n_harvest:HARVEST.length}]; },
+  note:'Aggregate โดยไม่มี GROUP BY = ยุบทั้งตารางเหลือแถวเดียว'},
+ {n:'ผลผลิตรวมรายแปลง', code:'SELECT   plot_id, SUM(qty_kg) AS total_kg\nFROM     harvest\nGROUP BY plot_id\nORDER BY total_kg DESC;',
+  run:function(){ return groupBy(HARVEST,'plot_id').map(function(g){
+        return {plot_id:g.key, total_kg:g.rows.reduce(function(a,r){return a+r.qty_kg;},0)}; })
+        .sort(function(a,b){return b.total_kg-a.total_kg;}); },
+  note:'GROUP BY ยุบแถวที่มี plot_id เดียวกันให้เหลือแถวเดียว แล้ว SUM รวมค่าในกลุ่ม'},
+ {n:'เฉลี่ย + นับ พร้อมกัน', code:'SELECT   plot_id,\n         COUNT(*)              AS n_times,\n         ROUND(AVG(qty_kg),1)  AS avg_kg,\n         MAX(qty_kg)           AS best_kg\nFROM     harvest\nGROUP BY plot_id;',
+  run:function(){ return groupBy(HARVEST,'plot_id').map(function(g){
+        var q=g.rows.map(function(r){return r.qty_kg;});
+        return {plot_id:g.key, n_times:q.length,
+                avg_kg:Math.round(q.reduce(function(a,b){return a+b;},0)/q.length*10)/10,
+                best_kg:Math.max.apply(null,q)}; }); },
+  note:'ใส่ aggregate หลายตัวในคิวรีเดียวได้ — ประหยัดกว่าการรันหลายรอบ'},
+ {n:'WHERE (กรองก่อนจัดกลุ่ม)', code:"SELECT   plot_id, SUM(qty_kg) AS total_kg\nFROM     harvest\nWHERE    harvest_date BETWEEN '2026-04-01' AND '2026-06-30'\nGROUP BY plot_id\nORDER BY total_kg DESC;",
+  run:function(){ var f=HARVEST.filter(function(r){return r.harvest_date<='2026-06-30';});
+        return groupBy(f,'plot_id').map(function(g){
+        return {plot_id:g.key, total_kg:g.rows.reduce(function(a,r){return a+r.qty_kg;},0)}; })
+        .sort(function(a,b){return b.total_kg-a.total_kg;}); },
+  note:'WHERE ตัดล็อตเดือน ก.ค. ออก <b>ก่อน</b> ที่จะนำมาบวกกัน → ผลรวมของ P01, P05, P12 ลดลงจากคิวรีก่อนหน้า'},
+ {n:'HAVING (กรองหลังจัดกลุ่ม)', code:'SELECT   plot_id, SUM(qty_kg) AS total_kg\nFROM     harvest\nGROUP BY plot_id\nHAVING   SUM(qty_kg) > 1200\nORDER BY total_kg DESC;',
+  run:function(){ return groupBy(HARVEST,'plot_id').map(function(g){
+        return {plot_id:g.key, total_kg:g.rows.reduce(function(a,r){return a+r.qty_kg;},0)}; })
+        .filter(function(r){return r.total_kg>1200;})
+        .sort(function(a,b){return b.total_kg-a.total_kg;}); },
+  note:'HAVING ทำงาน <b>หลัง</b> GROUP BY จึงใช้เงื่อนไขกับผลรวมได้ · ถ้าเขียน <code>WHERE SUM(qty_kg) > 1200</code> จะ error ทันที'},
+ {n:'% ของเสียรายแปลง', code:'SELECT   plot_id,\n         SUM(qty_kg)   AS total_kg,\n         SUM(waste_kg) AS total_waste,\n         ROUND(100.0*SUM(waste_kg)/SUM(qty_kg),1) AS waste_pct\nFROM     harvest\nGROUP BY plot_id\nORDER BY waste_pct DESC;',
+  run:function(){ return groupBy(HARVEST,'plot_id').map(function(g){
+        var q=g.rows.reduce(function(a,r){return a+r.qty_kg;},0);
+        var w=g.rows.reduce(function(a,r){return a+r.waste_kg;},0);
+        return {plot_id:g.key, total_kg:q, total_waste:w, waste_pct:Math.round(1000*w/q)/10}; })
+        .sort(function(a,b){return b.waste_pct-a.waste_pct;}); },
+  note:'<b>ต้องหารผลรวมด้วยผลรวม ไม่ใช่เฉลี่ยของอัตราส่วน</b> · สังเกตว่า P05 และ P06 (โรงเรือน B) ของเสียสูงกว่าแปลงอื่นชัดเจน — สอดคล้องกับเคสในคาบที่ 5 · ใส่ <code>100.0</code> ไม่ใช่ <code>100</code> เพื่อบังคับให้หารแบบทศนิยม'}
+];
+var gb=document.getElementById('grpBtns');
+GRPS.forEach(function(s,i){
+  var b=document.createElement('button'); b.textContent=s.n;
+  if(i===0) b.classList.add('on');
+  b.addEventListener('click', function(){
+    gb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    document.getElementById('grpCode').textContent=s.code;
+    var rows=s.run();
+    renderTable('grpTbl', rows);
+    document.getElementById('grpNote').innerHTML='คืนมา <b>'+rows.length+' แถว</b> · '+s.note;
+  });
+  gb.appendChild(b);
+  if(i===0) setTimeout(function(){ b.click(); },0);
+});
+
+/* ================= PAGE 4 : JOIN ================= */
+renderTable('jlTbl', PLOT, ['plot_id','house','crop_id']);
+renderTable('jrTbl', CROP, ['crop_id','crop_name','price_per_kg']);
+function buildJoin(){
+  var k=document.getElementById('joinKind').value;
+  var kw={inner:'JOIN', left:'LEFT JOIN', right:'RIGHT JOIN', full:'FULL OUTER JOIN'}[k];
+  document.getElementById('joinCode').textContent =
+    'SELECT p.plot_id, p.house, p.crop_id, c.crop_name, c.price_per_kg\nFROM   plot AS p\n'+kw+' crop AS c ON p.crop_id = c.crop_id;';
+  var out=[];
+  var cmap={}; CROP.forEach(function(c){ cmap[c.crop_id]=c; });
+  var used={};
+  if(k!=='right'){
+    PLOT.forEach(function(p){
+      var c=cmap[p.crop_id];
+      if(k==='inner' && !c) return;
+      if(c) used[c.crop_id]=1;
+      out.push({plot_id:p.plot_id, house:p.house, crop_id:p.crop_id,
+                crop_name:c?c.crop_name:null, price_per_kg:c?c.price_per_kg:null});
+    });
+  }
+  if(k==='right'||k==='full'){
+    CROP.forEach(function(c){
+      var matched = PLOT.some(function(p){ return p.crop_id===c.crop_id; });
+      if(k==='right'){
+        PLOT.filter(function(p){return p.crop_id===c.crop_id;}).forEach(function(p){
+          out.push({plot_id:p.plot_id, house:p.house, crop_id:p.crop_id, crop_name:c.crop_name, price_per_kg:c.price_per_kg});
+        });
+        if(!matched) out.push({plot_id:null, house:null, crop_id:null, crop_name:c.crop_name, price_per_kg:c.price_per_kg});
+      } else if(!matched){
+        out.push({plot_id:null, house:null, crop_id:null, crop_name:c.crop_name, price_per_kg:c.price_per_kg});
+      }
+    });
+  }
+  renderTable('joinTbl', out, ['plot_id','house','crop_id','crop_name','price_per_kg']);
+  var notes={
+    inner:'<b>INNER JOIN</b> คืน 5 แถว — แปลง P12 <b>หายไป</b> เพราะ crop_id = C9 ไม่มีในตาราง crop (ข้อมูลไม่สมบูรณ์) · ⚠️ นี่คืออันตรายที่พบบ่อยที่สุด: ข้อมูลหายเงียบ ๆ โดยไม่มีคำเตือน',
+    left:'<b>LEFT JOIN</b> คืน 6 แถว — เก็บทุกแปลงไว้ครบ แปลง P12 ยังอยู่แต่ crop_name เป็น <code>NULL</code> · ✅ ปลอดภัยกว่าเมื่อไม่อยากให้ข้อมูลหาย และช่วยให้เห็นปัญหาคุณภาพข้อมูลทันที',
+    right:'<b>RIGHT JOIN</b> ยึดตาราง crop เป็นหลัก — จะเห็นว่า "ร็อกเก็ต" (C4) มีในทะเบียนพืชแต่ยังไม่มีแปลงไหนปลูก · ใช้ตรวจว่ามีข้อมูลอ้างอิงตัวไหนที่ยังไม่ถูกใช้งาน',
+    full:'<b>FULL OUTER JOIN</b> เก็บทุกอย่าง — ได้ทั้งแปลง P12 ที่ไม่มีชนิดพืช และพืชร็อกเก็ตที่ไม่มีแปลง · ใช้ตรวจความครบถ้วนของข้อมูลสองฝั่งพร้อมกัน (บาง DBMS เช่น MySQL รุ่นเก่าไม่รองรับ ต้องใช้ UNION แทน)'
+  };
+  document.getElementById('joinNote').innerHTML = notes[k]+'<br><br>ผลลัพธ์: <b>'+out.length+' แถว</b>';
+}
+document.getElementById('joinKind').addEventListener('change', buildJoin);
+buildJoin();
+
+/* ================= PAGE 5 : query builder ================= */
+var AGGS={
+ sum_qty:  {sql:'SUM(qty_kg)', alias:'total_kg',   f:function(rs){ return rs.reduce(function(a,r){return a+r.qty_kg;},0); }},
+ avg_qty:  {sql:'ROUND(AVG(qty_kg),1)', alias:'avg_kg', f:function(rs){ return Math.round(rs.reduce(function(a,r){return a+r.qty_kg;},0)/rs.length*10)/10; }},
+ cnt:      {sql:'COUNT(*)', alias:'n_rows',       f:function(rs){ return rs.length; }},
+ sum_waste:{sql:'SUM(waste_kg)', alias:'total_waste', f:function(rs){ return rs.reduce(function(a,r){return a+r.waste_kg;},0); }},
+ waste_pct:{sql:'ROUND(100.0*SUM(waste_kg)/SUM(qty_kg),1)', alias:'waste_pct',
+            f:function(rs){ var q=rs.reduce(function(a,r){return a+r.qty_kg;},0);
+                            var w=rs.reduce(function(a,r){return a+r.waste_kg;},0);
+                            return q? Math.round(1000*w/q)/10 : 0; }},
+ revenue:  {sql:'SUM(qty_kg*price_per_kg)', alias:'revenue_baht',
+            f:function(rs){ return rs.reduce(function(a,r){return a+r.qty_kg*r.price_per_kg;},0); }}
+};
+var WHERES={
+ '':    {sql:null, f:function(){ return true; }},
+ q2:    {sql:"harvest_date BETWEEN '2026-04-01' AND '2026-06-30'", f:function(r){ return r.harvest_date>='2026-04-01' && r.harvest_date<='2026-06-30'; }},
+ kale:  {sql:"crop_name = 'เคล'", f:function(r){ return r.crop_name==='เคล'; }},
+ big:   {sql:'qty_kg >= 400', f:function(r){ return r.qty_kg>=400; }},
+ houseB:{sql:"house = 'B'", f:function(r){ return r.house==='B'; }}
+};
+function runQB(){
+  var g=document.getElementById('qbGroup').value,
+      aK=document.getElementById('qbAgg').value,
+      wK=document.getElementById('qbWhere').value,
+      hK=document.getElementById('qbHaving').value,
+      oK=document.getElementById('qbOrder').value,
+      lim=+document.getElementById('qbLimit').value;
+  var A=AGGS[aK], W=WHERES[wK];
+  var rows=joined().filter(W.f);
+  var res;
+  if(g){
+    res = groupBy(rows, g).map(function(gr){
+      var o={}; o[g]=gr.key; o[A.alias]=A.f(gr.rows); o.__n=gr.rows.length; return o;
+    });
+  } else {
+    var o={}; o[A.alias]=rows.length? A.f(rows):0; o.__n=rows.length; res=[o];
+  }
+  var havingSql=null;
+  if(hK==='gt1000'){ res=res.filter(function(r){return r[A.alias]>1000;}); havingSql=A.sql+' > 1000'; }
+  if(hK==='gt5'){    res=res.filter(function(r){return r[A.alias]>5;});    havingSql=A.sql+' > 5'; }
+  if(hK==='cnt3'){   res=res.filter(function(r){return r.__n>=3;});        havingSql='COUNT(*) >= 3'; }
+  if(oK==='desc') res.sort(function(a,b){ return b[A.alias]-a[A.alias]; });
+  if(oK==='asc')  res.sort(function(a,b){ return a[A.alias]-b[A.alias]; });
+  if(oK==='key' && g) res.sort(function(a,b){ return String(a[g]).localeCompare(String(b[g]),'th'); });
+  if(lim) res=res.slice(0,lim);
+  // build SQL text
+  var sel = g ? '         '+g+',\n         '+A.sql+' AS '+A.alias : '         '+A.sql+' AS '+A.alias;
+  var q = 'SELECT\n'+sel+'\nFROM     harvest h\nJOIN     plot p ON h.plot_id = p.plot_id\nJOIN     crop c ON p.crop_id = c.crop_id';
+  if(W.sql) q += '\nWHERE    '+W.sql;
+  if(g)     q += '\nGROUP BY '+g;
+  if(havingSql) q += '\nHAVING   '+havingSql;
+  if(oK==='desc') q += '\nORDER BY '+A.alias+' DESC';
+  if(oK==='asc')  q += '\nORDER BY '+A.alias+' ASC';
+  if(oK==='key' && g) q += '\nORDER BY '+g;
+  if(lim) q += '\nLIMIT    '+lim;
+  q += ';';
+  document.getElementById('qbCode').textContent=q;
+  var cols = g? [g, A.alias] : [A.alias];
+  var dec1 = (aK==='waste_pct'||aK==='avg_qty');
+  renderTable('qbTbl', res.map(function(r){
+    var o={}; cols.forEach(function(c){ o[c] = (c===A.alias && dec1) ? Number(r[c]).toFixed(1) : r[c]; }); return o;
+  }), cols, A.alias);
+  document.getElementById('qbRows').textContent='ผลลัพธ์: '+res.length+' แถว';
+  document.getElementById('qbNote2').textContent='แถวดิบหลัง WHERE: '+rows.length+' / '+HARVEST.length;
+  var msgs=[];
+  if(!g) msgs.push('ไม่ได้จัดกลุ่ม → aggregate ยุบทุกแถวเหลือค่าเดียว');
+  if(wK && g) msgs.push('WHERE ตัดแถวดิบทิ้งก่อน แล้วค่อยจัดกลุ่ม — ผลรวมของแต่ละกลุ่มจึงเล็กลง');
+  if(hK) msgs.push('HAVING ตัดกลุ่มทิ้ง <b>หลัง</b> คำนวณเสร็จแล้ว — สังเกตว่าจำนวนแถวผลลัพธ์ลดลง แต่ค่าในแต่ละกลุ่มไม่เปลี่ยน');
+  if(!g) {} 
+  if(!res.length) msgs.push('⚠️ ไม่มีแถวใดผ่านเงื่อนไข — ลองผ่อน HAVING หรือ WHERE ลง');
+  if(aK==='waste_pct') msgs.push('% ของเสียคำนวณจาก SUM(waste)/SUM(qty) ไม่ใช่ AVG ของอัตราส่วนรายแถว — ผลต่างกันเสมอเมื่อขนาดล็อตไม่เท่ากัน');
+  document.getElementById('qbNote').innerHTML = msgs.length? msgs.join('<br>') : 'ลองเปลี่ยนตัวเลือกด้านบนแล้วสังเกตว่าคำสั่ง SQL เปลี่ยนไปอย่างไร';
+}
+['qbGroup','qbAgg','qbWhere','qbHaving','qbOrder','qbLimit'].forEach(function(id){
+  document.getElementById(id).addEventListener('change', runQB);
+});
+runQB();
+
+/* ================= PAGE 6 : execution order ================= */
+var ORDS=[
+ {n:'❌ ใช้ alias ใน WHERE', code:'SELECT   plot_id, SUM(qty_kg) AS total_kg\nFROM     harvest\nWHERE    total_kg > 1000        -- ❌ ERROR\nGROUP BY plot_id;',
+  note:'<b>error: column "total_kg" does not exist</b> · WHERE ทำงานขั้นที่ 3 แต่ alias ถูกสร้างใน SELECT ขั้นที่ 6 · แก้โดยใช้ <code>HAVING SUM(qty_kg) > 1000</code>'},
+ {n:'✅ ใช้ alias ใน ORDER BY', code:'SELECT   plot_id, SUM(qty_kg) AS total_kg\nFROM     harvest\nGROUP BY plot_id\nORDER BY total_kg DESC;    -- ✅ ใช้ได้',
+  note:'ORDER BY ทำงานขั้นที่ 7 ซึ่งอยู่หลัง SELECT ขั้นที่ 6 ตอนนั้น alias มีอยู่แล้ว จึงอ้างถึงได้'},
+ {n:'❌ ใช้ aggregate ใน WHERE', code:'SELECT   plot_id\nFROM     harvest\nWHERE    COUNT(*) > 2       -- ❌ ERROR\nGROUP BY plot_id;',
+  note:'WHERE กรองทีละแถวดิบ ตอนนั้นยังไม่มีการจัดกลุ่ม จึงยังนับไม่ได้ · แก้โดยย้ายไป <code>HAVING COUNT(*) > 2</code>'},
+ {n:'✅ WHERE + HAVING ใช้คู่กัน', code:"SELECT   plot_id, SUM(qty_kg) AS total_kg\nFROM     harvest\nWHERE    harvest_date >= '2026-04-01'   -- กรองแถวดิบ\nGROUP BY plot_id\nHAVING   SUM(qty_kg) > 1000              -- กรองกลุ่ม\nORDER BY total_kg DESC;",
+  note:'✅ แพตเทิร์นมาตรฐาน: <b>WHERE ลดข้อมูลก่อน</b> (เร็วกว่ามากในตารางใหญ่) แล้ว <b>HAVING คัดกลุ่มทีหลัง</b>'}
+];
+var ob=document.getElementById('ordBtns');
+ORDS.forEach(function(s,i){
+  var b=document.createElement('button'); b.textContent=s.n;
+  if(i===0) b.classList.add('on');
+  b.addEventListener('click', function(){
+    ob.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    document.getElementById('ordCode').textContent=s.code;
+    document.getElementById('ordNote').innerHTML=s.note;
+  });
+  ob.appendChild(b);
+  if(i===0) setTimeout(function(){ b.click(); },0);
+});
+
+/* ================= QUIZ ================= */
+var QUIZ=[
+ {q:'คำสั่งใดใช้กรองแถวดิบ "ก่อน" การจัดกลุ่ม?',
+  a:['HAVING','WHERE','ORDER BY','LIMIT'],
+  c:1, e:'WHERE ทำงานก่อน GROUP BY จึงกรองแถวดิบ ส่วน HAVING ทำงานหลัง GROUP BY จึงใช้กรองผลสรุปของแต่ละกลุ่ม การใช้ WHERE ก่อนยังช่วยให้คิวรีเร็วขึ้นมากในตารางใหญ่'},
+ {q:'คิวรีใดจะเกิด error?',
+  a:['SELECT plot_id, SUM(qty_kg) AS total FROM harvest GROUP BY plot_id ORDER BY total DESC','SELECT plot_id, SUM(qty_kg) AS total FROM harvest WHERE total > 1000 GROUP BY plot_id','SELECT plot_id, SUM(qty_kg) FROM harvest GROUP BY plot_id HAVING SUM(qty_kg) > 1000','SELECT * FROM harvest WHERE qty_kg > 400'],
+  c:1, e:'alias ที่ตั้งใน SELECT ถูกสร้างในขั้นที่ 6 แต่ WHERE ทำงานในขั้นที่ 3 จึงยังไม่รู้จัก total · ต้องเขียนเป็น HAVING SUM(qty_kg) > 1000 แทน'},
+ {q:'ต้องการหาแถวที่ยังไม่ได้บันทึกของเสีย ควรเขียนอย่างไร?',
+  a:['WHERE waste_kg = NULL','WHERE waste_kg IS NULL','WHERE waste_kg = 0','WHERE waste_kg <> 0'],
+  c:1, e:'NULL หมายถึง "ไม่มีค่า" จึงเปรียบเทียบด้วย = ไม่ได้ (ผลลัพธ์เป็น unknown เสมอ) ต้องใช้ IS NULL · และ NULL ต่างจาก 0 ซึ่งเป็นค่าที่บันทึกไว้จริงว่าไม่มีของเสีย'},
+ {q:'ตาราง plot มี 6 แถว แต่ INNER JOIN กับ crop แล้วเหลือ 5 แถว สาเหตุคือ?',
+  a:['crop มีข้อมูลซ้ำ','มี plot 1 แถวที่ crop_id ไม่มีอยู่ในตาราง crop','เขียนคิวรีผิด syntax','INNER JOIN ตัดแถวแรกทิ้งเสมอ'],
+  c:1, e:'INNER JOIN คืนเฉพาะแถวที่จับคู่ได้ทั้งสองฝั่ง แถวที่มี Foreign Key ชี้ไปหาค่าที่ไม่มีอยู่จริงจะหายไปเงียบ ๆ · ถ้าไม่อยากให้ข้อมูลหาย ให้ใช้ LEFT JOIN แล้วจะเห็นเป็น NULL แทน'},
+ {q:'ต้องการนับจำนวนคำสั่งซื้อที่ส่งตรงเวลาในคิวรีเดียวกับจำนวนทั้งหมด ควรใช้อะไร?',
+  a:['COUNT(on_time)','SUM(CASE WHEN on_time = 1 THEN 1 ELSE 0 END)','AVG(on_time) * COUNT(*)','MAX(on_time)'],
+  c:1, e:'SUM(CASE WHEN … THEN 1 ELSE 0 END) เป็นแพตเทิร์นมาตรฐานสำหรับนับเฉพาะแถวที่เข้าเงื่อนไข ใช้คำนวณ OTIF, Fill Rate, % ของเสียได้ทั้งหมด · หมายเหตุ COUNT(on_time) จะนับทุกแถวที่ค่าไม่เป็น NULL รวมทั้งแถวที่ค่าเป็น 0 ด้วย'},
+ {q:'ลำดับการทำงานจริงของ SQL ข้อใดถูกต้อง?',
+  a:['SELECT → FROM → WHERE → GROUP BY','FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY','WHERE → FROM → SELECT → ORDER BY','GROUP BY → FROM → WHERE → SELECT'],
+  c:1, e:'ฐานข้อมูลเริ่มจากหาตารางก่อน (FROM/JOIN) → กรองแถว (WHERE) → จัดกลุ่ม (GROUP BY) → กรองกลุ่ม (HAVING) → เลือกคอลัมน์และตั้ง alias (SELECT) → เรียง (ORDER BY) → ตัดจำนวน (LIMIT)'},
+ {q:'ข้อใดคือการคำนวณ % ของเสียรายแปลงที่ถูกต้อง?',
+  a:['AVG(waste_kg / qty_kg) * 100','100.0 * SUM(waste_kg) / SUM(qty_kg)','SUM(waste_kg) / COUNT(*)','MAX(waste_kg) / MAX(qty_kg) * 100'],
+  c:1, e:'ต้องหารผลรวมด้วยผลรวม เพราะการเฉลี่ยอัตราส่วนรายแถวจะให้น้ำหนักล็อตเล็กเท่ากับล็อตใหญ่ · และต้องเขียน 100.0 (ไม่ใช่ 100) ในบางฐานข้อมูล เพื่อบังคับการหารแบบทศนิยม'},
+ {q:'ข้อใดคือกฎของ GROUP BY?',
+  a:['ทุกคอลัมน์ใน SELECT ต้องอยู่ใน GROUP BY หรือถูกห่อด้วยฟังก์ชัน aggregate','GROUP BY ต้องมาก่อน WHERE เสมอ','GROUP BY ใช้ได้กับคอลัมน์ตัวเลขเท่านั้น','ต้องมี ORDER BY ทุกครั้งที่ใช้ GROUP BY'],
+  c:0, e:'ถ้ามีคอลัมน์ที่ไม่ได้จัดกลุ่มและไม่ได้ aggregate ฐานข้อมูลจะไม่รู้ว่าควรแสดงค่าไหนของกลุ่มนั้น จึงเกิด error (บางระบบเช่น MySQL โหมดผ่อนปรนจะไม่ error แต่จะให้ค่าที่คาดเดาไม่ได้ ซึ่งอันตรายกว่า)'},
+ {q:'ต้องการดู 5 แปลงที่ให้ผลผลิตรวมสูงสุด ควรเขียนท้ายคิวรีอย่างไร?',
+  a:['ORDER BY total_kg ASC LIMIT 5','ORDER BY total_kg DESC LIMIT 5','LIMIT 5 ORDER BY total_kg DESC','HAVING total_kg = MAX(total_kg)'],
+  c:1, e:'DESC เรียงจากมากไปน้อย แล้ว LIMIT ตัดเอา 5 แถวแรก · ลำดับการเขียนต้องเป็น ORDER BY ก่อน LIMIT เสมอ เพราะ LIMIT ทำงานเป็นขั้นสุดท้าย'},
+ {q:'เพราะเหตุใดจึงแยกชื่อพืชไปไว้ตาราง crop แทนที่จะเก็บซ้ำในทุกแถวของ harvest?',
+  a:['เพื่อให้คิวรีสั้นลง','เพื่อลดความซ้ำซ้อน ประหยัดพื้นที่ และแก้ไขข้อมูลได้ที่เดียว (Normalization)','เพราะ SQL ห้ามเก็บข้อความในตารางใหญ่','เพื่อให้ JOIN ได้เยอะขึ้น'],
+  c:1, e:'Normalization ลดการเก็บข้อมูลซ้ำ ทำให้ประหยัดพื้นที่และป้องกันข้อมูลไม่ตรงกัน (เช่น สะกดชื่อพืชต่างกันในคนละแถว) เมื่อต้องแก้ชื่อพืชก็แก้ที่เดียวจบ'}
+];
+</script>
+<script>
+/* ===== navigation ===== */
+var PAGES = document.querySelectorAll('section.page');
+var TABS  = document.querySelectorAll('#tabs button');
+function go(i){
+  if(i<0) i=0; if(i>=PAGES.length) i=PAGES.length-1;
+  PAGES.forEach(function(p,k){ p.classList.toggle('active', k===i); });
+  TABS.forEach(function(b,k){ b.classList.toggle('active', k===i); });
+  document.getElementById('pbar').style.width = ((i+1)/PAGES.length*100)+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(typeof onPage==='function') onPage(i);
+}
+TABS.forEach(function(b){ b.addEventListener('click', function(){ go(+b.dataset.p); }); });
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  var cur = 0; PAGES.forEach(function(p,k){ if(p.classList.contains('active')) cur=k; });
+  if(e.key==='ArrowRight') go(cur+1);
+  if(e.key==='ArrowLeft')  go(cur-1);
+});
+go(0);
+
+/* ===== quiz engine ===== */
+(function(){
+  var wrap = document.getElementById('quizWrap');
+  if(!wrap || typeof QUIZ==='undefined') return;
+  var answered = 0, score = 0;
+  QUIZ.forEach(function(q, qi){
+    var d = document.createElement('div');
+    d.className = 'quiz-q';
+    var h = '<div class="qhead">'+(qi+1)+'. '+q.q+'</div>';
+    q.a.forEach(function(opt, oi){
+      h += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</button>';
+    });
+    h += '<div class="explain" id="ex'+qi+'"><b>เฉลย:</b> '+q.e+'</div>';
+    d.innerHTML = h;
+    wrap.appendChild(d);
+  });
+  wrap.addEventListener('click', function(ev){
+    var b = ev.target.closest('.opt');
+    if(!b || b.classList.contains('disabled')) return;
+    var qi = +b.dataset.q, oi = +b.dataset.o;
+    var box = b.parentNode;
+    if(box.dataset.done) return;
+    box.dataset.done = '1';
+    box.querySelectorAll('.opt').forEach(function(o,k){
+      o.classList.add('disabled');
+      if(k===QUIZ[qi].c) o.classList.add('correct');
+    });
+    if(oi!==QUIZ[qi].c) b.classList.add('wrong'); else score++;
+    document.getElementById('ex'+qi).classList.add('show');
+    answered++;
+    var sb = document.getElementById('scorebox');
+    if(answered===QUIZ.length && sb){
+      sb.classList.add('show');
+      document.getElementById('scoreNum').textContent = score+' / '+QUIZ.length;
+      var pct = Math.round(score/QUIZ.length*100);
+      document.getElementById('scoreMsg').textContent =
+        pct>=80 ? 'เยี่ยมมาก! พร้อมไปคาบต่อไปแล้ว 🎉' :
+        pct>=60 ? 'ผ่านเกณฑ์ แต่ควรทบทวนข้อที่ตอบผิดอีกครั้ง' :
+                  'ลองกลับไปทบทวนเนื้อหาแต่ละหน้าอีกรอบนะ';
+      sb.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+  var rb = document.getElementById('resetQuiz');
+  if(rb) rb.addEventListener('click', function(){ location.reload(); });
+})();
+</script>
+</body>
+</html>

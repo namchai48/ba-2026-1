@@ -103,6 +103,22 @@
   .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
   .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
   .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  /* check-in */
+  .checkin{border:none; background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:2px solid var(--brand)}
+  .ci-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
+  .ci-field{flex:1 1 260px; display:flex; flex-direction:column; gap:6px}
+  .ci-field label{font-weight:700; font-size:13.5px; color:#334155}
+  .ci-field input, .ci-field select{padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; font-family:inherit; font-size:15px; background:#fff; width:100%}
+  .ci-field input:focus, .ci-field select:focus{outline:none; border-color:var(--brand)}
+  .ci-submit{margin-top:14px}
+  .ci-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .ci-msg.ok{color:var(--brand2)}
+  .ci-msg.err{color:var(--red)}
+  /* quiz submit */
+  .qz-submit-wrap{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px}
+  .qz-msg{margin-top:12px; font-weight:700; font-size:14px; min-height:18px}
+  .qz-msg.ok{color:#bbf7d0}
+  .qz-msg.err{color:#fecaca}
 </style>
 </head>
 <body>
@@ -117,8 +133,9 @@
       <button data-p="3">Date</button>
       <button data-p="4">Lookup</button>
       <button data-p="5">Dynamic Arrays</button>
-      <button data-p="6">PivotTable</button>
-      <button data-p="7">แบบทดสอบ</button>
+      <button data-p="6">Data Toolkit</button>
+      <button data-p="7">PivotTable</button>
+      <button data-p="8">แบบทดสอบ</button>
     </nav>
   </div>
   <div class="progressbar"><div id="pbar"></div></div>
@@ -135,27 +152,64 @@
     ทุกหน้า <b style="color:#bbf7d0">พิมพ์/เลือกค่าแล้วเห็นผลลัพธ์จริง</b> จากข้อมูลฟาร์มชุดเดียวกัน</p>
     <div class="row" style="margin-top:18px">
       <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
-      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(6)">ลองสร้าง PivotTable</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(7)">ลองสร้าง PivotTable</button></div>
+    </div>
+  </div>
+
+  <div class="card checkin">
+    <span class="kicker">ก่อนเริ่มเรียน</span>
+    <h2>✅ เช็คชื่อเข้าเรียน</h2>
+    <p class="muted" style="margin-top:0">เลือกชื่อ–รหัสนิสิตของคุณ แล้วกดส่ง — ข้อมูลจะถูกส่งเข้า Google Form ของอาจารย์ทันที (ไม่ต้องออกจากหน้านี้)</p>
+    <div class="ci-row">
+      <div class="ci-field">
+        <label>อีเมล (Email) *</label>
+        <input type="email" id="ci_email" placeholder="you@go.buu.ac.th" autocomplete="email">
+      </div>
+      <div class="ci-field">
+        <label>เลือกข้อมูลนิสิต (ชื่อ–รหัส) *</label>
+        <select id="ci_student"><option value="">— เลือกชื่อของคุณ —</option></select>
+      </div>
+    </div>
+    <button class="btn ci-submit" id="ci_btn" onclick="submitCheckin()">📩 ส่งเช็คชื่อ</button>
+    <div class="ci-msg" id="ci_msg"></div>
+
+    <iframe name="ci_target" id="ci_target" style="display:none" title="hidden"></iframe>
+    <form id="ci_form" action="https://docs.google.com/forms/d/e/1FAIpQLScD9FZ_imgNSUpUkbG7ip-9PffNxRX74NW6j4N03BiIzNnaVg/formResponse" method="POST" target="ci_target" style="display:none">
+      <input type="hidden" name="emailAddress" id="ci_f_email">
+      <input type="hidden" name="entry.893657035" id="ci_f_student">
+      <input type="hidden" name="fvv" value="1">
+      <input type="hidden" name="pageHistory" value="0">
+    </form>
+  </div>
+
+  <div class="card">
+    <span class="kicker">เชื่อมจากครั้งที่ 1</span>
+    <h2>🔗 ทบทวนก่อนเริ่ม</h2>
+    <div class="grid g3" style="margin-top:8px">
+      <div class="tile"><b>กรอบ 4 ระดับ</b><div class="muted" style="font-size:13.5px">เครื่องมือวันนี้ทั้งหมดอยู่ในขั้น <b>Descriptive</b> — อธิบายว่า "เกิดอะไรขึ้น" กับผลผลิตฟาร์ม</div></div>
+      <div class="tile"><b>ครั้งที่แล้วทำได้แล้ว</b><div class="muted" style="font-size:13.5px">SUM, AVERAGE, MAX/MIN, COUNT, IF, SUMIF/COUNTIF (เงื่อนไขเดียว)</div></div>
+      <div class="tile"><b>วันนี้ต่อยอด</b><div class="muted" style="font-size:13.5px">หลายเงื่อนไข (IFS/SUMIFS) → ทำความสะอาดข้อมูล → เชื่อมตาราง → สรุปด้วย Pivot</div></div>
     </div>
   </div>
 
   <div class="card">
     <span class="kicker">แผนที่เนื้อหาวันนี้</span>
-    <h2>🗺️ 6 หัวข้อหลัก</h2>
+    <h2>🗺️ 7 หัวข้อหลัก</h2>
     <div class="grid g3" style="margin-top:8px">
       <div class="tile"><div class="n">1</div><b>Logic &amp; Conditional</b><div class="muted" style="font-size:13.5px">IF, IFS, SUMIFS, COUNTIFS — สรุปแบบมีเงื่อนไข</div></div>
       <div class="tile"><div class="n">2</div><b>Text Functions</b><div class="muted" style="font-size:13.5px">LEFT, MID, TRIM, PROPER — ทำความสะอาดข้อความ</div></div>
       <div class="tile"><div class="n">3</div><b>Date &amp; Time</b><div class="muted" style="font-size:13.5px">WEEKDAY, WEEKNUM, NETWORKDAYS, TEXT</div></div>
       <div class="tile"><div class="n">4</div><b>Lookup</b><div class="muted" style="font-size:13.5px">VLOOKUP, XLOOKUP, INDEX+MATCH</div></div>
       <div class="tile"><div class="n">5</div><b>Dynamic Arrays</b><div class="muted" style="font-size:13.5px">FILTER, SORT, UNIQUE — ผลลัพธ์หลายค่า</div></div>
-      <div class="tile"><div class="n">6</div><b>PivotTable / PivotChart</b><div class="muted" style="font-size:13.5px">สรุป จัดกลุ่ม นับ หาผลรวม ในไม่กี่คลิก</div></div>
+      <div class="tile"><div class="n">6</div><b>Data Toolkit</b><div class="muted" style="font-size:13.5px">Text to Columns, Remove Duplicates, Flash Fill, Validation, Heatmap</div></div>
+      <div class="tile"><div class="n">7</div><b>PivotTable / PivotChart</b><div class="muted" style="font-size:13.5px">สรุปผลผลิต ยอดขาย อัตราสูญเสีย ในไม่กี่คลิก</div></div>
     </div>
   </div>
 
   <div class="card">
     <span class="kicker">ข้อมูลที่ใช้ตลอดบทเรียน</span>
     <h2>🌾 สมุดบันทึกการเก็บเกี่ยว (Harvest Log)</h2>
-    <p class="muted" style="margin-top:0">ทุกเครื่องมือในหน้าถัด ๆ ไปทำงานบนตารางนี้ — ลองสังเกตว่าฟังก์ชันแต่ละตัวหยิบข้อมูลจากตรงไหน</p>
+    <p class="muted" style="margin-top:0">ตารางเดียวกับฟาร์มในครั้งที่ 1 แต่ขยายเพิ่ม: ครอบคลุม 3 เดือน (มิ.ย.–ส.ค.) และมีคอลัมน์ <b>สูญเสียหลังเก็บเกี่ยว</b> กับ <b>ราคาขาย</b> — ทุกเครื่องมือในหน้าถัด ๆ ไปทำงานบนตารางนี้</p>
     <div class="scroll" id="rawTableWrap"></div>
   </div>
 </section>
@@ -167,12 +221,15 @@
     <h2>🧮 Logic &amp; Conditional Aggregation</h2>
     <p class="muted">ตรรกะและการสรุปผลแบบ "มีเงื่อนไข" — หัวใจของการวิเคราะห์ข้อมูลใน Excel</p>
 
-    <h3>1) IF — ตรวจเงื่อนไขทีละค่า</h3>
-    <p class="note">ลากเพื่อกำหนดผลผลิต (กก.) แล้วดูว่าเมล่อนลูกนี้จัดเป็นเกรดไหน (เกณฑ์ ≥ 700 = พรีเมียม)</p>
+    <h3>1) IF / IFS — ตรวจเงื่อนไขทีละค่า</h3>
+    <p class="note">ลากเพื่อกำหนดผลผลิต (กก.) — IF ตรวจ 2 ทางเลือก ส่วน IFS ตรวจหลายเกณฑ์เรียงลำดับ (≥ 700 = A, ≥ 500 = B, ต่ำกว่า = C)</p>
     <input type="range" id="ifKg" min="0" max="1000" value="820" step="10">
     <div class="fx">
       <div class="formula" id="ifFormula"></div>
       <div style="margin-top:8px">→ <span class="res" id="ifRes"></span></div>
+      <div class="formula" id="ifsFormula" style="margin-top:14px"></div>
+      <div style="margin-top:8px">→ <span class="res" id="ifsRes"></span></div>
+      <div class="desc">IFS ตรวจเงื่อนไขจากซ้ายไปขวา คืนค่าของเงื่อนไขแรกที่เป็นจริง · TRUE ตัวสุดท้าย = "กรณีที่เหลือทั้งหมด"</div>
     </div>
 
     <h3>2) SUMIFS / COUNTIFS — สรุปเฉพาะแถวที่ตรงเงื่อนไข</h3>
@@ -203,7 +260,7 @@
     <p class="muted">ในฟาร์มมักมี "รหัสล็อตสินค้า" ที่ต้องแยกส่วน ลองพิมพ์รหัสแล้วดูว่าแต่ละฟังก์ชันตัด/แปลงอย่างไร</p>
     <label class="fld">รหัสล็อต (พิมพ์แก้ได้)</label>
     <input type="text" id="txtIn" value="  mel-A1-2026  " style="width:100%; max-width:360px; font-family:Consolas,monospace">
-    <p class="note">ตัวอย่างมีเว้นวรรคหน้า-หลังไว้ให้เห็นผลของ TRIM · โครงสร้าง = พืช(3)-แปลง-ปี</p>
+    <p class="note">ตัวอย่างมีเว้นวรรคหน้า-หลังไว้ให้เห็นผลของ TRIM · โครงสร้าง = พืช(3)-แปลง-ปี · สังเกตแถวแรก ๆ: ถ้าไม่ TRIM ก่อน LEFT จะติดเว้นวรรคมาด้วย!</p>
     <div class="scroll" style="max-height:none"><table class="xl" id="txtTable"></table></div>
   </div>
   <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: Date &amp; Time →</button></div>
@@ -238,7 +295,7 @@
     <div class="kv" id="lkResult"></div>
     <div class="fx">
       <div class="formula" id="lkFormula"></div>
-      <div class="desc">VLOOKUP ค้นจากคอลัมน์ซ้ายสุด · XLOOKUP ยืดหยุ่นกว่า ค้นได้ทุกทิศและไม่ต้องนับเลขคอลัมน์</div>
+      <div class="desc">VLOOKUP ค้นจากคอลัมน์ซ้ายสุด · XLOOKUP ยืดหยุ่นกว่า ค้นได้ทุกทิศและไม่ต้องนับเลขคอลัมน์ · INDEX+MATCH = MATCH หา "แถวที่เท่าไร" แล้ว INDEX ดึงค่าจากแถวนั้น — ใช้ได้ทุกเวอร์ชัน</div>
     </div>
 
     <div class="example-box">
@@ -268,20 +325,57 @@
     <div class="scroll" style="margin-top:12px"><table class="xl" id="daTable"></table></div>
     <p class="note" id="daNote" style="margin-top:10px"></p>
   </div>
-  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: PivotTable →</button></div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: Data Toolkit →</button></div>
 </section>
 
-<!-- ===== PAGE 6 : PIVOT ===== -->
+<!-- ===== PAGE 6 : DATA TOOLKIT ===== -->
 <section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">Data Toolkit</span>
+    <h2>🧰 เครื่องมือจัดการข้อมูล — ไม่ต้องเขียนสูตร</h2>
+    <p class="muted">เครื่องมือสำเร็จรูปในแท็บ <b>Data</b> และ <b>Home</b> ของ Excel — ใช้ทำความสะอาดและควบคุมคุณภาพข้อมูลก่อนวิเคราะห์ (ต่อจากเรื่องธรรมาภิบาลข้อมูลครั้งที่ 1)</p>
+
+    <h3>1) Text to Columns — แยก 1 คอลัมน์เป็นหลายคอลัมน์</h3>
+    <p class="note">รหัสล็อต "พืช-แปลง-ปี" ถูกกรอกรวมในคอลัมน์เดียว ลองกดปุ่มเพื่อแยกด้วยตัวคั่น "-"</p>
+    <button class="btn sm" id="ttcBtn">▶ Data → Text to Columns (Delimited: "-")</button>
+    <table class="xl" id="ttcTable" style="max-width:420px"></table>
+
+    <h3>2) Remove Duplicates — ลบแถวที่ซ้ำกัน</h3>
+    <p class="note">ทะเบียนแปลงถูกกรอกซ้ำ (แถวสีแดง) — เครื่องมือนี้เก็บแถวแรกไว้ ลบที่เหลือ</p>
+    <button class="btn sm" id="rdBtn">▶ Data → Remove Duplicates</button>
+    <span class="pill" id="rdMsg" style="display:none; margin-left:10px"></span>
+    <table class="xl" id="rdTable" style="max-width:420px"></table>
+
+    <h3>3) Flash Fill — เติมตามแบบอย่าง (Ctrl+E)</h3>
+    <p class="note">พิมพ์ "ผลลัพธ์ตัวอย่าง" ให้ Excel ดู 1 แถว (ดึงรหัสแปลงจากรหัสล็อต) แล้วกด Ctrl+E — Excel เดารูปแบบและเติมที่เหลือให้</p>
+    <button class="btn sm" id="ffBtn">▶ กด Ctrl+E (Flash Fill)</button>
+    <table class="xl" id="ffTable" style="max-width:420px"></table>
+
+    <h3>4) Data Validation — คุมค่าที่กรอกได้</h3>
+    <p class="note">ช่อง "เกรด" ตั้ง Data → Data Validation → List = A, B, C — ลองพิมพ์ค่าอื่นดู</p>
+    <div class="row" style="align-items:center">
+      <div style="flex:0; min-width:160px"><input type="text" id="dvIn" maxlength="2" placeholder="พิมพ์เกรด…" style="width:120px; text-align:center; font-weight:700"></div>
+      <div><span id="dvMsg" class="note"></span></div>
+    </div>
+
+    <h3>5) Conditional Formatting — heatmap ความชื้นดิน (%)</h3>
+    <p class="note">Home → Conditional Formatting → <b>Color Scales</b> · สีแดง = ดินแห้ง ต้องรีบให้น้ำ · สีเขียว = ความชื้นเหมาะสม — เห็นปัญหาได้โดยไม่ต้องอ่านตัวเลขทีละช่อง</p>
+    <table class="xl" id="cfTable" style="max-width:520px"></table>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: PivotTable →</button></div>
+</section>
+
+<!-- ===== PAGE 7 : PIVOT ===== -->
+<section class="page" id="p7">
   <div class="card">
     <span class="kicker">Advanced Excel</span>
     <h2>📊 PivotTable — สรุปข้อมูลในไม่กี่คลิก</h2>
-    <p class="muted">เครื่องมือสรุปข้อมูลที่ทรงพลังที่สุดของ Excel · เลือกฟิลด์ลงแต่ละโซน แล้วดูตารางสรุปและกราฟเกิดขึ้นทันที (จำลองการลาก-วางฟิลด์)</p>
+    <p class="muted">เครื่องมือสรุปข้อมูลที่ทรงพลังที่สุดของ Excel · สรุป <b>ผลผลิต / ยอดขาย / อัตราสูญเสีย</b> ราย <b>เดือน / ชนิดพืช / แปลง</b> — เลือกฟิลด์ลงแต่ละโซน แล้วดูตารางสรุปและกราฟเกิดขึ้นทันที (จำลองการลาก-วางฟิลด์)</p>
     <div class="pivot-ctrl">
       <div><label class="fld">🧱 Rows — จัดกลุ่มตาม</label>
-        <select id="pvRow"><option value="crop">พืช</option><option value="grade">เกรด</option><option value="plot">แปลง</option></select></div>
+        <select id="pvRow"><option value="crop">พืช</option><option value="month">เดือน</option><option value="grade">เกรด</option><option value="plot">แปลง</option></select></div>
       <div><label class="fld">🔢 Values — สรุปค่า</label>
-        <select id="pvAgg"><option value="sum">ผลรวมผลผลิต (SUM)</option><option value="count">จำนวนครั้ง (COUNT)</option><option value="avg">เฉลี่ยผลผลิต (AVERAGE)</option></select></div>
+        <select id="pvAgg"><option value="sum">ผลรวมผลผลิต (SUM)</option><option value="count">จำนวนครั้ง (COUNT)</option><option value="avg">เฉลี่ยผลผลิต (AVERAGE)</option><option value="rev">ยอดขายรวม (บาท)</option><option value="losspct">อัตราสูญเสียหลังเก็บเกี่ยว (%)</option></select></div>
       <div><label class="fld">🔎 Filters — กรองเกรด</label>
         <select id="pvFilter"><option value="*">ทั้งหมด</option><option>A</option><option>B</option><option>C</option></select></div>
     </div>
@@ -291,23 +385,46 @@
     </div>
     <p class="note" style="margin-top:12px">💡 นี่คือแนวคิดเดียวกับการลากฟิลด์ลงโซน Rows / Values / Filters ในหน้าต่าง PivotTable จริง · เพิ่มกราฟได้ทันทีด้วย PivotChart</p>
   </div>
-  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: แบบทดสอบ →</button></div>
+
+  <div class="card">
+    <span class="kicker">ลงมือทำ</span>
+    <h2>🧑‍🌾 แบบฝึกหัดท้ายคาบ</h2>
+    <p style="margin:.4em 0 0">ดาวน์โหลดไฟล์ <b>BDA_class2</b> แล้วใช้ PivotTable ตอบ 3 คำถามนี้จากข้อมูล Harvest Log ชุดเต็ม:</p>
+    <div class="grid g3" style="margin-top:12px">
+      <div class="tile"><div class="n">1</div><div style="font-size:14px">ผลผลิตรวม (กก.) แยกตาม <b>ชนิดพืช × เดือน</b> — เดือนไหนเก็บเกี่ยวได้มากที่สุด?</div></div>
+      <div class="tile"><div class="n">2</div><div style="font-size:14px"><b>อัตราสูญเสียหลังเก็บเกี่ยว (%)</b> รายแปลง — แปลงไหนสูญเสียเกิน 8% บ้าง?</div></div>
+      <div class="tile"><div class="n">3</div><div style="font-size:14px"><b>ยอดขายรวม (บาท)</b> รายชนิดพืช พร้อม PivotChart — พืชไหนทำเงินสูงสุด?</div></div>
+    </div>
+    <p style="margin:14px 0 0"><a class="btn" style="text-decoration:none;display:inline-block" href="https://drive.google.com/drive/folders/1hRPxN1vW9zIndTITzqEL1E9fhKE9i_I0?usp=sharing" target="_blank" rel="noopener">📥 ดาวน์โหลดไฟล์แบบฝึกหัด (Google Drive)</a></p>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn" onclick="go(8)">ถัดไป: แบบทดสอบ →</button></div>
 </section>
 
-<!-- ===== PAGE 7 : QUIZ ===== -->
-<section class="page" id="p7">
+<!-- ===== PAGE 8 : QUIZ ===== -->
+<section class="page" id="p8">
   <div class="card">
     <span class="kicker">ทบทวนความเข้าใจ</span>
     <h2>📝 แบบทดสอบท้ายบท</h2>
-    <p class="muted">7 ข้อ · เลือกคำตอบแล้วเห็นเฉลยและคำอธิบายทันที ทำซ้ำได้ไม่จำกัด</p>
+    <p class="muted">10 ข้อ · เลือกคำตอบแล้วเห็นเฉลยและคำอธิบายทันที ทำซ้ำได้ไม่จำกัด</p>
     <div id="quiz"></div>
     <div class="scorebox" id="scorebox">
-      <div class="big" id="scoreBig">0/7</div>
+      <div class="big" id="scoreBig">0/10</div>
       <div id="scoreMsg"></div>
-      <button class="btn ghost" style="margin-top:14px;background:#fff" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
+      <div class="qz-submit-wrap">
+        <button class="btn" id="qz_btn" style="background:#fff;color:#15803d" onclick="submitQuizScore()">📤 ส่งคะแนนเข้า Google Form</button>
+        <button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)" onclick="resetQuiz()">🔄 ทำใหม่อีกครั้ง</button>
+      </div>
+      <div class="qz-msg" id="qz_msg"></div>
+      <iframe name="qz_target" id="qz_target" style="display:none" title="hidden"></iframe>
+      <form id="qz_form" action="https://docs.google.com/forms/d/e/1FAIpQLSetpLFr54XjUaOoWv5dU5IwKGgM-qQExKLKzAC5-NhiKax94Q/formResponse" method="POST" target="qz_target" style="display:none">
+        <input type="hidden" name="entry.893657035" id="qz_f_student">
+        <input type="hidden" name="entry.1362746898" id="qz_f_score">
+        <input type="hidden" name="fvv" value="1">
+        <input type="hidden" name="pageHistory" value="0">
+      </form>
     </div>
   </div>
-  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn ghost" onclick="go(0)">กลับหน้าแรก</button></div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(7)">← ย้อนกลับ</button><button class="btn ghost" onclick="go(0)">กลับหน้าแรก</button></div>
 </section>
 
 <div class="foot">Business Data Analytics · ครั้งที่ 2 — Basic &amp; Advanced Excel · สื่อทบทวนสำหรับนิสิต Smart Farm<br>
@@ -315,23 +432,32 @@
 </main>
 
 <script>
-/* ===== Shared dataset: Harvest Log ===== */
+/* ===== Shared dataset: Harvest Log (มิ.ย.–ส.ค.) ===== */
 const DATA=[
-  {date:'2026-06-01',plot:'A1',crop:'เมล่อน',grade:'A',kg:820},
-  {date:'2026-06-03',plot:'A2',crop:'เมล่อน',grade:'B',kg:640},
-  {date:'2026-06-05',plot:'B1',crop:'มะเขือเทศ',grade:'A',kg:910},
-  {date:'2026-06-08',plot:'B2',crop:'มะเขือเทศ',grade:'C',kg:480},
-  {date:'2026-06-11',plot:'A3',crop:'เมล่อน',grade:'A',kg:750},
-  {date:'2026-06-14',plot:'C1',crop:'ผักสลัด',grade:'B',kg:300},
-  {date:'2026-06-17',plot:'C2',crop:'ผักสลัด',grade:'A',kg:420},
-  {date:'2026-06-20',plot:'B3',crop:'มะเขือเทศ',grade:'B',kg:560},
-  {date:'2026-06-23',plot:'A4',crop:'เมล่อน',grade:'C',kg:390},
-  {date:'2026-06-26',plot:'C3',crop:'ผักสลัด',grade:'A',kg:510}
+  {date:'2026-06-01',plot:'A1',crop:'เมล่อน',grade:'A',kg:820,loss:25,price:70},
+  {date:'2026-06-03',plot:'A2',crop:'เมล่อน',grade:'B',kg:640,loss:38,price:55},
+  {date:'2026-06-05',plot:'B1',crop:'มะเขือเทศ',grade:'A',kg:910,loss:30,price:32},
+  {date:'2026-06-08',plot:'B2',crop:'มะเขือเทศ',grade:'C',kg:480,loss:52,price:18},
+  {date:'2026-06-11',plot:'A3',crop:'เมล่อน',grade:'A',kg:750,loss:20,price:70},
+  {date:'2026-06-14',plot:'C1',crop:'ผักสลัด',grade:'B',kg:300,loss:24,price:45},
+  {date:'2026-06-17',plot:'C2',crop:'ผักสลัด',grade:'A',kg:420,loss:15,price:60},
+  {date:'2026-06-20',plot:'B3',crop:'มะเขือเทศ',grade:'B',kg:560,loss:40,price:25},
+  {date:'2026-06-23',plot:'A4',crop:'เมล่อน',grade:'C',kg:390,loss:45,price:40},
+  {date:'2026-06-26',plot:'C3',crop:'ผักสลัด',grade:'A',kg:510,loss:18,price:60},
+  {date:'2026-07-02',plot:'A1',crop:'เมล่อน',grade:'A',kg:860,loss:22,price:72},
+  {date:'2026-07-09',plot:'B1',crop:'มะเขือเทศ',grade:'B',kg:700,loss:46,price:24},
+  {date:'2026-07-16',plot:'C2',crop:'ผักสลัด',grade:'A',kg:450,loss:14,price:62},
+  {date:'2026-07-23',plot:'A2',crop:'เมล่อน',grade:'B',kg:610,loss:35,price:56},
+  {date:'2026-08-04',plot:'B2',crop:'มะเขือเทศ',grade:'A',kg:880,loss:28,price:33},
+  {date:'2026-08-11',plot:'C1',crop:'ผักสลัด',grade:'B',kg:330,loss:26,price:44}
 ];
+const MONTH_TH={'06':'มิ.ย.','07':'ก.ค.','08':'ส.ค.'};
+const monthOf=r=>MONTH_TH[r.date.slice(5,7)]||r.date.slice(5,7);
+const revOf=r=>r.kg*r.price;
 const fmt=n=>n.toLocaleString();
 
 /* ===== Navigation ===== */
-const TOTAL=8;
+const TOTAL=9;
 const pages=[...document.querySelectorAll('.page')];
 const tabBtns=[...document.querySelectorAll('#tabs button')];
 let visited=new Set([0]);
@@ -343,14 +469,14 @@ function go(i){
   visited.add(i);
   document.getElementById('pbar').style.width=(visited.size/TOTAL*100)+'%';
   window.scrollTo({top:0,behavior:'smooth'});
-  if(i===6) buildPivot();
+  if(i===7) buildPivot();
 }
 tabBtns.forEach(b=>b.addEventListener('click',()=>go(+b.dataset.p)));
 
 /* ===== Page 0: raw table ===== */
 (function(){
-  let h='<table class="xl"><thead><tr><th>#</th><th>วันที่</th><th>แปลง</th><th>พืช</th><th>เกรด</th><th>ผลผลิต (กก.)</th></tr></thead><tbody>';
-  DATA.forEach((r,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+r.date+'</td><td>'+r.plot+'</td><td>'+r.crop+'</td><td>'+r.grade+'</td><td>'+fmt(r.kg)+'</td></tr>';});
+  let h='<table class="xl"><thead><tr><th>#</th><th>วันที่</th><th>เดือน</th><th>แปลง</th><th>พืช</th><th>เกรด</th><th>ผลผลิต (กก.)</th><th>สูญเสีย (กก.)</th><th>ราคา (บ./กก.)</th><th>ยอดขาย (บาท)</th></tr></thead><tbody>';
+  DATA.forEach((r,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+r.date+'</td><td>'+monthOf(r)+'</td><td>'+r.plot+'</td><td>'+r.crop+'</td><td>'+r.grade+'</td><td>'+fmt(r.kg)+'</td><td>'+r.loss+'</td><td>'+r.price+'</td><td>'+fmt(revOf(r))+'</td></tr>';});
   h+='</tbody></table>';
   document.getElementById('rawTableWrap').innerHTML=h;
 })();
@@ -362,6 +488,9 @@ function updIf(){
   const out=v>=700?'เกรดพรีเมียม':'ทั่วไป';
   document.getElementById('ifFormula').textContent='=IF( '+v+' >= 700 , "เกรดพรีเมียม" , "ทั่วไป" )';
   document.getElementById('ifRes').textContent='"'+out+'"';
+  const g=v>=700?'A':v>=500?'B':'C';
+  document.getElementById('ifsFormula').textContent='=IFS( '+v+' >= 700 , "A" , '+v+' >= 500 , "B" , TRUE , "C" )';
+  document.getElementById('ifsRes').textContent='"'+g+'"';
 }
 ifKg.addEventListener('input',updIf); updIf();
 
@@ -390,15 +519,16 @@ function updText(){
   const s=txtIn.value;
   const trimmed=s.trim();
   const rows=[
-    ['LEFT(A2,3)','ตัด 3 ตัวจากซ้าย', JSON.stringify(trimmed.substring(0,3))],
-    ['RIGHT(A2,4)','ตัด 4 ตัวจากขวา', JSON.stringify(trimmed.slice(-4))],
-    ['MID(A2,5,2)','ตัด 2 ตัวเริ่มตำแหน่งที่ 5', JSON.stringify(trimmed.substring(4,6))],
-    ['LEN(A2)','นับตัวอักษร (รวมเว้นวรรค)', String(s.length)],
-    ['TRIM(A2)','ลบเว้นวรรคเกิน', JSON.stringify(trimmed)],
-    ['UPPER(A2)','ตัวพิมพ์ใหญ่ทั้งหมด', JSON.stringify(trimmed.toUpperCase())],
-    ['LOWER(A2)','ตัวพิมพ์เล็กทั้งหมด', JSON.stringify(trimmed.toLowerCase())],
-    ['PROPER(A2)','ขึ้นต้นแต่ละคำด้วยตัวใหญ่', JSON.stringify(trimmed.replace(/\b\w/g,c=>c.toUpperCase()))],
-    ['FIND("-",A2)','ตำแหน่งของ "-" ตัวแรก', String(trimmed.indexOf('-')+1)],
+    ['LEN(A2)','นับตัวอักษรของค่าดิบ (รวมเว้นวรรค!)', String(s.length)],
+    ['TRIM(A2)','ลบเว้นวรรคเกินหน้า-หลัง', JSON.stringify(trimmed)],
+    ['LEFT(A2,3)','ตัด 3 ตัวจากซ้ายของ "ค่าดิบ" — เว้นวรรคก็นับ', JSON.stringify(s.substring(0,3))],
+    ['LEFT(TRIM(A2),3)','TRIM ก่อนแล้วค่อยตัด — ได้รหัสพืชจริง', JSON.stringify(trimmed.substring(0,3))],
+    ['MID(TRIM(A2),5,2)','ตัด 2 ตัวเริ่มตำแหน่งที่ 5', JSON.stringify(trimmed.substring(4,6))],
+    ['RIGHT(TRIM(A2),4)','ตัด 4 ตัวจากขวา', JSON.stringify(trimmed.slice(-4))],
+    ['UPPER(TRIM(A2))','ตัวพิมพ์ใหญ่ทั้งหมด', JSON.stringify(trimmed.toUpperCase())],
+    ['LOWER(TRIM(A2))','ตัวพิมพ์เล็กทั้งหมด', JSON.stringify(trimmed.toLowerCase())],
+    ['PROPER(TRIM(A2))','ขึ้นต้นแต่ละคำด้วยตัวใหญ่', JSON.stringify(trimmed.replace(/\b\w/g,c=>c.toUpperCase()))],
+    ['FIND("-",TRIM(A2))','ตำแหน่งของ "-" ตัวแรก', String(trimmed.indexOf('-')+1)],
     ['CONCAT("ล็อต:",TRIM(A2))','ต่อข้อความ', JSON.stringify('ล็อต:'+trimmed)]
   ];
   let h='<thead><tr><th>สูตร (A2 = ช่องรหัส)</th><th>ความหมาย</th><th>ผลลัพธ์</th></tr></thead><tbody>';
@@ -445,20 +575,26 @@ updDate();
 /* ===== Page 4: Lookup ===== */
 (function(){
   const sel=document.getElementById('lkPlot');
-  DATA.forEach(r=>{const o=document.createElement('option');o.value=r.plot;o.textContent=r.plot+' ('+r.crop+')';sel.appendChild(o);});
+  [...new Set(DATA.map(r=>r.plot))].forEach(p=>{
+    const r=DATA.find(x=>x.plot===p);
+    const o=document.createElement('option');o.value=p;o.textContent=p+' ('+r.crop+')';sel.appendChild(o);
+  });
   sel.addEventListener('change',updLookup);
 })();
 function updLookup(){
   const p=document.getElementById('lkPlot').value;
   const r=DATA.find(x=>x.plot===p);
+  const n=DATA.filter(x=>x.plot===p).length;
   document.getElementById('lkResult').innerHTML=
     '<div class="box"><div class="v">'+r.crop+'</div><div class="l">พืช</div></div>'+
     '<div class="box"><div class="v">'+r.grade+'</div><div class="l">เกรด</div></div>'+
     '<div class="box"><div class="v">'+fmt(r.kg)+'</div><div class="l">ผลผลิต (กก.)</div></div>'+
     '<div class="box"><div class="v" style="font-size:16px">'+r.date+'</div><div class="l">วันที่</div></div>';
   document.getElementById('lkFormula').textContent=
-    '=VLOOKUP( "'+p+'" , A:F , 6 , FALSE )      → '+r.kg+'\n'+
-    '=XLOOKUP( "'+p+'" , แปลง , ผลผลิต )        → '+r.kg;
+    '=VLOOKUP( "'+p+'" , A:F , 6 , FALSE )              → '+r.kg+'\n'+
+    '=XLOOKUP( "'+p+'" , แปลง , ผลผลิต )                → '+r.kg+'\n'+
+    '=INDEX( ผลผลิต , MATCH("'+p+'" , แปลง , 0) )       → '+r.kg+
+    (n>1?'\n\n⚠ แปลง '+p+' มี '+n+' แถว (คนละเดือน) — ทั้งสามสูตรคืน "ค่าแรกที่พบ" เท่านั้น':'');
 }
 document.getElementById('lkPlot').selectedIndex=0; updLookup();
 
@@ -511,35 +647,123 @@ document.querySelectorAll('#daTabs button').forEach(b=>b.addEventListener('click
 }));
 updDa();
 
-/* ===== Page 6: Pivot ===== */
+/* ===== Page 6: Data Toolkit ===== */
+const TTC_ROWS=['MEL-A1-2026','MEL-A2-2026','TOM-B1-2026','LET-C1-2026'];
+let ttcSplit=false;
+function renderTtc(){
+  let h;
+  if(!ttcSplit){
+    h='<thead><tr><th>A — รหัสล็อต (คอลัมน์เดียว)</th></tr></thead><tbody>';
+    TTC_ROWS.forEach(c=>{h+='<tr><td style="text-align:left;font-family:Consolas,monospace">'+c+'</td></tr>';});
+  }else{
+    h='<thead><tr><th>A — พืช</th><th>B — แปลง</th><th>C — ปี</th></tr></thead><tbody>';
+    TTC_ROWS.forEach(c=>{const p=c.split('-');h+='<tr><td class="hl">'+p[0]+'</td><td class="hl">'+p[1]+'</td><td class="hl">'+p[2]+'</td></tr>';});
+  }
+  h+='</tbody>'; document.getElementById('ttcTable').innerHTML=h;
+  document.getElementById('ttcBtn').textContent=ttcSplit?'↺ กลับเป็นคอลัมน์เดียว':'▶ Data → Text to Columns (Delimited: "-")';
+}
+document.getElementById('ttcBtn').addEventListener('click',()=>{ttcSplit=!ttcSplit;renderTtc();});
+renderTtc();
+
+const RD_ROWS=[['A1','เมล่อน'],['A2','เมล่อน'],['A1','เมล่อน'],['B1','มะเขือเทศ'],['C1','ผักสลัด'],['B1','มะเขือเทศ']];
+let rdDone=false;
+function renderRd(){
+  const seen=new Set(); let h='<thead><tr><th>แปลง</th><th>พืช</th></tr></thead><tbody>'; let removed=0;
+  RD_ROWS.forEach(r=>{
+    const k=r.join('|'); const dup=seen.has(k); seen.add(k);
+    if(rdDone&&dup){removed++;return;}
+    h+='<tr><td'+(dup?' style="background:#fef2f2;color:#dc2626;font-weight:700"':'')+'>'+r[0]+(dup?' ⚠':'')+'</td><td'+(dup?' style="background:#fef2f2;color:#dc2626"':'')+'>'+r[1]+'</td></tr>';
+  });
+  h+='</tbody>'; document.getElementById('rdTable').innerHTML=h;
+  const msg=document.getElementById('rdMsg');
+  if(rdDone){msg.style.display='inline-block';msg.textContent='พบและลบแถวซ้ำ 2 แถว · เหลือ 4 แถว';}
+  else msg.style.display='none';
+  document.getElementById('rdBtn').textContent=rdDone?'↺ คืนค่าตารางเดิม':'▶ Data → Remove Duplicates';
+}
+document.getElementById('rdBtn').addEventListener('click',()=>{rdDone=!rdDone;renderRd();});
+renderRd();
+
+let ffDone=false;
+function renderFf(){
+  let h='<thead><tr><th>A — รหัสล็อต</th><th>B — แปลง (คอลัมน์ใหม่)</th></tr></thead><tbody>';
+  TTC_ROWS.forEach((c,i)=>{
+    const v=c.split('-')[1];
+    let cell;
+    if(i===0) cell='<td class="hl">'+v+' <span class="note">← ตัวอย่างที่พิมพ์ให้ดู</span></td>';
+    else if(ffDone) cell='<td class="hl">'+v+'</td>';
+    else cell='<td style="color:#94a3b8">?</td>';
+    h+='<tr><td style="text-align:left;font-family:Consolas,monospace">'+c+'</td>'+cell+'</tr>';
+  });
+  h+='</tbody>'; document.getElementById('ffTable').innerHTML=h;
+  document.getElementById('ffBtn').textContent=ffDone?'↺ ล้างคอลัมน์ B':'▶ กด Ctrl+E (Flash Fill)';
+}
+document.getElementById('ffBtn').addEventListener('click',()=>{ffDone=!ffDone;renderFf();});
+renderFf();
+
+const dvIn=document.getElementById('dvIn');
+dvIn.addEventListener('input',()=>{
+  const v=dvIn.value.trim().toUpperCase();
+  const msg=document.getElementById('dvMsg');
+  if(!v){msg.textContent='';dvIn.style.borderColor='';return;}
+  if(['A','B','C'].includes(v)){msg.innerHTML='<span style="color:var(--brand2);font-weight:700">✓ ผ่านการตรวจ — เกรด '+v+' อยู่ในรายการที่อนุญาต</span>';dvIn.style.borderColor='var(--brand)';}
+  else{msg.innerHTML='<span style="color:var(--red);font-weight:700">❌ Excel ปฏิเสธค่านี้ — ต้องเป็น A, B หรือ C เท่านั้น</span>';dvIn.style.borderColor='var(--red)';}
+});
+
+(function(){
+  const plots=['A1','A2','B1','B2','C1','C2'];
+  const weeks=['สัปดาห์ 1','สัปดาห์ 2','สัปดาห์ 3','สัปดาห์ 4'];
+  const vals=[[72,68,55,38],[65,60,48,35],[78,74,70,66],[52,44,36,30],[70,66,62,58],[60,52,45,40]];
+  const color=v=>{const t=Math.max(0,Math.min(1,(v-30)/45));return 'hsl('+Math.round(t*120)+',75%,'+(88-t*10)+'%)';};
+  let h='<thead><tr><th>แปลง</th>'+weeks.map(w=>'<th>'+w+'</th>').join('')+'</tr></thead><tbody>';
+  plots.forEach((p,i)=>{
+    h+='<tr><td style="font-weight:700">'+p+'</td>';
+    vals[i].forEach(v=>{h+='<td style="background:'+color(v)+' !important;font-weight:700">'+v+'</td>';});
+    h+='</tr>';
+  });
+  h+='</tbody>';
+  document.getElementById('cfTable').innerHTML=h;
+})();
+
+/* ===== Page 7: Pivot ===== */
 let pvChart=null;
+const MONTH_ORDER=['มิ.ย.','ก.ค.','ส.ค.'];
 function buildPivot(){
   const rowF=document.getElementById('pvRow').value;
   const agg=document.getElementById('pvAgg').value;
   const filt=document.getElementById('pvFilter').value;
   const rows=DATA.filter(r=>filt==='*'||r.grade===filt);
+  const keyOf=r=>rowF==='month'?monthOf(r):r[rowF];
   const groups={};
-  rows.forEach(r=>{const k=r[rowF]; (groups[k]=groups[k]||[]).push(r.kg);});
-  const keys=Object.keys(groups).sort();
-  const aggName={sum:'SUM',count:'COUNT',avg:'AVERAGE'}[agg];
-  const calc=arr=>agg==='sum'?arr.reduce((a,b)=>a+b,0):agg==='count'?arr.length:Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  rows.forEach(r=>{const k=keyOf(r); (groups[k]=groups[k]||[]).push(r);});
+  let keys=Object.keys(groups).sort();
+  if(rowF==='month') keys=MONTH_ORDER.filter(m=>keys.includes(m));
+  const calc=arr=>{
+    const kg=arr.reduce((a,b)=>a+b.kg,0);
+    if(agg==='sum') return kg;
+    if(agg==='count') return arr.length;
+    if(agg==='avg') return Math.round(kg/arr.length);
+    if(agg==='rev') return arr.reduce((a,b)=>a+revOf(b),0);
+    return Math.round(arr.reduce((a,b)=>a+b.loss,0)/kg*1000)/10; // losspct
+  };
   const vals=keys.map(k=>calc(groups[k]));
-  const rowLabel={crop:'พืช',grade:'เกรด',plot:'แปลง'}[rowF];
-  let total=agg==='count'?rows.length:agg==='avg'?Math.round(rows.reduce((a,b)=>a+b.kg,0)/rows.length):rows.reduce((a,b)=>a+b.kg,0);
-  let h='<thead><tr><th>'+rowLabel+'</th><th>'+aggName+' ผลผลิต</th></tr></thead><tbody>';
-  keys.forEach((k,i)=>{h+='<tr><td>'+k+'</td><td class="hl">'+fmt(vals[i])+'</td></tr>';});
-  h+='<tr><td style="font-weight:800;background:#1e293b;color:#fff">Grand Total</td><td style="font-weight:800;background:#1e293b;color:#fde047">'+fmt(total)+'</td></tr></tbody>';
+  const total=calc(rows);
+  const aggName={sum:'SUM ผลผลิต (กก.)',count:'COUNT (ครั้ง)',avg:'AVERAGE ผลผลิต (กก.)',rev:'SUM ยอดขาย (บาท)',losspct:'อัตราสูญเสีย (%)'}[agg];
+  const rowLabel={crop:'พืช',month:'เดือน',grade:'เกรด',plot:'แปลง'}[rowF];
+  const show=v=>agg==='losspct'?v.toFixed(1)+'%':fmt(v);
+  let h='<thead><tr><th>'+rowLabel+'</th><th>'+aggName+'</th></tr></thead><tbody>';
+  keys.forEach((k,i)=>{h+='<tr><td>'+k+'</td><td class="hl">'+show(vals[i])+'</td></tr>';});
+  h+='<tr><td style="font-weight:800;background:#1e293b;color:#fff">Grand Total</td><td style="font-weight:800;background:#1e293b;color:#fde047">'+show(total)+'</td></tr></tbody>';
   document.getElementById('pvTable').innerHTML=h;
   const ctx=document.getElementById('pvChart');
   if(pvChart) pvChart.destroy();
   pvChart=new Chart(ctx,{type:'bar',
-    data:{labels:keys,datasets:[{label:aggName+' ผลผลิต ('+rowLabel+')',data:vals,backgroundColor:'rgba(22,163,74,.75)',borderColor:'#15803d',borderWidth:1}]},
+    data:{labels:keys,datasets:[{label:aggName+' ('+rowLabel+')',data:vals,backgroundColor:agg==='losspct'?'rgba(220,38,38,.7)':'rgba(22,163,74,.75)',borderColor:agg==='losspct'?'#b91c1c':'#15803d',borderWidth:1}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},title:{display:true,text:'PivotChart'}},scales:{y:{beginAtZero:true}}}
   });
 }
 ['pvRow','pvAgg','pvFilter'].forEach(id=>document.getElementById(id).addEventListener('change',buildPivot));
 
-/* ===== Page 7: Quiz ===== */
+/* ===== Page 8: Quiz ===== */
 const quiz=[
   {q:'ต้องการหา "ผลรวมผลผลิต" เฉพาะพืช = เมล่อน และเกรด = A ควรใช้ฟังก์ชันใด?',
    opts:['SUMIF','SUMIFS','COUNTIFS','VLOOKUP'],a:1,
@@ -561,7 +785,16 @@ const quiz=[
    e:'UNIQUE ดึงเฉพาะค่าที่ไม่ซ้ำ · SORT = เรียง · FILTER = กรอง — ทั้งสามคือ Dynamic Arrays ที่ "spill" หลายค่า'},
   {q:'ใน PivotTable ถ้าลากฟิลด์ "พืช" ลงโซน Rows และ "ผลผลิต (Sum)" ลง Values จะได้อะไร?',
    opts:['รายการทุกแถวแบบไม่สรุป','ผลรวมผลผลิตแยกตามชนิดพืช','กราฟเส้นอย่างเดียว','ค่าเฉลี่ยของทุกคอลัมน์'],a:1,
-   e:'Rows = จัดกลุ่มตามพืช, Values(Sum) = ผลรวมผลผลิตของแต่ละกลุ่ม → ตารางสรุปผลผลิตรวมแยกตามชนิดพืช'}
+   e:'Rows = จัดกลุ่มตามพืช, Values(Sum) = ผลรวมผลผลิตของแต่ละกลุ่ม → ตารางสรุปผลผลิตรวมแยกตามชนิดพืช'},
+  {q:'รหัส "MEL-A1-2026" อยู่ในคอลัมน์เดียว ต้องการแยกเป็น 3 คอลัมน์ (พืช/แปลง/ปี) ควรใช้เครื่องมือใด?',
+   opts:['Remove Duplicates','Data Validation','Text to Columns','Conditional Formatting'],a:2,
+   e:'Text to Columns (Data → Text to Columns → Delimited) แยกคอลัมน์ตามตัวคั่น เช่น "-" · หรือใช้ Flash Fill ก็ได้ถ้ารูปแบบสม่ำเสมอ'},
+  {q:'ต้องการระบายสีตารางค่าความชื้นดินให้เห็นทันทีว่าแปลงไหน "แห้งผิดปกติ" โดยไม่ต้องอ่านตัวเลขทีละช่อง ใช้เครื่องมือใด?',
+   opts:['Conditional Formatting (Color Scales)','Flash Fill','Text to Columns','SORT()'],a:0,
+   e:'Conditional Formatting → Color Scales ทำ heatmap ระบายสีตามค่ามาก-น้อยอัตโนมัติ เหมาะกับการสแกนหาค่าผิดปกติด้วยตา'},
+  {q:'สูตร =INDEX(B:B, MATCH("A3", A:A, 0)) ทำหน้าที่อะไร?',
+   opts:['นับจำนวนแถวที่มีค่า "A3"','ดึงค่าคอลัมน์ B ของแถวที่คอลัมน์ A = "A3" (เหมือน VLOOKUP)','เรียงข้อมูลคอลัมน์ A','ลบแถวที่ซ้ำกัน'],a:1,
+   e:'MATCH หาว่า "A3" อยู่แถวที่เท่าไรในคอลัมน์ A แล้ว INDEX ดึงค่าจากแถวเดียวกันในคอลัมน์ B — ทำงานแบบเดียวกับ VLOOKUP/XLOOKUP แต่ใช้ได้ทุกเวอร์ชัน'}
 ];
 let answered=Array(quiz.length).fill(false), score=0;
 function renderQuiz(){
@@ -587,17 +820,57 @@ function showScore(){
   document.getElementById('scoreBig').textContent=score+'/'+quiz.length;
   let msg;
   if(score===quiz.length)msg='🎉 ยอดเยี่ยม! พร้อมลุยแบบฝึกหัด Excel แล้ว';
-  else if(score>=5)msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็ครบ';
+  else if(score>=7)msg='👍 ดีมาก! ทบทวนข้อที่ผิดอีกนิดก็ครบ';
   else msg='📖 ลองกลับไปเล่นเครื่องมือแต่ละหน้าอีกครั้งนะ จะเข้าใจง่ายขึ้น';
   document.getElementById('scoreMsg').textContent=msg;
+  var qb=document.getElementById('qz_btn');
+  if(qb){ qb.disabled=false; qb.style.opacity=''; qb.style.cursor='pointer'; }
+  var qm=document.getElementById('qz_msg');
+  if(qm){
+    var sName=(document.getElementById('ci_student')||{}).value||'';
+    qm.className='qz-msg'; qm.textContent = sName ? ('พร้อมส่งในชื่อ: '+sName) : 'ℹ️ ยังไม่ได้เช็คชื่อ — ไปเลือกชื่อที่หน้าแรกก่อนส่งคะแนน';
+  }
   sb.scrollIntoView({behavior:'smooth'});
+}
+function submitQuizScore(){
+  var student=(document.getElementById('ci_student')||{}).value||'';
+  var msg=document.getElementById('qz_msg');
+  if(!student){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาไปที่หน้าแรก แล้วเลือกชื่อของคุณในส่วน "เช็คชื่อเข้าเรียน" ก่อนส่งคะแนน'; return; }
+  document.getElementById('qz_f_student').value=student;
+  document.getElementById('qz_f_score').value=score;
+  document.getElementById('qz_form').submit();
+  var btn=document.getElementById('qz_btn'); if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='default'; }
+  msg.className='qz-msg ok'; msg.textContent='✅ ส่งคะแนนแล้ว: '+student+' — '+score+'/'+quiz.length+' คะแนน';
+  try{ localStorage.setItem('bda2_quiz', student+' : '+score+'/'+quiz.length+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
 }
 function resetQuiz(){
   answered=Array(quiz.length).fill(false); score=0;
   document.getElementById('scorebox').classList.remove('show');
-  renderQuiz(); document.getElementById('p7').scrollIntoView({behavior:'smooth'});
+  renderQuiz(); document.getElementById('p8').scrollIntoView({behavior:'smooth'});
 }
 renderQuiz();
+
+/* ---------- Page 0: Check-in (Google Form) ---------- */
+var ROSTER=["67090218 นางสาวเบญจรัตน์ กาศา","67090219 นางสาวมาริษา ชินสุข","67090220 นางสาวริลลดา อัตรา","67090221 นางสาววิจิตรา แนวคำพา","67090379 นางสาวจิรนันท์ ทองดอนน้อย","67090380 นางสาวชรินพัชร พรมกุล","67090382 นายธัญวิชญ์ แอบศรีหาด","67090383 นางสาวนิศากร จะคำรัมย์","67090384 นายบริรักษ์ ปัตตานัง","67090385 นางสาวปาลิดา อินทรคุ้มวงค์","67090386 นางสาวรุจิรดา ยอดทอง","67090387 นายวุฒิชัย ปัญจกะบุตร","67090388 นางสาวศุพิชญ์ทิญา เครือแก้ว","67090389 นางสาวสาธิดา ฤกษมงคล","67090390 นางสาวสิฐิตา บุญโยประการ","67090391 นางสาวอนัญพร ทวีพจน์","67090392 นายอนุพล นามสาม","67090393 นายก้องภพ เทินสระเกษ","67090394 นางสาวขวัญข้าว พุ่มทอง","67090395 นางสาวจิรัศยา พันธุ์ครุฑ","67090396 นายณฐนนท์ กองสุข","67090397 นายณภัทร ศิริโชติรุ่งขจร","67090398 นายณัฏฐวุฒิ พงศ์ภัคพันธุ์","67090401 นายธีรเดช โซว","67090403 นายนันทกร ธรรมวงศ์","67090404 นางสาวใบเฟิร์น บุญทูล","67090405 นางสาวปานไพลิน ชานาเมือง","67090407 นางสาวภนิดา สุทธิธรรมานันต์","67090408 นายรวิช ทองมี","67090409 นางสาวสิวพร หิรัญโท","67090410 นางสาวสุธาสินี อู่นอก","67090412 นางสาวสุภาพร แก่นการ","67090413 นางสาวหทัยภัทร รัตนรุ่งเรือง","67090414 นายอภิสิทธิ์ ตรงต่อกิจ","67090434 นายกฤตภัค ห้วยลำดวน","67090436 นายศิวนาถ ราศรีจันทร์","67090437 นางสาวกรณิศ กลั่นอักโข","67090441 นางสาวนันทิกา สะอาดประโคน","67090443 นางสาวปวีณอร เพ็งวิสาภาพพงษ์","67090445 นายรัฐภูมิ สว่างภพ"];
+(function(){
+  var sel=document.getElementById('ci_student'); if(!sel) return;
+  ROSTER.forEach(function(name){var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);});
+  try{ var s=localStorage.getItem('bda2_student'); if(s){ sel.value=s; } }catch(e){}
+  try{ var em=localStorage.getItem('bda2_email'); if(em){ var e=document.getElementById('ci_email'); if(e) e.value=em; } }catch(e){}
+  try{ var prev=localStorage.getItem('bda2_checkin'); if(prev){ var m=document.getElementById('ci_msg'); if(m){ m.className='ci-msg ok'; m.textContent='ℹ️ เคยเช็คชื่อจากเครื่องนี้: '+prev; } } }catch(e){}
+})();
+function submitCheckin(){
+  var email=(document.getElementById('ci_email').value||'').trim();
+  var student=document.getElementById('ci_student').value;
+  var msg=document.getElementById('ci_msg');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณากรอกอีเมลให้ถูกต้อง'; return; }
+  if(!student){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณาเลือกชื่อ–รหัสนิสิตของคุณ'; return; }
+  document.getElementById('ci_f_email').value=email;
+  document.getElementById('ci_f_student').value=student;
+  document.getElementById('ci_form').submit();
+  msg.className='ci-msg ok'; msg.textContent='✅ ส่งเช็คชื่อแล้ว: '+student;
+  try{ localStorage.setItem('bda2_student', student); localStorage.setItem('bda2_email', email); localStorage.setItem('bda2_checkin', student+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
 
 document.getElementById('pbar').style.width=(1/TOTAL*100)+'%';
 </script>

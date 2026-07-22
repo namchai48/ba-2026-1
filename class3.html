@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 3 (Power Query · สื่อ Interactive)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.65}
+  a{color:var(--brand2)}
+  header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 11px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; transition:.15s; font-family:inherit}
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none}
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  select, input[type=text], input[type=date], input[type=number], textarea{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink)}
+  select:focus, input:focus, textarea:focus{outline:none; border-color:var(--brand)}
+  label.fld{display:block; font-weight:700; font-size:13.5px; margin-bottom:5px; color:#334155}
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row > div{flex:1; min-width:150px}
+  input[type=range]{width:100%; accent-color:var(--brand)}
+  .fx{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px 16px; font-family:"Consolas",monospace; font-size:14px; margin-top:12px; overflow-x:auto}
+  .fx .formula{color:#4ade80; white-space:pre-wrap}
+  .fx .res{color:#fde047; font-weight:700; font-size:18px}
+  .fx .desc{color:#94a3b8; font-size:13px; margin-top:8px; font-family:inherit}
+  table.xl{border-collapse:collapse; width:100%; font-size:13.5px; margin-top:10px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 9px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700; position:sticky; top:0}
+  table.xl tr:nth-child(even) td{background:#f8fafc}
+  table.xl td.hl{background:#dcfce7 !important; font-weight:700}
+  table.xl td.warn{background:#fef2f2 !important; color:#b91c1c; font-weight:700}
+  .scroll{max-height:340px; overflow:auto; border-radius:10px; border:1px solid var(--line)}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .note{font-size:13px; color:var(--muted)}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .kv .box{flex:1; min-width:120px; text-align:center; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb}
+  .kv .box .v{font-size:22px; font-weight:800; color:var(--brand2)}
+  .kv .box .l{font-size:12px; color:var(--muted)}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .steps{counter-reset:s; padding-left:0; list-style:none}
+  .steps li{position:relative; padding:10px 0 10px 42px; border-bottom:1px dashed var(--line)}
+  .steps li:before{counter-increment:s; content:counter(s); position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:9px; background:var(--brand-soft); color:var(--brand2); font-weight:800; display:grid; place-items:center; font-size:13px}
+  code{background:#f1f5f9; padding:2px 6px; border-radius:6px; font-family:"Consolas",monospace; font-size:.92em; color:#0f172a}
+  .cols2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+  .callout{border-left:4px solid var(--amber); background:#fffbeb; padding:12px 16px; border-radius:0 12px 12px 0; margin-top:14px; font-size:14.5px}
+  .callout.good{border-color:var(--brand); background:#f0fdf4}
+  .callout.bad{border-color:var(--red); background:#fef2f2}
+  .chartbox{position:relative; height:300px; margin-top:14px}
+</style>
+</head>
+<body>
+<script>
+function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th-TH',{minimumFractionDigits:d, maximumFractionDigits:d}); }
+</script>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 3</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">ETL คืออะไร</button>
+      <button data-p="2">ทำความสะอาด</button>
+      <button data-p="3">Append</button>
+      <button data-p="4">Merge</button>
+      <button data-p="5">M-Code</button>
+      <button data-p="6">Refresh</button>
+      <button data-p="7">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ===== PAGE 0 : OVERVIEW ===== -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">Power Query · Data Preparation</span>
+    <h1>ครั้งที่ 3 — Power Query: รวมและทำความสะอาดข้อมูลเซนเซอร์ฟาร์ม</h1>
+    <p class="lead muted">คาบนี้เราจะเลิก "ก็อป–วาง–แก้มือ" ทุกเดือน แล้วเปลี่ยนเป็น <b style="color:#bbf7d0">สร้างขั้นตอนครั้งเดียว กดรีเฟรชได้ตลอดไป</b><br>
+    โจทย์จริง: ไฟล์ log เซนเซอร์จาก 3 โรงเรือน คนละรูปแบบ ต้องรวมเป็นตารางเดียวให้พร้อมวิเคราะห์</p>
+    <div class="row" style="margin-top:18px">
+      <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(2)">ลองทำความสะอาดข้อมูล</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">สิ่งที่จะได้จากคาบนี้</span>
+    <h2>เป้าหมายการเรียนรู้</h2>
+    <div class="grid g2">
+      <div class="tile"><div class="n">1</div><b>เข้าใจ ETL</b><div class="note">แยกออกว่างานไหนคือ Extract / Transform / Load และทำไมต้องแยกจากการวิเคราะห์</div></div>
+      <div class="tile"><div class="n">2</div><b>ทำความสะอาดข้อมูลดิบ</b><div class="note">Remove Rows, Use First Row as Headers, Change Type, Trim, Remove Duplicates, Split Column</div></div>
+      <div class="tile"><div class="n">3</div><b>Append หลายไฟล์</b><div class="note">รวม log เซนเซอร์หลายโรงเรือน/หลายเดือน ให้เป็นตารางเดียว</div></div>
+      <div class="tile"><div class="n">4</div><b>Merge (คล้าย VLOOKUP)</b><div class="note">ดึงข้อมูลแปลง/ชนิดพืช มาต่อท้าย และเข้าใจ Join แต่ละแบบ</div></div>
+      <div class="tile"><div class="n">5</div><b>อ่าน M-Code</b><div class="note">รู้ว่าแต่ละคลิกกลายเป็นโค้ดอะไร และแก้ไขได้เมื่อจำเป็น</div></div>
+      <div class="tile"><div class="n">6</div><b>Close &amp; Load + Refresh</b><div class="note">ทำครั้งเดียว ใช้ซ้ำได้ทุกเดือน — หัวใจของการทำงานจริง</div></div>
+    </div>
+    <div class="callout">💡 <b>ประโยคที่อยากให้จำ:</b> Power Query ไม่ได้แก้ข้อมูล — มันจดจำ "ขั้นตอนการแก้" ไว้ แล้วทำซ้ำให้อัตโนมัติทุกครั้งที่มีข้อมูลใหม่</div>
+  </div>
+
+  <div class="card">
+    <h2>สถานการณ์ตลอดคาบนี้</h2>
+    <p class="lead">ฟาร์มผักสลัดมี 3 โรงเรือน แต่ละโรงเรือนส่งไฟล์ CSV จากเซนเซอร์มาทุกสิ้นเดือน — คนละหัวตาราง มีบรรทัดหัวรายงานปนมา มีค่าซ้ำ มีค่าว่าง และคอลัมน์ <code>แปลง-โซน</code> ถูกรวมกันอยู่</p>
+    <div class="kv">
+      <div class="box"><div class="v">3</div><div class="l">ไฟล์/โรงเรือน</div></div>
+      <div class="box"><div class="v">~4,300</div><div class="l">แถวต่อเดือน</div></div>
+      <div class="box"><div class="v">12</div><div class="l">เดือน/ปี</div></div>
+      <div class="box"><div class="v">1</div><div class="l">ครั้งที่ต้องตั้งค่า</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><span></span><button class="btn" onclick="go(1)">ถัดไป: ETL คืออะไร →</button></div>
+</section>
+
+<!-- ===== PAGE 1 : ETL ===== -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">แนวคิดหลัก</span>
+    <h2>ETL = Extract → Transform → Load</h2>
+    <p class="lead">80% ของเวลานักวิเคราะห์หมดไปกับการเตรียมข้อมูล ไม่ใช่การวิเคราะห์ — ETL คือการทำให้ 80% นั้นเป็นอัตโนมัติ</p>
+    <div class="grid g3" style="margin-top:16px">
+      <div class="tile"><div class="n">E</div><b>Extract — ดึงข้อมูล</b>
+        <div class="note">จาก Excel, CSV, โฟลเดอร์, ฐานข้อมูล, เว็บ, API เซนเซอร์<br><br>Power Query: <code>Data → Get Data</code></div></div>
+      <div class="tile"><div class="n">T</div><b>Transform — แปลงรูป</b>
+        <div class="note">ตัดขยะ ตั้งหัวตาราง แก้ชนิดข้อมูล ลบซ้ำ แยกคอลัมน์ รวมตาราง<br><br>Power Query: หน้าต่าง Editor + Applied Steps</div></div>
+      <div class="tile"><div class="n">L</div><b>Load — ส่งออก</b>
+        <div class="note">โหลดเข้า Sheet, Data Model, หรือ Power BI เพื่อไปทำ PivotTable/Dashboard ต่อ<br><br>Power Query: <code>Close &amp; Load To…</code></div></div>
+    </div>
+    <div class="callout good">✅ <b>ต่างจากการแก้มือใน Excel อย่างไร?</b> แก้มือ = แก้ "ข้อมูล" (ทำครั้งเดียวใช้ครั้งเดียว) · Power Query = แก้ "สูตรของขั้นตอน" (ทำครั้งเดียวใช้ได้ตลอด)</div>
+  </div>
+
+  <div class="card">
+    <h2>เทียบให้เห็นภาพ: ทำมือ vs Power Query</h2>
+    <div class="cols2">
+      <div>
+        <h3 style="color:var(--red)">❌ วิธีเดิม (ทำมือทุกเดือน)</h3>
+        <ul class="steps">
+          <li>เปิด 3 ไฟล์ ก็อปวางต่อกัน</li>
+          <li>ลบบรรทัดหัวรายงานทีละไฟล์</li>
+          <li>ไล่ลบแถวซ้ำด้วยตา</li>
+          <li>แยกคอลัมน์ด้วย Text to Columns</li>
+          <li>VLOOKUP ดึงชนิดพืช</li>
+          <li><b>เดือนหน้า → ทำใหม่ทั้งหมด (≈45 นาที)</b></li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--brand2)">✅ วิธี Power Query</h3>
+        <ul class="steps">
+          <li>Get Data → From Folder (ครั้งเดียว)</li>
+          <li>คลิกขั้นตอนทำความสะอาด (ครั้งเดียว)</li>
+          <li>Append + Merge (ครั้งเดียว)</li>
+          <li>Close &amp; Load</li>
+          <li>วางไฟล์ใหม่ในโฟลเดอร์</li>
+          <li><b>เดือนหน้า → กด Refresh All (≈5 วินาที)</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="example-box">
+      <div class="lbl">คำนวณให้เห็นภาพ</div>
+      <div class="row" style="margin-top:8px">
+        <div><label class="fld">จำนวนไฟล์ต่อเดือน</label><input type="number" id="etlFiles" value="3" min="1" max="50"></div>
+        <div><label class="fld">นาทีที่ใช้ทำมือ/ไฟล์</label><input type="number" id="etlMin" value="15" min="1" max="120"></div>
+        <div><label class="fld">จำนวนเดือน</label><input type="number" id="etlMon" value="12" min="1" max="60"></div>
+      </div>
+      <div class="fx"><div class="formula" id="etlFx"></div><div class="desc">ยิ่งข้อมูลเข้ามาบ่อย ยิ่งคุ้มที่จะทำเป็น pipeline</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← ย้อนกลับ</button><button class="btn" onclick="go(2)">ถัดไป: ทำความสะอาดข้อมูล →</button></div>
+</section>
+
+<!-- ===== PAGE 2 : CLEAN ===== -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">ลงมือทำ</span>
+    <h2>🧹 ห้องทดลองทำความสะอาดข้อมูล</h2>
+    <p class="lead">นี่คือไฟล์ <code>sensor_greenhouseA.csv</code> ที่เพิ่ง Get Data เข้ามา — กดปุ่มขั้นตอนด้านล่างทีละขั้น แล้วดูตารางเปลี่ยนแบบทันที (ลำดับซ้าย→ขวาคือลำดับที่ควรทำจริง)</p>
+    <div class="fn-list" id="stepBtns">
+      <button data-s="rmTop">Remove Top Rows (3)</button>
+      <button data-s="header">Use First Row as Headers</button>
+      <button data-s="trim">Trim + Change Type</button>
+      <button data-s="dup">Remove Duplicates</button>
+      <button data-s="split">Split Column by "-"</button>
+      <button data-s="err">Replace Errors / Remove Blank</button>
+    </div>
+    <div class="badge-row">
+      <span class="badge" id="rowCount"></span>
+      <span class="badge" id="colCount"></span>
+      <span class="badge" id="issueCount"></span>
+      <button class="btn sm ghost" id="resetSteps">รีเซ็ต</button>
+      <button class="btn sm" id="allSteps">ทำทุกขั้นตอน</button>
+    </div>
+    <div class="scroll" style="margin-top:12px"><table class="xl" id="cleanTbl"></table></div>
+    <div class="callout" id="stepNote">👆 ยังไม่ได้ทำอะไรเลย — สังเกตว่า 3 แถวแรกไม่ใช่ข้อมูล และหัวตารางยังเป็น Column1, Column2…</div>
+  </div>
+
+  <div class="card">
+    <h2>Applied Steps — สมุดบันทึกขั้นตอน</h2>
+    <p>ทุกครั้งที่คลิก Power Query จะจดไว้ที่แถบขวามือ ชื่อว่า <b>Applied Steps</b> ลบ/แก้/สลับลำดับได้ตลอดเวลา — นี่คือสิ่งที่ทำให้ทำซ้ำได้</p>
+    <div class="scroll" style="max-height:260px"><table class="xl" id="stepsTbl"></table></div>
+    <div class="callout bad">⚠️ <b>ลำดับสำคัญมาก:</b> ถ้า <code>Use First Row as Headers</code> ก่อน <code>Remove Top Rows</code> หัวตารางจะกลายเป็น "รายงานข้อมูลเซนเซอร์…" ทันที ลองสลับดูจะเห็นว่าพังทั้งคิวรี</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: Append →</button></div>
+</section>
+
+<!-- ===== PAGE 3 : APPEND ===== -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">รวมแนวตั้ง</span>
+    <h2>📚 Append — ต่อแถวจากหลายไฟล์</h2>
+    <p class="lead">ใช้เมื่อ <b>โครงสร้างเหมือนกันแต่คนละไฟล์</b> เช่น log เซนเซอร์คนละโรงเรือน หรือคนละเดือน → ได้ตารางที่ "ยาวขึ้น"</p>
+    <div class="row" style="margin-top:6px">
+      <div id="fileToggles" class="fn-list" style="flex:1"></div>
+    </div>
+    <div class="kv">
+      <div class="box"><div class="v" id="apRows">0</div><div class="l">แถวรวม</div></div>
+      <div class="box"><div class="v" id="apFiles">0</div><div class="l">ไฟล์ที่เลือก</div></div>
+      <div class="box"><div class="v" id="apCols">0</div><div class="l">คอลัมน์ผลลัพธ์</div></div>
+    </div>
+    <div class="scroll" style="margin-top:12px"><table class="xl" id="apTbl"></table></div>
+    <div class="callout" id="apNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>กับดักที่พบบ่อยเวลา Append</h2>
+    <div class="grid g2">
+      <div class="tile"><b>ชื่อหัวคอลัมน์ไม่ตรงกัน</b><div class="note">โรงเรือน C เขียน <code>Temp</code> แทน <code>อุณหภูมิ</code> → Power Query จะสร้างคอลัมน์ใหม่แยก และเติม <code>null</code> ให้ไฟล์อื่น<br><b>วิธีแก้:</b> Rename ให้ตรงกันก่อน Append</div></div>
+      <div class="tile"><b>ไม่รู้ว่าข้อมูลมาจากไฟล์ไหน</b><div class="note">หลังรวมแล้วแยกไม่ออก<br><b>วิธีแก้:</b> เพิ่มคอลัมน์ <code>Source.Name</code> หรือ Custom Column ระบุโรงเรือน ก่อนรวม</div></div>
+      <div class="tile"><b>ชนิดข้อมูลไม่ตรง</b><div class="note">ไฟล์หนึ่งอุณหภูมิเป็นข้อความ อีกไฟล์เป็นตัวเลข → รวมแล้วคำนวณไม่ได้<br><b>วิธีแก้:</b> Change Type ทุกไฟล์ก่อน</div></div>
+      <div class="tile"><b>ใช้ Append ทั้งที่ควรใช้ Merge</b><div class="note">ถ้าอยาก "เพิ่มคอลัมน์" ไม่ใช่ "เพิ่มแถว" ต้องใช้ Merge<br><b>จำง่าย:</b> Append = ยาวลง ↓ · Merge = กว้างออก →</div></div>
+    </div>
+    <div class="callout good">💡 <b>ทริกใช้จริง:</b> ถ้าไฟล์เข้ามาทุกเดือน ให้ใช้ <code>Get Data → From Folder</code> แล้ว Combine — ระบบจะ Append ไฟล์ใหม่ให้เองโดยไม่ต้องแก้คิวรีอีกเลย</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: Merge →</button></div>
+</section>
+
+<!-- ===== PAGE 4 : MERGE ===== -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">รวมแนวนอน</span>
+    <h2>🔗 Merge — ต่อคอลัมน์ (VLOOKUP เวอร์ชันโปร)</h2>
+    <p class="lead">เรามีสรุปค่าเซนเซอร์รายแปลง แต่ยังไม่รู้ว่าแต่ละแปลงปลูกอะไร กี่ไร่ — ต้องดึงจากตาราง <code>plot_master</code> มาต่อ</p>
+    <div class="cols2">
+      <div>
+        <h3>ตารางซ้าย: sensor_summary</h3>
+        <table class="xl" id="leftTbl"></table>
+      </div>
+      <div>
+        <h3>ตารางขวา: plot_master</h3>
+        <table class="xl" id="rightTbl"></table>
+      </div>
+    </div>
+    <div class="row" style="margin-top:18px">
+      <div><label class="fld">เลือกชนิดการเชื่อม (Join Kind)</label>
+        <select id="joinKind">
+          <option value="left">Left Outer — เก็บทุกแถวซ้าย + ที่ตรงกันจากขวา (ค่าเริ่มต้น เทียบเท่า VLOOKUP)</option>
+          <option value="inner">Inner — เก็บเฉพาะที่ตรงกันทั้งสองฝั่ง</option>
+          <option value="right">Right Outer — เก็บทุกแถวขวา</option>
+          <option value="full">Full Outer — เก็บทุกแถวทั้งสองฝั่ง</option>
+          <option value="lanti">Left Anti — เฉพาะแถวซ้ายที่ <b>ไม่</b> ตรงกับขวา (ใช้หาข้อมูลหาย)</option>
+          <option value="ranti">Right Anti — เฉพาะแถวขวาที่ไม่ตรงกับซ้าย</option>
+        </select>
+      </div>
+    </div>
+    <h3>ผลลัพธ์หลัง Merge (คีย์ = รหัสแปลง)</h3>
+    <div class="scroll"><table class="xl" id="mergeTbl"></table></div>
+    <div class="callout" id="joinNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>Merge vs VLOOKUP/XLOOKUP</h2>
+    <table class="xl">
+      <tr><th>ประเด็น</th><th>VLOOKUP / XLOOKUP</th><th>Merge (Power Query)</th></tr>
+      <tr><td>จำนวนคอลัมน์ที่ดึงได้</td><td>ทีละคอลัมน์ (ต้องเขียนหลายสูตร)</td><td class="hl">เลือกหลายคอลัมน์พร้อมกัน</td></tr>
+      <tr><td>ข้อมูลหลายแสนแถว</td><td>ช้า ไฟล์บวม</td><td class="hl">เร็ว ไม่เก็บสูตรในเซลล์</td></tr>
+      <tr><td>หาข้อมูลที่จับคู่ไม่ได้</td><td>ต้องไล่หา <code>#N/A</code></td><td class="hl">ใช้ Left Anti Join ได้ทันที</td></tr>
+      <tr><td>ทำซ้ำเดือนหน้า</td><td>ลากสูตรใหม่</td><td class="hl">กด Refresh</td></tr>
+      <tr><td>คีย์ซ้ำในตารางขวา</td><td>ได้ค่าแรกเท่านั้น (เงียบ ๆ)</td><td>แถวจะเพิ่มจำนวน — ต้องระวัง!</td></tr>
+    </table>
+    <div class="callout bad">⚠️ <b>ข้อผิดพลาดอันดับ 1 ของนักศึกษา:</b> ตารางขวามีรหัสแปลงซ้ำ → หลัง Merge แถวเพิ่มจาก 500 เป็น 900 โดยไม่รู้ตัว แล้วผลรวมผลผลิตเพี้ยน<br><b>เช็คเสมอ:</b> จำนวนแถวก่อน–หลัง Merge ต้องเท่ากัน (ถ้าใช้ Left Outer และคีย์ขวาไม่ซ้ำ)</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(3)">← ย้อนกลับ</button><button class="btn" onclick="go(5)">ถัดไป: M-Code →</button></div>
+</section>
+
+<!-- ===== PAGE 5 : M CODE ===== -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">Advanced Editor</span>
+    <h2>👨‍💻 ทุกคลิกของคุณ = โค้ด M</h2>
+    <p class="lead">Power Query เขียนภาษา <b>M</b> ให้อัตโนมัติ เราไม่ต้องเขียนเองตั้งแต่ต้น แต่ <b>ต้องอ่านออก</b> เพื่อแก้เมื่อคิวรีพัง — เลือกขั้นตอนด้านล่างเพื่อดูโค้ดที่ถูกสร้าง</p>
+    <div class="fn-list" id="mBtns"></div>
+    <div class="fx"><div class="formula" id="mCode"></div></div>
+    <div class="callout" id="mNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>กายวิภาคของโค้ด M</h2>
+    <div class="fx"><div class="formula">let
+    Source = Csv.Document(File.Contents("C:\Farm\sensorA.csv")),
+    RemovedTop = Table.Skip(Source, 3),
+    Promoted   = Table.PromoteHeaders(RemovedTop),
+    Typed      = Table.TransformColumnTypes(Promoted, {{"อุณหภูมิ", type number}}),
+    NoDup      = Table.Distinct(Typed)
+in
+    NoDup</div>
+      <div class="desc">อ่านจากบนลงล่าง: แต่ละบรรทัดรับผลลัพธ์จากบรรทัดก่อนหน้ามาแปลงต่อ แล้วส่งชื่อขั้นตอนสุดท้ายออกหลัง <b>in</b></div>
+    </div>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="tile"><b><code>let … in</code></b><div class="note">โครงหลัก: <code>let</code> ประกาศขั้นตอน · <code>in</code> บอกว่าจะส่งขั้นตอนไหนออก</div></div>
+      <div class="tile"><b>ชื่อขั้นตอน</b><div class="note">คือชื่อที่เห็นใน Applied Steps เปลี่ยนชื่อได้ แต่ต้องเปลี่ยนทุกที่ที่อ้างถึง</div></div>
+      <div class="tile"><b>Case-sensitive</b><div class="note">M แยกตัวพิมพ์ใหญ่–เล็ก: <code>Table.Skip</code> ≠ <code>table.skip</code></div></div>
+    </div>
+    <div class="callout good">🛠️ <b>ใช้จริงบ่อยที่สุด:</b> เปลี่ยน path ไฟล์ตอนย้ายเครื่อง — เปิด Advanced Editor แล้วแก้ที่บรรทัด <code>Source</code> บรรทัดเดียวจบ</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: Close &amp; Load →</button></div>
+</section>
+
+<!-- ===== PAGE 6 : REFRESH ===== -->
+<section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">ปิดงาน</span>
+    <h2>💾 Close &amp; Load และการ Refresh</h2>
+    <div class="grid g3">
+      <div class="tile"><div class="n">A</div><b>Table (Worksheet)</b><div class="note">โหลดเป็นตารางในชีต — เหมาะกับข้อมูลไม่เกินหลักแสนแถว และอยากเห็นข้อมูลจริง</div></div>
+      <div class="tile"><div class="n">B</div><b>Only Create Connection</b><div class="note">ไม่โหลดลงชีต ใช้เป็นตารางกลางเพื่อไป Append/Merge ต่อ — ไฟล์เบากว่ามาก</div></div>
+      <div class="tile"><div class="n">C</div><b>Add to Data Model</b><div class="note">โหลดเข้า Data Model เพื่อไปทำ PivotTable/DAX/Power BI ต่อ (คาบหน้า!)</div></div>
+    </div>
+    <div class="callout">📌 ในโจทย์ฟาร์มของเรา: ไฟล์ดิบ 3 โรงเรือน = <b>Connection only</b> · ตารางที่ Append+Merge แล้ว = <b>Add to Data Model</b></div>
+  </div>
+
+  <div class="card">
+    <h2>🔄 จำลองการ Refresh ประจำเดือน</h2>
+    <p>สมมติสิ้นเดือนมีไฟล์ใหม่วางในโฟลเดอร์ กด Refresh แล้วดูว่าเกิดอะไรขึ้น</p>
+    <div class="row">
+      <div style="flex:0"><button class="btn" id="btnAddFile">📥 วางไฟล์ใหม่ในโฟลเดอร์</button></div>
+      <div style="flex:0"><button class="btn ghost" id="btnRefresh">🔄 Refresh All</button></div>
+      <div style="flex:0"><button class="btn ghost" id="btnResetSim">รีเซ็ต</button></div>
+    </div>
+    <div class="kv">
+      <div class="box"><div class="v" id="simFiles">3</div><div class="l">ไฟล์ในโฟลเดอร์</div></div>
+      <div class="box"><div class="v" id="simLoaded">3</div><div class="l">ไฟล์ที่โหลดแล้ว</div></div>
+      <div class="box"><div class="v" id="simRows">12,900</div><div class="l">แถวใน Data Model</div></div>
+      <div class="box"><div class="v" id="simTime">0</div><div class="l">นาทีที่ใช้แก้มือ</div></div>
+    </div>
+    <div class="callout" id="simNote">โฟลเดอร์มี 3 ไฟล์ ทุกอย่างซิงก์กันอยู่</div>
+  </div>
+
+  <div class="card">
+    <h2>เช็กลิสต์ก่อนส่งงาน Power Query</h2>
+    <ul class="steps">
+      <li>ชนิดข้อมูลทุกคอลัมน์ถูกต้อง (วันที่เป็น Date ไม่ใช่ Text)</li>
+      <li>ไม่มี <code>Error</code> หรือ <code>null</code> ค้างโดยไม่ตั้งใจ — ตรวจด้วย Column Quality</li>
+      <li>จำนวนแถวหลัง Merge เท่ากับก่อน Merge (ถ้าตั้งใจใช้ Left Outer)</li>
+      <li>ตั้งชื่อขั้นตอนและชื่อคิวรีให้สื่อความ ไม่ใช่ <code>Query1</code></li>
+      <li>ลองลบ/เพิ่มข้อมูลในไฟล์ต้นทางแล้ว Refresh — ต้องไม่พัง</li>
+      <li>มีคอลัมน์ระบุแหล่งที่มา (โรงเรือน/เดือน) เสมอ</li>
+    </ul>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ทำแบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 7 : QUIZ ===== -->
+<section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">ทบทวน</span>
+    <h2>📝 แบบทดสอบครั้งที่ 3</h2>
+    <p class="lead">10 ข้อ · เลือกคำตอบแล้วดูเฉลยทันที</p>
+    <div id="quizWrap"></div>
+    <div class="scorebox" id="scorebox">
+      <div>คะแนนของคุณ</div>
+      <div class="big" id="scoreNum"></div>
+      <div id="scoreMsg"></div>
+      <button class="btn ghost" id="resetQuiz" style="margin-top:14px">ทำใหม่อีกครั้ง</button>
+    </div>
+  </div>
+  <div class="foot">Business Data Analytics · ครั้งที่ 3 — Power Query (ETL) · แขนงสมาร์ทฟาร์มมิ่งและโซ่อุปทานอัจฉริยะ</div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← กลับหน้าแรก</button><span></span></div>
+</section>
+
+</main>
+
+<script>
+/* ---------- PAGE 1 : ETL saving calc ---------- */
+function calcEtl(){
+  var f=+document.getElementById('etlFiles').value||0,
+      m=+document.getElementById('etlMin').value||0,
+      mo=+document.getElementById('etlMon').value||0;
+  var manual=f*m*mo, pq=f*m+ (mo*0.5);
+  document.getElementById('etlFx').innerHTML =
+    'ทำมือ  = '+f+' ไฟล์ × '+m+' นาที × '+mo+' เดือน = <span class="res">'+manual.toLocaleString()+' นาที</span> ('+(manual/60).toFixed(1)+' ชม.)\n'+
+    'Power Query = ตั้งค่าครั้งเดียว '+(f*m)+' นาที + Refresh '+mo+' ครั้ง ≈ <span class="res">'+pq.toFixed(0)+' นาที</span>\n'+
+    'ประหยัดได้ <span class="res">'+(manual-pq).toFixed(0)+' นาที/ปี</span>';
+}
+['etlFiles','etlMin','etlMon'].forEach(function(id){ document.getElementById(id).addEventListener('input', calcEtl); });
+calcEtl();
+
+/* ---------- PAGE 2 : cleaning lab ---------- */
+var RAW = [
+ ['รายงานข้อมูลเซนเซอร์ — โรงเรือน A','','',''],
+ ['ส่งออกเมื่อ 30/06/2026','','',''],
+ ['','','',''],
+ ['วันที่','แปลง-โซน','อุณหภูมิ','ความชื้นดิน'],
+ ['01/06/2026','P01-A',' 31.2 ','62'],
+ ['01/06/2026','P01-B','30.8','58'],
+ ['02/06/2026','P02-A','33.5 ','55'],
+ ['02/06/2026','P02-A','33.5 ','55'],
+ ['03/06/2026','P03-C','32.0',''],
+ ['03/06/2026','P01-A','n/a','61'],
+ ['04/06/2026','P02-B',' 29.7','67'],
+ ['04/06/2026','P03-A','28.9','70'],
+ ['05/06/2026','P01-B','30.1','59'],
+ ['05/06/2026','P01-B','30.1','59']
+];
+var ORDER = ['rmTop','header','trim','dup','split','err'];
+var STEPNAME = {rmTop:'Removed Top Rows', header:'Promoted Headers', trim:'Trimmed & Changed Type',
+                dup:'Removed Duplicates', split:'Split Column by Delimiter', err:'Replaced Errors / Removed Blanks'};
+var STEPM = {rmTop:'Table.Skip(Source, 3)', header:'Table.PromoteHeaders(#"Removed Top Rows")',
+             trim:'Table.TransformColumnTypes(Table.TransformColumns(#"Promoted Headers",{{"อุณหภูมิ", Text.Trim}}),{{"อุณหภูมิ", type number},{"ความชื้นดิน", Int64.Type},{"วันที่", type date}})',
+             dup:'Table.Distinct(#"Changed Type")',
+             split:'Table.SplitColumn(#"Removed Duplicates","แปลง-โซน",Splitter.SplitTextByDelimiter("-"),{"รหัสแปลง","โซน"})',
+             err:'Table.SelectRows(Table.ReplaceErrorValues(#"Split Column",{{"อุณหภูมิ",null}}), each [อุณหภูมิ] <> null and [ความชื้นดิน] <> null)'};
+var active = {};
+function buildClean(){
+  var head = null, rows = RAW.map(function(r){ return r.slice(); });
+  var issues = 0;
+  if(active.rmTop) rows = rows.slice(3);
+  if(active.header && rows.length){ head = rows[0].slice(); rows = rows.slice(1); }
+  if(active.trim) rows = rows.map(function(r){ return r.map(function(c){ return String(c).trim(); }); });
+  if(active.dup){
+    var seen={}, out=[];
+    rows.forEach(function(r){ var k=r.join('|'); if(!seen[k]){ seen[k]=1; out.push(r); } });
+    rows = out;
+  }
+  if(active.split){
+    if(head){ head = [head[0],'รหัสแปลง','โซน'].concat(head.slice(2)); }
+    rows = rows.map(function(r){
+      var p = String(r[1]).split('-');
+      return [r[0], p[0]||'', p[1]||''].concat(r.slice(2));
+    });
+  }
+  if(active.err){
+    rows = rows.filter(function(r){
+      return r.every(function(c){ return String(c).trim()!=='' && String(c).toLowerCase()!=='n/a'; });
+    });
+  }
+  // count remaining issues
+  rows.forEach(function(r){ r.forEach(function(c){
+    var v=String(c); if(v.trim()==='' || v.toLowerCase()==='n/a' || (v!==v.trim())) issues++; }); });
+  var t = document.getElementById('cleanTbl'); t.innerHTML='';
+  var ncol = Math.max.apply(null, rows.map(function(r){return r.length;}).concat(head?[head.length]:[4]));
+  var tr = document.createElement('tr');
+  for(var i=0;i<ncol;i++){
+    var th=document.createElement('th');
+    th.textContent = head ? (head[i]||'Column'+(i+1)) : 'Column'+(i+1);
+    tr.appendChild(th);
+  }
+  t.appendChild(tr);
+  rows.forEach(function(r){
+    var tr2=document.createElement('tr');
+    for(var i=0;i<ncol;i++){
+      var td=document.createElement('td');
+      var v = r[i]===undefined?'':r[i];
+      td.textContent = v===''? '' : v;
+      var s=String(v);
+      if(s.trim()==='' || s.toLowerCase()==='n/a' || (s!==s.trim() && s!=='')) td.className='warn';
+      tr2.appendChild(td);
+    }
+    t.appendChild(tr2);
+  });
+  document.getElementById('rowCount').textContent = 'แถวข้อมูล: '+rows.length;
+  document.getElementById('colCount').textContent = 'คอลัมน์: '+ncol;
+  document.getElementById('issueCount').textContent = 'เซลล์ที่ยังมีปัญหา: '+issues;
+  // steps table
+  var st = document.getElementById('stepsTbl');
+  st.innerHTML = '<tr><th style="width:60px">#</th><th>Applied Step</th><th>ผลที่เกิด</th></tr>';
+  var n=1;
+  var res = {rmTop:'ตัด 3 บรรทัดหัวรายงานทิ้ง', header:'เลื่อนแถวแรกขึ้นเป็นชื่อคอลัมน์',
+             trim:'ตัดช่องว่างหน้า-หลัง และกำหนดชนิดข้อมูลให้ถูก', dup:'ลบแถวที่ซ้ำกันทุกคอลัมน์',
+             split:'แยก "P01-A" เป็นรหัสแปลง + โซน', err:'ตัดแถวที่มี n/a หรือค่าว่างออก'};
+  var r0=document.createElement('tr');
+  r0.innerHTML='<td>0</td><td style="text-align:left"><b>Source</b></td><td style="text-align:left">อ่านไฟล์ sensor_greenhouseA.csv</td>';
+  st.appendChild(r0);
+  ORDER.forEach(function(s){
+    if(!active[s]) return;
+    var tr3=document.createElement('tr');
+    tr3.innerHTML='<td>'+(n++)+'</td><td style="text-align:left"><b>'+STEPNAME[s]+'</b></td><td style="text-align:left">'+res[s]+'</td>';
+    st.appendChild(tr3);
+  });
+  var done = ORDER.filter(function(s){return active[s];}).length;
+  var note = document.getElementById('stepNote');
+  if(done===0) note.innerHTML='👆 ยังไม่ได้ทำอะไรเลย — สังเกตว่า 3 แถวแรกไม่ใช่ข้อมูล และหัวตารางยังเป็น Column1, Column2…';
+  else if(done===ORDER.length) note.innerHTML='🎉 <b>สะอาดแล้ว!</b> เหลือ '+rows.length+' แถวที่พร้อมวิเคราะห์ ทุกคอลัมน์มีชนิดข้อมูลถูกต้อง — ขั้นตอนทั้งหมดนี้จะทำซ้ำอัตโนมัติเมื่อกด Refresh';
+  else note.innerHTML='ทำไปแล้ว '+done+'/'+ORDER.length+' ขั้นตอน · เซลล์สีแดงคือจุดที่ยังมีปัญหา (ค่าว่าง / n/a / มีช่องว่างเกิน)';
+}
+document.getElementById('stepBtns').addEventListener('click', function(e){
+  var b=e.target.closest('button'); if(!b) return;
+  var s=b.dataset.s; active[s]=!active[s]; b.classList.toggle('on', !!active[s]); buildClean();
+});
+document.getElementById('resetSteps').addEventListener('click', function(){
+  active={}; document.querySelectorAll('#stepBtns button').forEach(function(b){b.classList.remove('on');}); buildClean();
+});
+document.getElementById('allSteps').addEventListener('click', function(){
+  ORDER.forEach(function(s){active[s]=true;});
+  document.querySelectorAll('#stepBtns button').forEach(function(b){b.classList.add('on');}); buildClean();
+});
+buildClean();
+
+/* ---------- PAGE 3 : append ---------- */
+var FILES = [
+  {id:'A', name:'sensorA_มิ.ย.csv', house:'โรงเรือน A', rows:4320, cols:['วันที่','รหัสแปลง','อุณหภูมิ','ความชื้นดิน'],
+   sample:[['01/06/2026','P01','31.2','62'],['02/06/2026','P02','33.5','55']]},
+  {id:'B', name:'sensorB_มิ.ย.csv', house:'โรงเรือน B', rows:4320, cols:['วันที่','รหัสแปลง','อุณหภูมิ','ความชื้นดิน'],
+   sample:[['01/06/2026','P05','29.4','71'],['02/06/2026','P06','30.2','68']]},
+  {id:'C', name:'sensorC_มิ.ย.csv', house:'โรงเรือน C', rows:4260, cols:['วันที่','รหัสแปลง','Temp','ความชื้นดิน'],
+   sample:[['01/06/2026','P09','27.8','74'],['02/06/2026','P10','28.6','72']]}
+];
+var sel = {A:true, B:true, C:false};
+function buildAppend(){
+  var chosen = FILES.filter(function(f){ return sel[f.id]; });
+  var cols = [];
+  chosen.forEach(function(f){ f.cols.forEach(function(c){ if(cols.indexOf(c)<0) cols.push(c); }); });
+  cols = ['โรงเรือน'].concat(cols);
+  var t = document.getElementById('apTbl'); t.innerHTML='';
+  var tr=document.createElement('tr');
+  cols.forEach(function(c){ var th=document.createElement('th'); th.textContent=c; tr.appendChild(th); });
+  t.appendChild(tr);
+  var total=0;
+  chosen.forEach(function(f){
+    total += f.rows;
+    f.sample.forEach(function(r){
+      var tr2=document.createElement('tr');
+      cols.forEach(function(c){
+        var td=document.createElement('td');
+        if(c==='โรงเรือน'){ td.textContent=f.house; td.className='hl'; }
+        else {
+          var idx=f.cols.indexOf(c);
+          if(idx<0){ td.textContent='null'; td.className='warn'; }
+          else td.textContent=r[idx];
+        }
+        tr2.appendChild(td);
+      });
+      t.appendChild(tr2);
+    });
+  });
+  document.getElementById('apRows').textContent = total.toLocaleString();
+  document.getElementById('apFiles').textContent = chosen.length;
+  document.getElementById('apCols').textContent = cols.length;
+  var note=document.getElementById('apNote');
+  if(chosen.length===0) note.innerHTML='เลือกไฟล์อย่างน้อย 1 ไฟล์เพื่อดูผลลัพธ์';
+  else if(sel.C) note.innerHTML='⚠️ <b>สังเกตปัญหา:</b> โรงเรือน C ตั้งชื่อคอลัมน์ว่า <code>Temp</code> ไม่ใช่ <code>อุณหภูมิ</code> → Power Query สร้างคอลัมน์แยก และเติม <code>null</code> ให้ไฟล์อื่น<br><b>แก้โดย:</b> Rename Column ในคิวรีของโรงเรือน C ให้เป็น "อุณหภูมิ" <u>ก่อน</u> Append';
+  else note.innerHTML='✅ หัวคอลัมน์ตรงกันทุกไฟล์ → Append ได้สะอาด รวม '+total.toLocaleString()+' แถว (ตารางด้านบนแสดงตัวอย่าง 2 แถวแรกของแต่ละไฟล์)';
+}
+var ft=document.getElementById('fileToggles');
+FILES.forEach(function(f){
+  var b=document.createElement('button');
+  b.textContent=f.name; b.dataset.f=f.id;
+  if(sel[f.id]) b.classList.add('on');
+  b.addEventListener('click', function(){ sel[f.id]=!sel[f.id]; b.classList.toggle('on', sel[f.id]); buildAppend(); });
+  ft.appendChild(b);
+});
+buildAppend();
+
+/* ---------- PAGE 4 : merge ---------- */
+var LEFT = [
+  ['P01','โรงเรือน A','31.0'],
+  ['P02','โรงเรือน A','32.8'],
+  ['P05','โรงเรือน B','29.4'],
+  ['P09','โรงเรือน C','27.8'],
+  ['P12','โรงเรือน C','28.3']
+];
+var RIGHT = [
+  ['P01','ผักสลัดกรีนโอ๊ค','2.5'],
+  ['P02','ผักสลัดคอส','1.8'],
+  ['P05','เคล','3.0'],
+  ['P07','ผักโขม','2.2'],
+  ['P09','ร็อกเก็ต','1.5']
+];
+function tbl(el, head, rows){
+  var t=document.getElementById(el); t.innerHTML='';
+  var tr=document.createElement('tr');
+  head.forEach(function(h){ var th=document.createElement('th'); th.textContent=h; tr.appendChild(th); });
+  t.appendChild(tr);
+  rows.forEach(function(r){
+    var tr2=document.createElement('tr');
+    r.forEach(function(c){ var td=document.createElement('td'); td.textContent=c; if(c==='null'||c==='—') td.className='warn'; tr2.appendChild(td); });
+    t.appendChild(tr2);
+  });
+}
+tbl('leftTbl', ['รหัสแปลง','โรงเรือน','อุณหภูมิเฉลี่ย'], LEFT);
+tbl('rightTbl', ['รหัสแปลง','ชนิดพืช','พื้นที่ (ไร่)'], RIGHT);
+function buildMerge(){
+  var k=document.getElementById('joinKind').value;
+  var rmap={}; RIGHT.forEach(function(r){ rmap[r[0]]=r; });
+  var lmap={}; LEFT.forEach(function(r){ lmap[r[0]]=r; });
+  var out=[];
+  if(k==='left'||k==='lanti'||k==='full'||k==='inner'){
+    LEFT.forEach(function(l){
+      var r=rmap[l[0]];
+      if(k==='lanti'){ if(!r) out.push([l[0],l[1],l[2],'—','—']); return; }
+      if(k==='inner' && !r) return;
+      out.push([l[0],l[1],l[2], r?r[1]:'null', r?r[2]:'null']);
+    });
+  }
+  if(k==='right'||k==='ranti'||k==='full'){
+    RIGHT.forEach(function(r){
+      var l=lmap[r[0]];
+      if(k==='ranti'){ if(!l) out.push(['—','—','—',r[1],r[2]]); return; }
+      if(k==='full' && l) return;
+      if(k==='right'){ out.push([r[0], l?l[1]:'null', l?l[2]:'null', r[1], r[2]]); return; }
+      out.push([r[0],'null','null',r[1],r[2]]);
+    });
+  }
+  tbl('mergeTbl', ['รหัสแปลง','โรงเรือน','อุณหภูมิเฉลี่ย','ชนิดพืช','พื้นที่ (ไร่)'], out);
+  var notes={
+    left:'<b>Left Outer</b> — เหมือน VLOOKUP ที่สุด: เก็บทุกแถวของตารางซ้าย (5 แถว) แถวที่หาคู่ไม่ได้ (P12) ได้ <code>null</code> · <b>ใช้เมื่อ</b> อยากเสริมข้อมูลโดยไม่อยากให้แถวหาย',
+    inner:'<b>Inner</b> — เหลือเฉพาะแปลงที่มีทั้งสองฝั่ง (P01, P02, P05, P09) = 4 แถว · <b>ระวัง:</b> P12 หายไปเงียบ ๆ ถ้าไม่ตั้งใจจะทำให้ยอดรวมขาด',
+    right:'<b>Right Outer</b> — ยึดตาราง plot_master เป็นหลัก จะเห็นว่า P07 มีในทะเบียนแปลงแต่ไม่มีข้อมูลเซนเซอร์ · <b>ใช้เมื่อ</b> อยากรู้ว่าแปลงไหนยังไม่ส่งข้อมูล',
+    full:'<b>Full Outer</b> — เก็บทุกอย่างทั้งสองฝั่ง (6 แถว: 5 ซ้าย + P07 จากขวา) · <b>ใช้เมื่อ</b> ตรวจสอบความครบถ้วนของข้อมูลสองระบบ',
+    lanti:'<b>Left Anti</b> — เหลือแค่ P12 คือแปลงที่ส่งข้อมูลเซนเซอร์เข้ามาแต่ <b>ยังไม่มีในทะเบียนแปลง</b> · <b>ใช้เมื่อ</b> ตามหาข้อมูลผี/รหัสพิมพ์ผิด — เครื่องมือ QA ที่ดีที่สุดของ Power Query',
+    ranti:'<b>Right Anti</b> — เหลือ P07 คือแปลงที่มีในทะเบียนแต่เซนเซอร์เงียบ · <b>ใช้เมื่อ</b> ตรวจว่าเซนเซอร์ตัวไหนเสีย/ไม่ส่งข้อมูล'
+  };
+  document.getElementById('joinNote').innerHTML = notes[k] + '<br><br>จำนวนแถวผลลัพธ์: <b>'+out.length+'</b> (ตารางซ้ายมี 5 แถว · ตารางขวามี 5 แถว)';
+}
+document.getElementById('joinKind').addEventListener('change', buildMerge);
+buildMerge();
+
+/* ---------- PAGE 5 : M code ---------- */
+var mSteps = [
+  {k:'src', label:'Source', code:'Source = Csv.Document(File.Contents("C:\\Farm\\sensorA.csv"),\n           [Delimiter=",", Encoding=65001])',
+   note:'อ่านไฟล์ CSV เข้ามาเป็นตาราง · <code>Encoding=65001</code> คือ UTF-8 — ถ้าภาษาไทยเพี้ยนเป็น ??? ให้แก้ตรงนี้'},
+  {k:'skip', label:'Table.Skip', code:'#"Removed Top Rows" = Table.Skip(Source, 3)',
+   note:'ตัด 3 แถวแรกทิ้ง · ชื่อขั้นตอนมีช่องว่างจึงต้องเขียนในรูป <code>#"…"</code>'},
+  {k:'promote', label:'Table.PromoteHeaders', code:'#"Promoted Headers" = Table.PromoteHeaders(#"Removed Top Rows")',
+   note:'เลื่อนแถวแรกขึ้นเป็นชื่อคอลัมน์'},
+  {k:'type', label:'Table.TransformColumnTypes', code:'#"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",\n      {{"วันที่", type date}, {"อุณหภูมิ", type number}, {"ความชื้นดิน", Int64.Type}})',
+   note:'กำหนดชนิดข้อมูล — <b>ขั้นตอนที่คนลืมบ่อยที่สุด</b> ถ้าไม่ทำ ตัวเลขจะถูกมองเป็นข้อความและคำนวณไม่ได้'},
+  {k:'distinct', label:'Table.Distinct', code:'#"Removed Duplicates" = Table.Distinct(#"Changed Type")',
+   note:'ลบแถวซ้ำ · ถ้าอยากดูซ้ำเฉพาะบางคอลัมน์ ใส่รายชื่อคอลัมน์เป็น argument ที่สอง'},
+  {k:'split', label:'Table.SplitColumn', code:'#"Split Column" = Table.SplitColumn(#"Removed Duplicates", "แปลง-โซน",\n      Splitter.SplitTextByDelimiter("-"), {"รหัสแปลง", "โซน"})',
+   note:'แยก P01-A เป็นสองคอลัมน์ · เทียบเท่า Text to Columns ใน Excel แต่ทำซ้ำได้'},
+  {k:'append', label:'Table.Combine (Append)', code:'#"Appended" = Table.Combine({sensorA, sensorB, sensorC})',
+   note:'รวมหลายตารางแนวตั้ง — ชื่อคอลัมน์ต้องตรงกันจึงจะซ้อนทับกันสวย'},
+  {k:'merge', label:'Table.NestedJoin (Merge)', code:'#"Merged" = Table.NestedJoin(#"Appended", {"รหัสแปลง"},\n      plot_master, {"รหัสแปลง"}, "plot", JoinKind.LeftOuter),\n#"Expanded" = Table.ExpandTableColumn(#"Merged","plot",{"ชนิดพืช","พื้นที่"})',
+   note:'Merge สร้างคอลัมน์ตารางซ้อน ต้องกด Expand (<code>Table.ExpandTableColumn</code>) อีกทีจึงเห็นข้อมูล · เปลี่ยน <code>JoinKind.LeftOuter</code> เป็น <code>Inner / LeftAnti</code> ได้ตรงนี้'},
+  {k:'filter', label:'Table.SelectRows (Filter)', code:'#"Filtered" = Table.SelectRows(#"Expanded",\n      each [อุณหภูมิ] <> null and [อุณหภูมิ] < 45)',
+   note:'กรองแถว · <code>each</code> = ทำกับทุกแถว · <code>[ชื่อคอลัมน์]</code> = ค่าในแถวนั้น'},
+  {k:'custom', label:'Table.AddColumn (Custom)', code:'#"Added Custom" = Table.AddColumn(#"Filtered", "สถานะความชื้น",\n      each if [ความชื้นดิน] < 50 then "แห้งเกิน"\n           else if [ความชื้นดิน] > 80 then "แฉะเกิน"\n           else "ปกติ", type text)',
+   note:'สร้างคอลัมน์ใหม่ด้วยเงื่อนไข — เทียบเท่า IF ซ้อนใน Excel แต่อ่านง่ายกว่า'}
+];
+var mb=document.getElementById('mBtns');
+mSteps.forEach(function(s,i){
+  var b=document.createElement('button');
+  b.textContent=s.label;
+  b.addEventListener('click', function(){
+    mb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    document.getElementById('mCode').textContent = s.code;
+    document.getElementById('mNote').innerHTML = s.note;
+  });
+  mb.appendChild(b);
+  if(i===0) setTimeout(function(){ b.click(); },0);
+});
+
+/* ---------- PAGE 6 : refresh sim ---------- */
+var sim={files:3, loaded:3, rows:12900};
+function drawSim(msg){
+  document.getElementById('simFiles').textContent = sim.files;
+  document.getElementById('simLoaded').textContent = sim.loaded;
+  document.getElementById('simRows').textContent = sim.rows.toLocaleString();
+  document.getElementById('simTime').textContent = 0;
+  document.getElementById('simNote').innerHTML = msg;
+}
+document.getElementById('btnAddFile').addEventListener('click', function(){
+  sim.files++;
+  drawSim('📥 มีไฟล์ใหม่ <code>sensor'+String.fromCharCode(64+sim.files)+'_ก.ค.csv</code> ในโฟลเดอร์ แต่ Data Model ยังมี '+sim.loaded+' ไฟล์ — <b>ยังไม่มีอะไรเปลี่ยน จนกว่าจะกด Refresh</b>');
+});
+document.getElementById('btnRefresh').addEventListener('click', function(){
+  if(sim.loaded===sim.files){ drawSim('🔄 Refresh เสร็จ — ไม่มีไฟล์ใหม่ ข้อมูลเท่าเดิม'); return; }
+  var added=(sim.files-sim.loaded);
+  sim.rows += added*4300; sim.loaded=sim.files;
+  drawSim('✅ Refresh เสร็จใน 5 วินาที — เพิ่ม '+added+' ไฟล์ (~'+(added*4300).toLocaleString()+' แถว) <b>ผ่านทุกขั้นตอนทำความสะอาด + Append + Merge อัตโนมัติ</b> โดยไม่ต้องแก้อะไรเลย<br>เวลาที่ใช้แก้มือ = <b>0 นาที</b> 🎉');
+});
+document.getElementById('btnResetSim').addEventListener('click', function(){
+  sim={files:3,loaded:3,rows:12900}; drawSim('โฟลเดอร์มี 3 ไฟล์ ทุกอย่างซิงก์กันอยู่');
+});
+
+/* ---------- QUIZ ---------- */
+var QUIZ = [
+ {q:'ETL ย่อมาจากอะไร และ Power Query ทำหน้าที่ส่วนใดมากที่สุด?',
+  a:['Extract, Transform, Load — Power Query เด่นที่ Transform','Excel, Table, List — Power Query ทำ List','Export, Test, Launch — Power Query ทำ Test','Enter, Type, Link — Power Query ทำ Link'],
+  c:0, e:'ETL = Extract (ดึง) → Transform (แปลง) → Load (โหลด) โดย Power Query ทำได้ทั้งสามส่วน แต่จุดแข็งคือ Transform ที่บันทึกขั้นตอนไว้ทำซ้ำได้'},
+ {q:'ไฟล์ CSV มีหัวรายงาน 3 บรรทัดก่อนถึงชื่อคอลัมน์จริง ควรทำขั้นตอนใดตามลำดับ?',
+  a:['Use First Row as Headers → Remove Top Rows (3)','Remove Top Rows (3) → Use First Row as Headers','Remove Duplicates → Use First Row as Headers','Change Type → Remove Top Rows (3)'],
+  c:1, e:'ต้องตัดขยะออกก่อน แล้วค่อยเลื่อนแถวแรกขึ้นเป็นหัวตาราง ถ้าสลับลำดับ หัวตารางจะกลายเป็นข้อความหัวรายงาน และคิวรีจะพังทั้งสาย'},
+ {q:'ต้องการรวม log เซนเซอร์ 12 เดือนที่มีหัวตารางเหมือนกัน ให้เป็นตารางเดียว ควรใช้อะไร?',
+  a:['Merge','Append','Group By','Pivot Column'],
+  c:1, e:'Append = ต่อ "แถว" ใช้เมื่อโครงสร้างเหมือนกันแต่คนละไฟล์/ช่วงเวลา · Merge = ต่อ "คอลัมน์" ใช้เมื่อดึงข้อมูลจากอีกตารางมาเสริม (จำ: Append ยาวลง ↓, Merge กว้างออก →)'},
+ {q:'ต้องการหาว่ารหัสแปลงใดในไฟล์เซนเซอร์ที่ไม่มีอยู่ในทะเบียนแปลง ควรใช้ Join แบบใด?',
+  a:['Inner Join','Full Outer Join','Left Anti Join','Right Outer Join'],
+  c:2, e:'Left Anti Join คืนเฉพาะแถวของตารางซ้ายที่จับคู่กับตารางขวาไม่ได้ — เป็นเครื่องมือ QA ที่เร็วที่สุดสำหรับหารหัสพิมพ์ผิดหรือข้อมูลที่ยังไม่ลงทะเบียน'},
+ {q:'หลัง Merge แบบ Left Outer จำนวนแถวเพิ่มจาก 500 เป็น 870 สาเหตุที่เป็นไปได้มากที่สุดคือ?',
+  a:['Power Query มีบั๊ก','คีย์ในตารางขวามีค่าซ้ำ ทำให้แถวถูกจับคู่หลายครั้ง','ลืมกด Close & Load','ตารางซ้ายมีค่าว่าง'],
+  c:1, e:'ถ้าคีย์ฝั่งขวาซ้ำ แถวซ้าย 1 แถวจะจับคู่ได้หลายแถว ทำให้ข้อมูลบานปลายและยอดรวมเพี้ยน จึงควรตรวจ Remove Duplicates ที่ตารางขวาก่อน Merge เสมอ'},
+ {q:'ข้อใดคือเหตุผลหลักที่ต้องทำ Change Type ทุกครั้ง?',
+  a:['ทำให้ไฟล์เล็กลง','เพื่อให้สีตารางสวยขึ้น','ถ้าไม่ทำ ตัวเลข/วันที่จะถูกมองเป็นข้อความ ทำให้คำนวณและเรียงลำดับผิด','Power Query บังคับให้ทำ'],
+  c:2, e:'ชนิดข้อมูลผิดคือสาเหตุอันดับต้น ๆ ของผลวิเคราะห์ผิด เช่น อุณหภูมิเป็น Text จะหาค่าเฉลี่ยไม่ได้ หรือวันที่เป็น Text จะเรียงลำดับผิด'},
+ {q:'โครงสร้างโค้ด M ที่ถูกต้องคือข้อใด?',
+  a:['begin … end','let … in','function … return','query … select'],
+  c:1, e:'ภาษา M ใช้โครง let (ประกาศขั้นตอนแต่ละขั้นคั่นด้วยจุลภาค) … in (ระบุขั้นตอนสุดท้ายที่จะส่งออก) และ M เป็นภาษาที่แยกตัวพิมพ์ใหญ่–เล็ก'},
+ {q:'จะทำอย่างไรให้ Power Query รับไฟล์เดือนใหม่โดยไม่ต้องแก้คิวรีเลย?',
+  a:['Get Data → From Folder แล้ว Combine','ก็อปข้อมูลวางท้ายตารางเดิม','สร้างคิวรีใหม่ทุกเดือน','ใช้ VLOOKUP เชื่อมไฟล์'],
+  c:0, e:'From Folder จะอ่านทุกไฟล์ในโฟลเดอร์นั้น เมื่อวางไฟล์ใหม่แล้วกด Refresh ระบบจะ Append ให้เองอัตโนมัติ — นี่คือแพตเทิร์นมาตรฐานของงานที่ข้อมูลเข้ามาเป็นรอบ'},
+ {q:'ตัวเลือก Load แบบใดเหมาะกับ "ตารางดิบที่จะเอาไป Merge ต่อ แต่ไม่ต้องการเห็นในชีต"?',
+  a:['Table (Worksheet)','PivotTable Report','Only Create Connection','Add to Data Model'],
+  c:2, e:'Only Create Connection จะไม่โหลดข้อมูลลงชีต ทำให้ไฟล์เบาและเปิดเร็ว แต่ยังใช้เป็นแหล่งข้อมูลให้คิวรีอื่นมา Append/Merge ได้'},
+ {q:'ข้อใด "ไม่ใช่" ข้อดีของ Power Query เมื่อเทียบกับการแก้ข้อมูลด้วยมือใน Excel?',
+  a:['ทำซ้ำได้ด้วยการกด Refresh','ตรวจสอบย้อนหลังได้ว่าแก้อะไรไปบ้างจาก Applied Steps','ลดความผิดพลาดจากการก็อปวาง','ทำให้ข้อมูลต้นทางถูกแก้ไขให้ถูกต้องไปด้วย'],
+  c:3, e:'Power Query ไม่แตะไฟล์ต้นทางเลย มันอ่านมาแล้วแปลงในคิวรีเท่านั้น (non-destructive) ซึ่งเป็นข้อดีด้านความปลอดภัยของข้อมูล ไม่ใช่ข้อเสีย แต่ก็ไม่ได้ "แก้ต้นทางให้"'}
+];
+</script>
+<script>
+/* ===== navigation ===== */
+var PAGES = document.querySelectorAll('section.page');
+var TABS  = document.querySelectorAll('#tabs button');
+function go(i){
+  if(i<0) i=0; if(i>=PAGES.length) i=PAGES.length-1;
+  PAGES.forEach(function(p,k){ p.classList.toggle('active', k===i); });
+  TABS.forEach(function(b,k){ b.classList.toggle('active', k===i); });
+  document.getElementById('pbar').style.width = ((i+1)/PAGES.length*100)+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(typeof onPage==='function') onPage(i);
+}
+TABS.forEach(function(b){ b.addEventListener('click', function(){ go(+b.dataset.p); }); });
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  var cur = 0; PAGES.forEach(function(p,k){ if(p.classList.contains('active')) cur=k; });
+  if(e.key==='ArrowRight') go(cur+1);
+  if(e.key==='ArrowLeft')  go(cur-1);
+});
+go(0);
+
+/* ===== quiz engine ===== */
+(function(){
+  var wrap = document.getElementById('quizWrap');
+  if(!wrap || typeof QUIZ==='undefined') return;
+  var answered = 0, score = 0;
+  QUIZ.forEach(function(q, qi){
+    var d = document.createElement('div');
+    d.className = 'quiz-q';
+    var h = '<div class="qhead">'+(qi+1)+'. '+q.q+'</div>';
+    q.a.forEach(function(opt, oi){
+      h += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</button>';
+    });
+    h += '<div class="explain" id="ex'+qi+'"><b>เฉลย:</b> '+q.e+'</div>';
+    d.innerHTML = h;
+    wrap.appendChild(d);
+  });
+  wrap.addEventListener('click', function(ev){
+    var b = ev.target.closest('.opt');
+    if(!b || b.classList.contains('disabled')) return;
+    var qi = +b.dataset.q, oi = +b.dataset.o;
+    var box = b.parentNode;
+    if(box.dataset.done) return;
+    box.dataset.done = '1';
+    box.querySelectorAll('.opt').forEach(function(o,k){
+      o.classList.add('disabled');
+      if(k===QUIZ[qi].c) o.classList.add('correct');
+    });
+    if(oi!==QUIZ[qi].c) b.classList.add('wrong'); else score++;
+    document.getElementById('ex'+qi).classList.add('show');
+    answered++;
+    var sb = document.getElementById('scorebox');
+    if(answered===QUIZ.length && sb){
+      sb.classList.add('show');
+      document.getElementById('scoreNum').textContent = score+' / '+QUIZ.length;
+      var pct = Math.round(score/QUIZ.length*100);
+      document.getElementById('scoreMsg').textContent =
+        pct>=80 ? 'เยี่ยมมาก! พร้อมไปคาบต่อไปแล้ว 🎉' :
+        pct>=60 ? 'ผ่านเกณฑ์ แต่ควรทบทวนข้อที่ตอบผิดอีกครั้ง' :
+                  'ลองกลับไปทบทวนเนื้อหาแต่ละหน้าอีกรอบนะ';
+      sb.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+  var rb = document.getElementById('resetQuiz');
+  if(rb) rb.addEventListener('click', function(){ location.reload(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 4 (Power BI & DAX · สื่อ Interactive)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.65}
+  a{color:var(--brand2)}
+  header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 11px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; transition:.15s; font-family:inherit}
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none}
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  select, input[type=text], input[type=date], input[type=number], textarea{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink)}
+  select:focus, input:focus, textarea:focus{outline:none; border-color:var(--brand)}
+  label.fld{display:block; font-weight:700; font-size:13.5px; margin-bottom:5px; color:#334155}
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row > div{flex:1; min-width:150px}
+  input[type=range]{width:100%; accent-color:var(--brand)}
+  .fx{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px 16px; font-family:"Consolas",monospace; font-size:14px; margin-top:12px; overflow-x:auto}
+  .fx .formula{color:#4ade80; white-space:pre-wrap}
+  .fx .res{color:#fde047; font-weight:700; font-size:18px}
+  .fx .desc{color:#94a3b8; font-size:13px; margin-top:8px; font-family:inherit}
+  table.xl{border-collapse:collapse; width:100%; font-size:13.5px; margin-top:10px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 9px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700; position:sticky; top:0}
+  table.xl tr:nth-child(even) td{background:#f8fafc}
+  table.xl td.hl{background:#dcfce7 !important; font-weight:700}
+  table.xl td.warn{background:#fef2f2 !important; color:#b91c1c; font-weight:700}
+  .scroll{max-height:340px; overflow:auto; border-radius:10px; border:1px solid var(--line)}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .note{font-size:13px; color:var(--muted)}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .kv .box{flex:1; min-width:120px; text-align:center; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb}
+  .kv .box .v{font-size:22px; font-weight:800; color:var(--brand2)}
+  .kv .box .l{font-size:12px; color:var(--muted)}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .steps{counter-reset:s; padding-left:0; list-style:none}
+  .steps li{position:relative; padding:10px 0 10px 42px; border-bottom:1px dashed var(--line)}
+  .steps li:before{counter-increment:s; content:counter(s); position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:9px; background:var(--brand-soft); color:var(--brand2); font-weight:800; display:grid; place-items:center; font-size:13px}
+  code{background:#f1f5f9; padding:2px 6px; border-radius:6px; font-family:"Consolas",monospace; font-size:.92em; color:#0f172a}
+  .cols2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+  .callout{border-left:4px solid var(--amber); background:#fffbeb; padding:12px 16px; border-radius:0 12px 12px 0; margin-top:14px; font-size:14.5px}
+  .callout.good{border-color:var(--brand); background:#f0fdf4}
+  .callout.bad{border-color:var(--red); background:#fef2f2}
+  .chartbox{position:relative; height:300px; margin-top:14px}
+</style>
+</head>
+<body>
+<script>
+function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th-TH',{minimumFractionDigits:d, maximumFractionDigits:d}); }
+</script>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 4</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">Data Model</button>
+      <button data-p="2">Column vs Measure</button>
+      <button data-p="3">DAX ห้องทดลอง</button>
+      <button data-p="4">CALCULATE</button>
+      <button data-p="5">Time Intelligence</button>
+      <button data-p="6">KPI โลจิสติกส์</button>
+      <button data-p="7">ออกแบบ Dashboard</button>
+      <button data-p="8">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ===== PAGE 0 ===== -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">Power BI · DAX · Dashboard</span>
+    <h1>ครั้งที่ 4 — Power BI &amp; DAX: Farm Performance Dashboard</h1>
+    <p class="lead muted">จากข้อมูลที่สะอาดแล้วในคาบที่ 3 → คาบนี้เปลี่ยนเป็น <b style="color:#bbf7d0">แดชบอร์ดที่ผู้จัดการฟาร์มเปิดดูแล้วตัดสินใจได้ทันที</b><br>
+    หัวใจคือ 2 เรื่อง: <b>โมเดลข้อมูล</b> ที่ถูกต้อง และ <b>Measure (DAX)</b> ที่คำนวณตามบริบทของตัวกรอง</p>
+    <div class="row" style="margin-top:18px">
+      <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(3)">ลองเขียน DAX เลย</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">เป้าหมาย</span>
+    <h2>จบคาบนี้แล้วต้องทำอะไรได้</h2>
+    <div class="grid g2">
+      <div class="tile"><div class="n">1</div><b>ออกแบบ Star Schema</b><div class="note">แยก Fact / Dimension และสร้าง Date Table ให้ถูกต้อง</div></div>
+      <div class="tile"><div class="n">2</div><b>แยก Column กับ Measure</b><div class="note">รู้ว่าเมื่อไรควรใช้อะไร และทำไมใช้ผิดแล้วไฟล์อืด</div></div>
+      <div class="tile"><div class="n">3</div><b>เขียน DAX พื้นฐาน</b><div class="note">SUM, SUMX, AVERAGE, DIVIDE, COUNTROWS, CALCULATE</div></div>
+      <div class="tile"><div class="n">4</div><b>Time Intelligence</b><div class="note">TOTALYTD, SAMEPERIODLASTYEAR — เทียบผลผลิตปีนี้กับปีก่อน</div></div>
+      <div class="tile"><div class="n">5</div><b>KPI โลจิสติกส์</b><div class="note">OTIF, Fill Rate, Inventory Turnover, Order Cycle Time</div></div>
+      <div class="tile"><div class="n">6</div><b>เล่าเรื่องด้วยแดชบอร์ด</b><div class="note">วางเลย์เอาต์ให้คนอ่านเข้าใจใน 5 วินาที</div></div>
+    </div>
+    <div class="callout">💡 <b>ประโยคที่อยากให้จำ:</b> Excel คำนวณตาม "เซลล์" · Power BI คำนวณตาม "บริบทของตัวกรอง (filter context)" — เข้าใจข้อนี้ = เข้าใจ DAX ไปแล้วครึ่งทาง</div>
+  </div>
+  <div class="nav-next"><span></span><button class="btn" onclick="go(1)">ถัดไป: Data Model →</button></div>
+</section>
+
+<!-- ===== PAGE 1 : DATA MODEL ===== -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">รากฐานที่สำคัญที่สุด</span>
+    <h2>⭐ Star Schema — ตารางข้อเท็จจริงล้อมด้วยตารางมิติ</h2>
+    <p class="lead">อย่ายัดทุกอย่างไว้ตารางเดียว! แยกเป็น <b>Fact</b> (สิ่งที่วัดได้ เกิดซ้ำ ๆ) และ <b>Dimension</b> (สิ่งที่ใช้แบ่งกลุ่ม/กรอง)</p>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><b>📅 DimDate</b><div class="note">วันที่, ปี, ไตรมาส, เดือน, ฤดูกาล<br><span class="badge">Dimension</span></div></div>
+      <div class="tile" style="background:#fff7ed;border-color:var(--amber)"><b>📊 FactHarvest</b><div class="note">วันที่, รหัสแปลง, รหัสพืช, กก.ที่เก็บได้, ของเสีย, ต้นทุน, ยอดขาย<br><span class="badge">Fact — ตารางใหญ่</span></div></div>
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><b>🌱 DimPlot</b><div class="note">รหัสแปลง, โรงเรือน, พื้นที่ (ไร่), ระบบให้น้ำ<br><span class="badge">Dimension</span></div></div>
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><b>🥬 DimCrop</b><div class="note">รหัสพืช, ชนิดพืช, กลุ่มสินค้า, อายุเก็บเกี่ยว<br><span class="badge">Dimension</span></div></div>
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><b>🚚 DimCustomer</b><div class="note">รหัสลูกค้า, ช่องทาง, จังหวัด<br><span class="badge">Dimension</span></div></div>
+      <div class="tile" style="background:#fff7ed;border-color:var(--amber)"><b>📦 FactShipment</b><div class="note">วันที่จัดส่ง, รหัสลูกค้า, จำนวนสั่ง, จำนวนส่ง, ส่งตรงเวลา?<br><span class="badge">Fact</span></div></div>
+    </div>
+    <div class="callout good">✅ <b>กฎง่าย ๆ:</b> ความสัมพันธ์เป็น <b>1 ต่อกลุ่ม (One-to-Many)</b> เสมอ — ฝั่ง "1" คือ Dimension, ฝั่ง "กลุ่ม" คือ Fact และตัวกรองไหลจาก Dimension → Fact ทางเดียว</div>
+  </div>
+
+  <div class="card">
+    <h2>🔍 ทำไมต้องมี Date Table แยก?</h2>
+    <p>Time Intelligence ทุกฟังก์ชัน (<code>TOTALYTD</code>, <code>SAMEPERIODLASTYEAR</code>) ต้องการตารางวันที่ที่ <b>ต่อเนื่องครบทุกวัน</b> และถูกทำเครื่องหมายเป็น Date Table</p>
+    <div class="cols2">
+      <div>
+        <h3 style="color:var(--red)">❌ ใช้คอลัมน์วันที่ในตาราง Fact ตรง ๆ</h3>
+        <ul class="steps">
+          <li>วันที่ที่ไม่มีการเก็บเกี่ยวจะหายไป → กราฟขาดช่วง</li>
+          <li>เทียบปีต่อปีเพี้ยน เพราะจำนวนวันไม่เท่ากัน</li>
+          <li>ถ้ามี 2 Fact (Harvest, Shipment) จะกรองพร้อมกันไม่ได้</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--brand2)">✅ สร้าง DimDate แล้วเชื่อมทั้งสอง Fact</h3>
+        <div class="fx"><div class="formula">DimDate =
+CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
+
+-- แล้วเพิ่มคอลัมน์
+ปี      = YEAR([Date])
+เดือน   = FORMAT([Date],"MMM")
+ไตรมาส  = "Q" &amp; QUARTER([Date])
+ฤดูกาล  = IF(MONTH([Date]) IN {11,12,1,2}, "ฤดูหนาว",
+          IF(MONTH([Date]) IN {3,4,5}, "ฤดูร้อน", "ฤดูฝน"))</div></div>
+      </div>
+    </div>
+    <div class="callout bad">⚠️ อย่าลืม <code>Table tools → Mark as date table</code> ไม่งั้น Time Intelligence จะให้ผลผิดแบบเงียบ ๆ</div>
+  </div>
+
+  <div class="card">
+    <h2>เลือกดูผลของทิศทางตัวกรอง</h2>
+    <div class="row">
+      <div><label class="fld">ถ้ากรองที่ตารางนี้…</label>
+        <select id="filterFrom">
+          <option value="crop">DimCrop = "ผักสลัดกรีนโอ๊ค"</option>
+          <option value="date">DimDate = ปี 2026</option>
+          <option value="fact">FactHarvest = ของเสีย > 10 กก.</option>
+        </select>
+      </div>
+    </div>
+    <div class="callout" id="flowNote"></div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← ย้อนกลับ</button><button class="btn" onclick="go(2)">ถัดไป: Column vs Measure →</button></div>
+</section>
+
+<!-- ===== PAGE 2 : COLUMN VS MEASURE ===== -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">คำถามยอดฮิตในการสอบ</span>
+    <h2>🆚 Calculated Column vs Measure</h2>
+    <div class="cols2">
+      <div class="tile">
+        <b style="font-size:18px">Calculated Column</b>
+        <ul>
+          <li>คำนวณ <b>ทีละแถว</b> ตอนโหลดข้อมูล (row context)</li>
+          <li>เก็บผลลัพธ์ไว้ในหน่วยความจำจริง → กินพื้นที่</li>
+          <li>ค่าคงที่ ไม่เปลี่ยนตาม Slicer</li>
+          <li>ใช้ได้ในแกน/Slicer/ตัวกรอง</li>
+        </ul>
+        <div class="fx"><div class="formula">กำไรต่อแถว =
+    FactHarvest[ยอดขาย] - FactHarvest[ต้นทุน]</div></div>
+        <div class="callout good" style="font-size:13.5px">ใช้เมื่อ: ต้องการ <b>จัดกลุ่ม/กรอง</b> เช่น สร้างคอลัมน์ "ระดับของเสีย" = สูง/กลาง/ต่ำ เพื่อเอาไปทำ Slicer</div>
+      </div>
+      <div class="tile">
+        <b style="font-size:18px">Measure</b>
+        <ul>
+          <li>คำนวณ <b>ตอนแสดงผล</b> ตามตัวกรองที่ใช้อยู่ (filter context)</li>
+          <li>ไม่เก็บข้อมูล → ไฟล์เล็ก เร็ว</li>
+          <li>เปลี่ยนค่าทันทีเมื่อคลิก Slicer</li>
+          <li>ใช้ในการ์ด KPI, กราฟ, ตาราง</li>
+        </ul>
+        <div class="fx"><div class="formula">กำไรรวม =
+    SUM(FactHarvest[ยอดขาย]) - SUM(FactHarvest[ต้นทุน])</div></div>
+        <div class="callout good" style="font-size:13.5px">ใช้เมื่อ: ต้องการ <b>ตัวเลขสรุป</b> ที่ตอบสนองตัวกรอง — <b>เป็นค่าเริ่มต้นที่ควรเลือกก่อนเสมอ</b></div>
+      </div>
+    </div>
+    <div class="callout">🧠 <b>กฎการตัดสินใจ:</b> ถามตัวเองว่า "ฉันจะเอาสิ่งนี้ไปวางบนแกน X หรือ Slicer ไหม?" → ถ้าใช่ ใช้ Column · ถ้าจะเอาไปเป็นตัวเลขในกราฟ → ใช้ Measure</div>
+  </div>
+
+  <div class="card">
+    <h2>🧪 ทดลอง: ทำไม Measure ถึงตอบสนอง Slicer แต่ Column ไม่</h2>
+    <div class="row">
+      <div><label class="fld">Slicer: ชนิดพืช</label>
+        <select id="cmCrop"><option value="all">ทั้งหมด</option><option>กรีนโอ๊ค</option><option>คอส</option><option>เคล</option></select></div>
+      <div><label class="fld">Slicer: ปี</label>
+        <select id="cmYear"><option value="all">ทั้งหมด</option><option>2025</option><option>2026</option></select></div>
+    </div>
+    <div class="kv">
+      <div class="box"><div class="v" id="cmMeasure">–</div><div class="l">Measure: กำไรรวม (ตอบสนอง Slicer)</div></div>
+      <div class="box"><div class="v" id="cmColumn">–</div><div class="l">Column: กำไรของแถวแรกในตาราง (คงที่เสมอ)</div></div>
+      <div class="box"><div class="v" id="cmRows">–</div><div class="l">แถวที่อยู่ในบริบทตอนนี้</div></div>
+    </div>
+    <div class="callout" id="cmNote"></div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: DAX ห้องทดลอง →</button></div>
+</section>
+
+<!-- ===== PAGE 3 : DAX LAB ===== -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">ลงมือทำ</span>
+    <h2>🧮 ห้องทดลอง DAX — เลือก Measure แล้วดูผลจริง</h2>
+    <p class="lead">ข้อมูลชุดเดียวกันทั้งหน้า: ผลผลิตรายเดือน 2 ปี × 3 ชนิดพืช · เปลี่ยน Slicer แล้วสังเกตว่าเลขขยับอย่างไร</p>
+    <div class="row">
+      <div><label class="fld">ปี</label><select id="dxYear"><option value="all">ทั้งหมด</option><option>2025</option><option>2026</option></select></div>
+      <div><label class="fld">ชนิดพืช</label><select id="dxCrop"><option value="all">ทั้งหมด</option><option>กรีนโอ๊ค</option><option>คอส</option><option>เคล</option></select></div>
+      <div><label class="fld">ครึ่งปี</label><select id="dxHalf"><option value="all">ทั้งปี</option><option value="h1">ม.ค.–มิ.ย.</option><option value="h2">ก.ค.–ธ.ค.</option></select></div>
+    </div>
+    <div class="fn-list" id="dxBtns"></div>
+    <div class="fx"><div class="formula" id="dxCode"></div><div style="margin-top:10px">ผลลัพธ์ = <span class="res" id="dxRes"></span></div><div class="desc" id="dxDesc"></div></div>
+    <div class="chartbox"><canvas id="dxChart"></canvas></div>
+    <div class="note" style="margin-top:8px">กราฟแสดง Measure ที่เลือก แยกตามเดือน ภายใต้ตัวกรองปัจจุบัน</div>
+  </div>
+
+  <div class="card">
+    <h2>SUM vs SUMX — จุดที่คนพลาดบ่อย</h2>
+    <div class="cols2">
+      <div>
+        <div class="fx"><div class="formula">-- ❌ ผิด: หาค่าเฉลี่ยราคาต่อ กก. แบบนี้
+ราคาเฉลี่ยผิด =
+    AVERAGE(FactHarvest[ราคาต่อกก.])</div></div>
+        <div class="note">เฉลี่ยแบบไม่ถ่วงน้ำหนัก — เดือนที่ขายได้ 10 กก. มีน้ำหนักเท่าเดือนที่ขาย 5,000 กก.</div>
+      </div>
+      <div>
+        <div class="fx"><div class="formula">-- ✅ ถูก: ถ่วงน้ำหนักด้วยปริมาณ
+ราคาเฉลี่ยถูก =
+    DIVIDE(
+        SUMX(FactHarvest, [ปริมาณ] * [ราคาต่อกก.]),
+        SUM(FactHarvest[ปริมาณ])
+    )</div></div>
+        <div class="note"><code>SUMX</code> คำนวณทีละแถวก่อนแล้วค่อยรวม — ใช้เมื่อสูตรต้องคูณ/หารกันในระดับแถว</div>
+      </div>
+    </div>
+    <div class="callout bad">⚠️ ใช้ <code>DIVIDE(a, b)</code> แทน <code>a / b</code> เสมอ — DIVIDE จัดการหารด้วยศูนย์ให้ (คืน BLANK แทน error) ซึ่งเกิดบ่อยมากเมื่อ Slicer กรองจนไม่เหลือข้อมูล</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: CALCULATE →</button></div>
+</section>
+
+<!-- ===== PAGE 4 : CALCULATE ===== -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">ฟังก์ชันที่ทรงพลังที่สุดใน DAX</span>
+    <h2>⚡ CALCULATE — เปลี่ยนบริบทของตัวกรอง</h2>
+    <div class="fx"><div class="formula">CALCULATE( &lt;นิพจน์ที่จะคำนวณ&gt; , &lt;ตัวกรองที่ 1&gt; , &lt;ตัวกรองที่ 2&gt; , … )</div>
+      <div class="desc">อ่านว่า: "คำนวณสิ่งนี้ <b>ใหม่</b> โดยแทนที่/เพิ่มตัวกรองตามที่ระบุ"</div></div>
+    <p style="margin-top:14px">ลองกดดูว่าตัวกรองแต่ละแบบเปลี่ยนผลลัพธ์อย่างไร (บริบทปัจจุบัน: <b id="calcCtx"></b>)</p>
+    <div class="row">
+      <div><label class="fld">Slicer ที่ผู้ใช้เลือกอยู่: ชนิดพืช</label>
+        <select id="calcSlicer"><option value="all">ทั้งหมด</option><option>กรีนโอ๊ค</option><option>คอส</option><option>เคล</option></select></div>
+    </div>
+    <div class="fn-list" id="calcBtns"></div>
+    <div class="fx"><div class="formula" id="calcCode"></div><div style="margin-top:10px">ผลลัพธ์ = <span class="res" id="calcRes"></span></div><div class="desc" id="calcDesc"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>3 พฤติกรรมของ CALCULATE ที่ต้องแยกให้ออก</h2>
+    <table class="xl">
+      <tr><th>รูปแบบ</th><th>ทำอะไร</th><th>ตัวอย่างใช้จริงในฟาร์ม</th></tr>
+      <tr><td><code>CALCULATE([ยอดขาย], DimCrop[ชนิด]="เคล")</code></td><td>แทนที่ตัวกรองเดิมบนคอลัมน์นั้น</td><td style="text-align:left">การ์ด "ยอดขายเคล" ที่ไม่เปลี่ยนแม้ผู้ใช้เลือกพืชอื่น</td></tr>
+      <tr><td><code>CALCULATE([ยอดขาย], ALL(DimCrop))</code></td><td>ล้างตัวกรองออกทั้งตาราง</td><td style="text-align:left">หาสัดส่วน % ของพืชแต่ละชนิดเทียบยอดรวมทั้งฟาร์ม</td></tr>
+      <tr><td><code>CALCULATE([ยอดขาย], FactHarvest[ของเสีย]&gt;10)</code></td><td>เพิ่มเงื่อนไขซ้อนบนตัวกรองเดิม</td><td style="text-align:left">ดูเฉพาะล็อตที่ของเสียเกินเกณฑ์</td></tr>
+    </table>
+    <div class="callout good">💡 <b>สูตร % ของทั้งหมด</b> ที่ใช้บ่อยที่สุดในแดชบอร์ด:<br>
+      <code>% ยอดขาย = DIVIDE( [ยอดขายรวม], CALCULATE([ยอดขายรวม], ALL(DimCrop)) )</code></div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(3)">← ย้อนกลับ</button><button class="btn" onclick="go(5)">ถัดไป: Time Intelligence →</button></div>
+</section>
+
+<!-- ===== PAGE 5 : TIME INTELLIGENCE ===== -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">เทียบเวลา</span>
+    <h2>📅 Time Intelligence — ปีนี้เทียบปีก่อน</h2>
+    <p class="lead">คำถามที่ผู้จัดการฟาร์มถามบ่อยที่สุดคือ "<b>เดือนนี้ดีกว่าปีที่แล้วไหม?</b>" — DAX มีฟังก์ชันสำเร็จรูปให้</p>
+    <div class="row">
+      <div><label class="fld">ชนิดพืช</label><select id="tiCrop"><option value="all">ทั้งหมด</option><option>กรีนโอ๊ค</option><option>คอส</option><option>เคล</option></select></div>
+      <div><label class="fld">ดูค่า</label><select id="tiMetric"><option value="kg">ผลผลิต (กก.)</option><option value="sales">ยอดขาย (บาท)</option></select></div>
+    </div>
+    <div class="kv">
+      <div class="box"><div class="v" id="ti2026">–</div><div class="l">ปี 2026 (YTD)</div></div>
+      <div class="box"><div class="v" id="ti2025">–</div><div class="l">ปี 2025 (ช่วงเดียวกัน)</div></div>
+      <div class="box"><div class="v" id="tiYoY">–</div><div class="l">YoY %</div></div>
+    </div>
+    <div class="chartbox"><canvas id="tiChart"></canvas></div>
+    <div class="callout" id="tiNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>สูตรที่ใช้บ่อยที่สุด 4 ตัว</h2>
+    <div class="fx"><div class="formula">ยอดขายรวม        = SUM(FactHarvest[ยอดขาย])
+
+ยอดขาย YTD       = TOTALYTD([ยอดขายรวม], DimDate[Date])
+
+ยอดขายปีก่อน      = CALCULATE([ยอดขายรวม], SAMEPERIODLASTYEAR(DimDate[Date]))
+
+YoY %            = DIVIDE([ยอดขายรวม] - [ยอดขายปีก่อน], [ยอดขายปีก่อน])</div>
+      <div class="desc">ทั้ง 4 ตัวต้องมี DimDate ที่ Mark as date table แล้วเท่านั้น · <code>TOTALYTD</code> = สะสมตั้งแต่ต้นปีถึงจุดที่กำลังดู</div></div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="tile"><b>ฟาร์มที่ปีบัญชีไม่ตรงปีปฏิทิน</b><div class="note">ใส่ argument ที่ 3: <code>TOTALYTD([ยอดขายรวม], DimDate[Date], "30/9")</code> สำหรับปีบัญชีสิ้นสุด 30 ก.ย.</div></div>
+      <div class="tile"><b>ผลผลิตเกษตรมีฤดูกาล</b><div class="note">เทียบเดือนต่อเดือน (MoM) อาจหลอกตา เพราะฤดูต่างกัน — ควรเทียบ <b>ปีต่อปีเดือนเดียวกัน</b> เป็นหลัก</div></div>
+    </div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: KPI โลจิสติกส์ →</button></div>
+</section>
+
+<!-- ===== PAGE 6 : KPI ===== -->
+<section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">ตัวชี้วัดที่ใช้จริงในสายงาน</span>
+    <h2>🚚 KPI โลจิสติกส์สินค้าเกษตร — คำนวณเอง</h2>
+    <p class="lead">ปรับตัวเลขด้านล่างแล้วดูว่า KPI ขยับอย่างไร · เลือกอย่างน้อย 2 ตัวใส่ในแดชบอร์ดของคุณ</p>
+    <div class="row">
+      <div><label class="fld">จำนวนคำสั่งซื้อทั้งหมด</label><input type="number" id="kOrders" value="480"></div>
+      <div><label class="fld">ส่งครบ <b>และ</b> ตรงเวลา</label><input type="number" id="kOtif" value="452"></div>
+      <div><label class="fld">จำนวนที่ลูกค้าสั่ง (กก.)</label><input type="number" id="kDemand" value="52000"></div>
+      <div><label class="fld">จำนวนที่ส่งได้จริง (กก.)</label><input type="number" id="kShip" value="48600"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div><label class="fld">ต้นทุนขาย/ปี (บาท)</label><input type="number" id="kCogs" value="9600000"></div>
+      <div><label class="fld">สต๊อกเฉลี่ย (บาท)</label><input type="number" id="kInv" value="620000"></div>
+      <div><label class="fld">รวมเวลา รับออเดอร์→ถึงมือลูกค้า (ชม.)</label><input type="number" id="kCycle" value="15840"></div>
+      <div><label class="fld">ของเสียหลังเก็บเกี่ยว (กก.)</label><input type="number" id="kWaste" value="3100"></div>
+    </div>
+    <div class="grid g2" id="kpiCards" style="margin-top:18px"></div>
+  </div>
+
+  <div class="card">
+    <h2>นิยามและสูตร</h2>
+    <table class="xl">
+      <tr><th>KPI</th><th>สูตร</th><th>ความหมายในบริบทฟาร์ม</th><th>เกณฑ์ทั่วไป</th></tr>
+      <tr><td><b>OTIF</b><br>(On-Time In-Full)</td><td>ออเดอร์ที่ส่งครบและตรงเวลา ÷ ออเดอร์ทั้งหมด</td><td style="text-align:left">ผักถึงมือลูกค้าครบจำนวนและทันรอบจัดเรียงหน้าร้าน</td><td>≥ 95%</td></tr>
+      <tr><td><b>Fill Rate</b></td><td>ปริมาณที่ส่งได้ ÷ ปริมาณที่ลูกค้าสั่ง</td><td style="text-align:left">วัดว่าผลผลิตพอกับอุปสงค์แค่ไหน</td><td>≥ 95%</td></tr>
+      <tr><td><b>Inventory Turnover</b></td><td>ต้นทุนขาย ÷ สต๊อกเฉลี่ย</td><td style="text-align:left">ของสดหมุนเร็วแค่ไหน — สินค้าเกษตรควรสูงกว่าสินค้าทั่วไปมาก</td><td>สูงยิ่งดี</td></tr>
+      <tr><td><b>Order Cycle Time</b></td><td>เวลารวม ÷ จำนวนออเดอร์</td><td style="text-align:left">ยิ่งสั้น ผักยิ่งสด อายุวางขายยิ่งยาว</td><td>ยิ่งต่ำยิ่งดี</td></tr>
+      <tr><td><b>Post-Harvest Loss</b></td><td>ของเสีย ÷ ผลผลิตทั้งหมด</td><td style="text-align:left">KPI เฉพาะเกษตร — เชื่อมกับ cold chain โดยตรง</td><td>&lt; 8%</td></tr>
+    </table>
+    <div class="callout">📌 <b>ข้อสอบชอบถาม:</b> OTIF กับ Fill Rate ต่างกันอย่างไร? — OTIF นับเป็น "ออเดอร์" (ครบ+ตรงเวลา ถึงจะนับ) ส่วน Fill Rate นับเป็น "ปริมาณ" ดังนั้นออเดอร์ที่ส่งครบแต่ช้า 1 วัน จะทำให้ Fill Rate เต็ม 100% แต่ OTIF ตก</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: ออกแบบ Dashboard →</button></div>
+</section>
+
+<!-- ===== PAGE 7 : DASHBOARD DESIGN ===== -->
+<section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">งานที่ต้องส่ง</span>
+    <h2>🎨 ออกแบบ Farm Performance Dashboard</h2>
+    <p class="lead">คนดูแดชบอร์ดโดยเฉลี่ย <b>5 วินาที</b> ก่อนตัดสินใจว่าจะอ่านต่อไหม — เลย์เอาต์จึงสำคัญพอ ๆ กับตัวเลข</p>
+    <div style="border:2px dashed var(--line); border-radius:14px; padding:16px; background:#fbfdfb; margin-top:12px">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px">
+        <div class="tile" style="background:#dcfce7"><b style="font-size:13px">ผลผลิตรวม</b><div style="font-size:20px;font-weight:800;color:var(--brand2)">186,400 กก.</div><div class="note">▲ 8.2% YoY</div></div>
+        <div class="tile" style="background:#dcfce7"><b style="font-size:13px">ผลผลิตต่อไร่</b><div style="font-size:20px;font-weight:800;color:var(--brand2)">2,331 กก.</div><div class="note">▲ 3.1%</div></div>
+        <div class="tile" style="background:#fef2f2"><b style="font-size:13px">ของเสียหลังเก็บเกี่ยว</b><div style="font-size:20px;font-weight:800;color:var(--red)">6.4%</div><div class="note">▼ ดีขึ้น 1.2pp</div></div>
+        <div class="tile" style="background:#dcfce7"><b style="font-size:13px">OTIF</b><div style="font-size:20px;font-weight:800;color:var(--brand2)">94.2%</div><div class="note">เป้า 95%</div></div>
+      </div>
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-top:10px">
+        <div class="tile"><b style="font-size:13px">แนวโน้มผลผลิตรายเดือน (เทียบปีก่อน)</b><div class="chartbox" style="height:200px"><canvas id="dbChart1"></canvas></div></div>
+        <div class="tile"><b style="font-size:13px">Top 5 แปลงตามผลผลิตต่อไร่</b><div class="chartbox" style="height:200px"><canvas id="dbChart2"></canvas></div></div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:8px">โครงมาตรฐาน: <b>แถวบน = KPI การ์ด</b> (ตอบ "ตอนนี้เป็นอย่างไร") · <b>แถวกลาง = แนวโน้ม + จัดอันดับ</b> (ตอบ "ทำไม") · <b>แถวล่าง = ตารางรายละเอียด</b> (ตอบ "แล้วยังไงต่อ")</div>
+  </div>
+
+  <div class="card">
+    <h2>ทำ / ไม่ทำ</h2>
+    <div class="cols2">
+      <div>
+        <h3 style="color:var(--brand2)">✅ ทำ</h3>
+        <ul>
+          <li>วาง KPI สำคัญที่สุดมุมบนซ้าย (คนอ่านจากซ้าย→ขวา)</li>
+          <li>ใส่ค่าเปรียบเทียบเสมอ (เป้า หรือ ปีก่อน) — ตัวเลขเดี่ยว ๆ ไม่มีความหมาย</li>
+          <li>ใช้สีสื่อความหมาย: เขียว=ดี แดง=ต้องแก้ และใช้ให้น้อยที่สุด</li>
+          <li>ตั้งชื่อกราฟเป็น "ข้อสรุป" ไม่ใช่ชื่อฟิลด์ เช่น "ผลผลิตโรงเรือน C ต่ำกว่าเป้า 12%"</li>
+          <li>จำกัด 1 หน้า = 1 คำถามธุรกิจ</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color:var(--red)">❌ ไม่ทำ</h3>
+        <ul>
+          <li>ยัดกราฟ 12 อันในหน้าเดียว</li>
+          <li>ใช้กราฟวงกลมที่มีมากกว่า 5 ชิ้น</li>
+          <li>กราฟ 3 มิติ / เอฟเฟกต์เงา — บิดเบือนการอ่านค่า</li>
+          <li>แกน Y ไม่เริ่มที่ศูนย์ในกราฟแท่ง (ทำให้ความต่างดูเว่อร์)</li>
+          <li>ใช้สีรุ้งทั้งหน้าโดยไม่มีความหมาย</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout good">📋 <b>เกณฑ์ให้คะแนนงานคาบนี้:</b> โมเดลข้อมูลถูกต้อง (25%) · Measure ใช้ DAX เหมาะสมอย่างน้อย 5 ตัว (25%) · มี Time Intelligence (15%) · มี KPI โลจิสติกส์ ≥ 2 ตัว (15%) · การออกแบบและการเล่าเรื่อง (20%)</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn" onclick="go(8)">ทำแบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 8 : QUIZ ===== -->
+<section class="page" id="p8">
+  <div class="card">
+    <span class="kicker">ทบทวน</span>
+    <h2>📝 แบบทดสอบครั้งที่ 4</h2>
+    <p class="lead">10 ข้อ · เลือกคำตอบแล้วดูเฉลยทันที</p>
+    <div id="quizWrap"></div>
+    <div class="scorebox" id="scorebox">
+      <div>คะแนนของคุณ</div>
+      <div class="big" id="scoreNum"></div>
+      <div id="scoreMsg"></div>
+      <button class="btn ghost" id="resetQuiz" style="margin-top:14px">ทำใหม่อีกครั้ง</button>
+    </div>
+  </div>
+  <div class="foot">Business Data Analytics · ครั้งที่ 4 — Power BI &amp; DAX · แขนงสมาร์ทฟาร์มมิ่งและโซ่อุปทานอัจฉริยะ</div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← กลับหน้าแรก</button><span></span></div>
+</section>
+
+</main>
+
+<script>
+/* ================= DATA ================= */
+var CROPS = ['กรีนโอ๊ค','คอส','เคล'];
+var MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+var BASE = {'กรีนโอ๊ค':[2600,2450,2200,1900,1750,1800,2050,2250,2400,2650,2800,2900],
+            'คอส':     [1900,1850,1700,1500,1380,1420,1600,1750,1850,1980,2100,2180],
+            'เคล':     [1200,1150,1080, 960, 900, 930,1020,1100,1160,1240,1320,1380]};
+var PRICE = {'กรีนโอ๊ค':78,'คอส':72,'เคล':95};
+var RAI   = {'กรีนโอ๊ค':32,'คอส':26,'เคล':18};
+var DATA = [];
+CROPS.forEach(function(c){
+  [2025,2026].forEach(function(y){
+    for(var m=0;m<12;m++){
+      var growth = (y===2026 ? 1.082 : 1.0);
+      var wobble = 1 + (((m*7 + c.length*13 + y) % 11) - 5)/100;
+      var kg = Math.round(BASE[c][m]*growth*wobble);
+      var wastePct = 0.055 + (((m*5 + c.length*3) % 7))/200;
+      if(y===2025) wastePct += 0.012;
+      var waste = Math.round(kg*wastePct);
+      var sales = Math.round((kg-waste)*PRICE[c]);
+      var cost  = Math.round(kg*PRICE[c]*0.62);
+      DATA.push({y:y, m:m, crop:c, kg:kg, waste:waste, sales:sales, cost:cost, rai:RAI[c]});
+    }
+  });
+});
+function filterData(f){
+  return DATA.filter(function(d){
+    if(f.year && f.year!=='all' && d.y!==+f.year) return false;
+    if(f.crop && f.crop!=='all' && d.crop!==f.crop) return false;
+    if(f.half==='h1' && d.m>5) return false;
+    if(f.half==='h2' && d.m<6) return false;
+    return true;
+  });
+}
+function sum(rows, k){ return rows.reduce(function(a,r){ return a + r[k]; },0); }
+function baht(n){ return Number(n).toLocaleString('th-TH',{maximumFractionDigits:0}); }
+
+/* ================= PAGE 1 : filter flow ================= */
+var flowNotes = {
+  crop:'กรอง <b>DimCrop</b> → ตัวกรองไหลลงไปที่ <b>FactHarvest</b> ตามลูกศร One-to-Many → ทุก Measure คำนวณเฉพาะแถวของกรีนโอ๊ค ✅ <b>นี่คือทิศทางที่ถูกต้อง</b>',
+  date:'กรอง <b>DimDate</b> → ไหลลงไปทั้ง <b>FactHarvest และ FactShipment</b> พร้อมกัน → กราฟทั้งหน้าขยับไปปี 2026 พร้อมกัน ✅ นี่คือเหตุผลที่ต้องมี Date Table กลาง',
+  fact:'กรองที่ <b>FactHarvest</b> โดยตรง → ตัวกรอง <b>ไม่</b> ไหลย้อนขึ้นไปที่ Dimension (ค่าเริ่มต้นเป็น Single direction) → ตาราง DimPlot ยังแสดงครบทุกแปลง ⚠️ ถ้าต้องการให้ไหลย้อน ต้องตั้ง Cross filter = Both ซึ่ง <b>ควรเลี่ยง</b> เพราะทำให้เกิดความกำกวมและช้า'
+};
+document.getElementById('filterFrom').addEventListener('change', function(){
+  document.getElementById('flowNote').innerHTML = flowNotes[this.value];
+});
+document.getElementById('flowNote').innerHTML = flowNotes.crop;
+
+/* ================= PAGE 2 : column vs measure ================= */
+function updCM(){
+  var f={year:document.getElementById('cmYear').value, crop:document.getElementById('cmCrop').value};
+  var rows=filterData(f);
+  var profit=sum(rows,'sales')-sum(rows,'cost');
+  document.getElementById('cmMeasure').textContent = baht(profit)+' ฿';
+  var first=DATA[0];
+  document.getElementById('cmColumn').textContent = baht(first.sales-first.cost)+' ฿';
+  document.getElementById('cmRows').textContent = rows.length+' / '+DATA.length;
+  document.getElementById('cmNote').innerHTML =
+    'Measure คำนวณจาก <b>'+rows.length+'</b> แถวที่เหลือหลังกรอง จึงเปลี่ยนค่าทุกครั้ง · ส่วน Calculated Column ถูกคำนวณและเก็บไว้ตั้งแต่ตอนโหลดข้อมูล ค่าของแต่ละแถวจึง <b>ไม่มีทางเปลี่ยน</b> ไม่ว่าจะกดอะไร (สิ่งที่เปลี่ยนคือ "แถวไหนถูกนำมารวม")';
+}
+['cmYear','cmCrop'].forEach(function(id){ document.getElementById(id).addEventListener('change', updCM); });
+updCM();
+
+/* ================= PAGE 3 : DAX lab ================= */
+var MEASURES = [
+ {name:'ผลผลิตรวม', code:'ผลผลิตรวม =\n    SUM( FactHarvest[ปริมาณกก.] )',
+  calc:function(r){ return sum(r,'kg'); }, unit:' กก.',
+  desc:'SUM รวมค่าทั้งคอลัมน์ภายใต้ตัวกรองปัจจุบัน — เป็น Measure พื้นฐานที่สุด'},
+ {name:'ยอดขายรวม', code:'ยอดขายรวม =\n    SUM( FactHarvest[ยอดขาย] )',
+  calc:function(r){ return sum(r,'sales'); }, unit:' ฿',
+  desc:'ใช้เป็นฐานของ Measure อื่นอีกหลายตัว — เขียนครั้งเดียวแล้วอ้างถึงด้วย [ยอดขายรวม]'},
+ {name:'กำไรขั้นต้น', code:'กำไรขั้นต้น =\n    [ยอดขายรวม] - SUM( FactHarvest[ต้นทุน] )',
+  calc:function(r){ return sum(r,'sales')-sum(r,'cost'); }, unit:' ฿',
+  desc:'อ้าง Measure เดิมซ้อนกันได้ ทำให้แก้ที่เดียวแล้วเปลี่ยนทั้งระบบ'},
+ {name:'% ของเสียหลังเก็บเกี่ยว', code:'% ของเสีย =\n    DIVIDE(\n        SUM( FactHarvest[ของเสีย] ),\n        SUM( FactHarvest[ปริมาณกก.] )\n    )',
+  calc:function(r){ var k=sum(r,'kg'); return k? sum(r,'waste')/k*100 : 0; }, unit:' %', dec:2,
+  desc:'DIVIDE ปลอดภัยกว่าเครื่องหมาย / เพราะคืน BLANK แทน error เมื่อตัวหารเป็นศูนย์'},
+ {name:'ผลผลิตต่อไร่', code:'ผลผลิตต่อไร่ =\n    DIVIDE(\n        SUM( FactHarvest[ปริมาณกก.] ),\n        SUM( DimPlot[พื้นที่ไร่] )\n    )',
+  calc:function(r){ var rai=sum(r,'rai'); return rai? sum(r,'kg')/rai : 0; }, unit:' กก./ไร่', dec:1,
+  desc:'KPI หลักของเกษตรแม่นยำ — ต้องหารด้วยพื้นที่ ไม่ใช่ดูผลผลิตดิบอย่างเดียว'},
+ {name:'จำนวนรายการเก็บเกี่ยว', code:'จำนวนรายการ =\n    COUNTROWS( FactHarvest )',
+  calc:function(r){ return r.length; }, unit:' แถว',
+  desc:'COUNTROWS นับแถวในบริบทปัจจุบัน ใช้ตรวจสอบว่าตัวกรองทำงานถูกไหม'},
+ {name:'ราคาเฉลี่ยถ่วงน้ำหนัก (SUMX)', code:'ราคาเฉลี่ยถ่วงน้ำหนัก =\n    DIVIDE(\n        SUMX( FactHarvest, [ปริมาณกก.] * RELATED(DimCrop[ราคา]) ),\n        SUM( FactHarvest[ปริมาณกก.] )\n    )',
+  calc:function(r){ var k=sum(r,'kg'); if(!k) return 0;
+     var tot=r.reduce(function(a,d){ return a + d.kg*PRICE[d.crop]; },0); return tot/k; }, unit:' ฿/กก.', dec:2,
+  desc:'SUMX คำนวณทีละแถวก่อนรวม — จำเป็นเมื่อต้องคูณค่าข้ามคอลัมน์ (AVERAGE ธรรมดาจะให้คำตอบผิด)'},
+ {name:'ผลผลิตเฉลี่ยต่อเดือน', code:'ผลผลิตเฉลี่ยต่อเดือน =\n    AVERAGEX(\n        VALUES( DimDate[เดือน] ),\n        [ผลผลิตรวม]\n    )',
+  calc:function(r){ var ms={}; r.forEach(function(d){ ms[d.y+'-'+d.m]=(ms[d.y+'-'+d.m]||0)+d.kg; });
+     var ks=Object.keys(ms); if(!ks.length) return 0;
+     return ks.reduce(function(a,k){return a+ms[k];},0)/ks.length; }, unit:' กก.', dec:0,
+  desc:'AVERAGEX วนตามรายการที่ระบุ (เดือน) แล้วเฉลี่ย — ต่างจาก AVERAGE ที่เฉลี่ยทีละแถวดิบ'}
+];
+var dxIdx=0, dxChart=null;
+function dxFilters(){ return {year:document.getElementById('dxYear').value, crop:document.getElementById('dxCrop').value, half:document.getElementById('dxHalf').value}; }
+function updDX(){
+  var m=MEASURES[dxIdx], f=dxFilters(), rows=filterData(f);
+  var v=m.calc(rows);
+  document.getElementById('dxCode').textContent=m.code;
+  document.getElementById('dxRes').textContent = (m.dec!==undefined? fmt(v,m.dec) : baht(v)) + m.unit;
+  document.getElementById('dxDesc').innerHTML = m.desc + ' · บริบทตอนนี้มี <b>'+rows.length+'</b> แถว';
+  var labels=[], vals=[];
+  for(var i=0;i<12;i++){
+    if(f.half==='h1' && i>5) continue;
+    if(f.half==='h2' && i<6) continue;
+    labels.push(MONTHS[i]);
+    vals.push(m.calc(rows.filter(function(d){ return d.m===i; })));
+  }
+  if(dxChart) dxChart.destroy();
+  dxChart = new Chart(document.getElementById('dxChart'), {
+    type:'bar',
+    data:{labels:labels, datasets:[{label:m.name, data:vals, backgroundColor:'#16a34a', borderRadius:6}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:true}}, scales:{y:{beginAtZero:true}}}
+  });
+}
+var dxb=document.getElementById('dxBtns');
+MEASURES.forEach(function(m,i){
+  var b=document.createElement('button'); b.textContent=m.name;
+  if(i===0) b.classList.add('on');
+  b.addEventListener('click', function(){
+    dxb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); dxIdx=i; updDX();
+  });
+  dxb.appendChild(b);
+});
+['dxYear','dxCrop','dxHalf'].forEach(function(id){ document.getElementById(id).addEventListener('change', updDX); });
+
+/* ================= PAGE 4 : CALCULATE ================= */
+var CALCS = [
+ {name:'ไม่ใช้ CALCULATE', code:'ยอดขายรวม =\n    SUM( FactHarvest[ยอดขาย] )',
+  calc:function(sl){ return sum(filterData({crop:sl}),'sales'); },
+  desc:'ตามตัวกรองของผู้ใช้ทุกประการ — เปลี่ยน Slicer แล้วเลขเปลี่ยน'},
+ {name:'บังคับเป็น "เคล"', code:'ยอดขายเคล =\n    CALCULATE(\n        [ยอดขายรวม],\n        DimCrop[ชนิดพืช] = "เคล"\n    )',
+  calc:function(){ return sum(filterData({crop:'เคล'}),'sales'); },
+  desc:'<b>แทนที่</b> ตัวกรองบนคอลัมน์ชนิดพืช → ไม่ว่าผู้ใช้เลือกอะไร ก็ได้ยอดของเคลเสมอ (ใช้ทำการ์ดเปรียบเทียบ)'},
+ {name:'ล้างตัวกรองด้วย ALL', code:'ยอดขายทั้งฟาร์ม =\n    CALCULATE(\n        [ยอดขายรวม],\n        ALL( DimCrop )\n    )',
+  calc:function(){ return sum(DATA,'sales'); },
+  desc:'<b>ล้าง</b> ตัวกรองทั้งตาราง DimCrop → ได้ยอดรวมทุกพืชเสมอ ใช้เป็นตัวหารในการหา % ของทั้งหมด'},
+ {name:'% ของทั้งฟาร์ม', code:'% ยอดขาย =\n    DIVIDE(\n        [ยอดขายรวม],\n        CALCULATE( [ยอดขายรวม], ALL(DimCrop) )\n    )',
+  calc:function(sl){ var t=sum(DATA,'sales'); return t? sum(filterData({crop:sl}),'sales')/t*100 : 0; }, pct:true,
+  desc:'แพตเทิร์นที่ใช้บ่อยที่สุดในแดชบอร์ด: ตัวตั้งตามบริบท ตัวหารล้างบริบท'},
+ {name:'เฉพาะปี 2026', code:'ยอดขาย 2026 =\n    CALCULATE(\n        [ยอดขายรวม],\n        DimDate[ปี] = 2026\n    )',
+  calc:function(sl){ return sum(filterData({crop:sl, year:2026}),'sales'); },
+  desc:'เพิ่มตัวกรองปีทับลงไป โดยยังเคารพ Slicer ชนิดพืชที่ผู้ใช้เลือกอยู่'},
+ {name:'เฉพาะล็อตของเสียสูง', code:'ยอดขายล็อตเสี่ยง =\n    CALCULATE(\n        [ยอดขายรวม],\n        FILTER( FactHarvest,\n            FactHarvest[ของเสีย] > 120 )\n    )',
+  calc:function(sl){ return sum(filterData({crop:sl}).filter(function(d){return d.waste>120;}),'sales'); },
+  desc:'<b>เพิ่มเงื่อนไขซ้อน</b> บนตัวกรองเดิม — ใช้ FILTER เมื่อเงื่อนไขซับซ้อนกว่าการเทียบค่าตรง ๆ'}
+];
+var calcIdx=0;
+function updCalc(){
+  var sl=document.getElementById('calcSlicer').value, c=CALCS[calcIdx];
+  document.getElementById('calcCtx').textContent = 'ชนิดพืช = '+(sl==='all'?'ทั้งหมด':sl);
+  document.getElementById('calcCode').textContent=c.code;
+  var v=c.calc(sl);
+  document.getElementById('calcRes').textContent = c.pct? fmt(v,1)+' %' : baht(v)+' ฿';
+  document.getElementById('calcDesc').innerHTML=c.desc;
+}
+var cb=document.getElementById('calcBtns');
+CALCS.forEach(function(c,i){
+  var b=document.createElement('button'); b.textContent=c.name;
+  if(i===0) b.classList.add('on');
+  b.addEventListener('click', function(){
+    cb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); calcIdx=i; updCalc();
+  });
+  cb.appendChild(b);
+});
+document.getElementById('calcSlicer').addEventListener('change', updCalc);
+updCalc();
+
+/* ================= PAGE 5 : time intelligence ================= */
+var tiChart=null;
+function updTI(){
+  var crop=document.getElementById('tiCrop').value, met=document.getElementById('tiMetric').value;
+  var key = met==='kg' ? 'kg' : 'sales';
+  var cur=[], prev=[], curC=0, prevC=0;
+  for(var i=0;i<12;i++){
+    var a=sum(filterData({crop:crop, year:2026}).filter(function(d){return d.m===i;}), key);
+    var b=sum(filterData({crop:crop, year:2025}).filter(function(d){return d.m===i;}), key);
+    curC+=a; prevC+=b; cur.push(curC); prev.push(prevC);
+  }
+  var t26=curC, t25=prevC;
+  var unit = met==='kg' ? ' กก.' : ' ฿';
+  document.getElementById('ti2026').textContent = baht(t26)+unit;
+  document.getElementById('ti2025').textContent = baht(t25)+unit;
+  var yoy = t25? (t26-t25)/t25*100 : 0;
+  var el=document.getElementById('tiYoY');
+  el.textContent = (yoy>=0?'▲ ':'▼ ')+fmt(Math.abs(yoy),1)+' %';
+  el.style.color = yoy>=0 ? 'var(--brand2)' : 'var(--red)';
+  if(tiChart) tiChart.destroy();
+  tiChart=new Chart(document.getElementById('tiChart'),{
+    type:'line',
+    data:{labels:MONTHS, datasets:[
+      {label:'YTD 2026', data:cur, borderColor:'#16a34a', backgroundColor:'rgba(22,163,74,.12)', fill:true, tension:.3},
+      {label:'YTD 2025 (SAMEPERIODLASTYEAR)', data:prev, borderColor:'#94a3b8', borderDash:[6,4], fill:false, tension:.3}
+    ]},
+    options:{responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true}}}
+  });
+  document.getElementById('tiNote').innerHTML =
+    'เส้นเขียวคือ <code>TOTALYTD</code> (สะสมตั้งแต่ต้นปี) เส้นประเทาคือ <code>SAMEPERIODLASTYEAR</code> · ระยะห่างระหว่างสองเส้นที่ถ่างขึ้นเรื่อย ๆ = เติบโตต่อเนื่อง ไม่ใช่แค่เดือนเดียวฟลุก';
+}
+['tiCrop','tiMetric'].forEach(function(id){ document.getElementById(id).addEventListener('change', updTI); });
+
+/* ================= PAGE 6 : KPI ================= */
+function updKPI(){
+  var o=+document.getElementById('kOrders').value||0,
+      ot=+document.getElementById('kOtif').value||0,
+      dm=+document.getElementById('kDemand').value||0,
+      sh=+document.getElementById('kShip').value||0,
+      cg=+document.getElementById('kCogs').value||0,
+      iv=+document.getElementById('kInv').value||0,
+      cy=+document.getElementById('kCycle').value||0,
+      ws=+document.getElementById('kWaste').value||0;
+  var otif = o? ot/o*100 : 0;
+  var fill = dm? sh/dm*100 : 0;
+  var turn = iv? cg/iv : 0;
+  var cyc  = o? cy/o : 0;
+  var loss = dm? ws/(sh+ws)*100 : 0;
+  var days = turn? 365/turn : 0;
+  var cards=[
+    {t:'OTIF', v:fmt(otif,1)+'%', f:'ส่งครบ+ตรงเวลา ÷ ออเดอร์ทั้งหมด = '+ot+' ÷ '+o, ok:otif>=95, g:'เป้า ≥ 95%'},
+    {t:'Fill Rate', v:fmt(fill,1)+'%', f:'ปริมาณส่ง ÷ ปริมาณสั่ง = '+baht(sh)+' ÷ '+baht(dm), ok:fill>=95, g:'เป้า ≥ 95%'},
+    {t:'Inventory Turnover', v:fmt(turn,1)+' รอบ/ปี', f:'ต้นทุนขาย ÷ สต๊อกเฉลี่ย', ok:turn>=12, g:'ของสดควร ≥ 12 รอบ/ปี'},
+    {t:'Days of Inventory', v:fmt(days,1)+' วัน', f:'365 ÷ Inventory Turnover', ok:days<=30, g:'ผักสด ควร ≤ 7 วัน'},
+    {t:'Order Cycle Time', v:fmt(cyc,1)+' ชม.', f:'เวลารวม ÷ จำนวนออเดอร์', ok:cyc<=48, g:'ยิ่งต่ำ ผักยิ่งสด'},
+    {t:'Post-Harvest Loss', v:fmt(loss,1)+'%', f:'ของเสีย ÷ ผลผลิตทั้งหมด', ok:loss<=8, g:'เป้า < 8%'}
+  ];
+  var w=document.getElementById('kpiCards'); w.innerHTML='';
+  cards.forEach(function(c){
+    var d=document.createElement('div');
+    d.className='tile';
+    d.style.borderColor = c.ok? 'var(--brand)':'var(--red)';
+    d.style.background  = c.ok? '#f0fdf4':'#fef2f2';
+    d.innerHTML='<b>'+c.t+'</b><div style="font-size:28px;font-weight:800;color:'+(c.ok?'var(--brand2)':'var(--red)')+'">'+c.v+'</div>'+
+                '<div class="note">'+c.f+'</div><div class="note"><b>'+c.g+'</b> · '+(c.ok?'✅ ผ่านเกณฑ์':'⚠️ ต่ำกว่าเกณฑ์')+'</div>';
+    w.appendChild(d);
+  });
+}
+['kOrders','kOtif','kDemand','kShip','kCogs','kInv','kCycle','kWaste'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', updKPI);
+});
+updKPI();
+
+/* ================= PAGE 7 : dashboard mock charts ================= */
+var dbDone=false;
+function drawDB(){
+  if(dbDone) return; dbDone=true;
+  var y26=[], y25=[];
+  for(var i=0;i<12;i++){
+    y26.push(sum(DATA.filter(function(d){return d.y===2026&&d.m===i;}),'kg'));
+    y25.push(sum(DATA.filter(function(d){return d.y===2025&&d.m===i;}),'kg'));
+  }
+  new Chart(document.getElementById('dbChart1'),{
+    type:'line',
+    data:{labels:MONTHS, datasets:[
+      {label:'2026', data:y26, borderColor:'#16a34a', tension:.3, fill:false},
+      {label:'2025', data:y25, borderColor:'#cbd5e1', borderDash:[5,4], tension:.3, fill:false}]},
+    options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{boxWidth:12, font:{size:10}}}}, scales:{y:{beginAtZero:false}, x:{ticks:{font:{size:9}}}}}
+  });
+  new Chart(document.getElementById('dbChart2'),{
+    type:'bar',
+    data:{labels:['P07','P02','P11','P05','P09'], datasets:[{label:'กก./ไร่', data:[2680,2540,2410,2290,2150], backgroundColor:'#15803d', borderRadius:5}]},
+    options:{indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true, ticks:{font:{size:9}}}}}
+  });
+}
+function onPage(i){
+  if(i===3) updDX();
+  if(i===5) updTI();
+  if(i===7) drawDB();
+}
+
+/* ================= QUIZ ================= */
+var QUIZ = [
+ {q:'ในโมเดลแบบ Star Schema ตารางใดคือ Fact Table?',
+  a:['DimCrop (ทะเบียนชนิดพืช)','FactHarvest (บันทึกการเก็บเกี่ยวรายวัน)','DimDate (ตารางวันที่)','DimPlot (ทะเบียนแปลง)'],
+  c:1, e:'Fact Table เก็บ "เหตุการณ์ที่วัดได้และเกิดซ้ำ ๆ" พร้อมตัวเลขที่นำไปรวมได้ (กก., บาท) ส่วน Dimension เก็บคุณลักษณะที่ใช้แบ่งกลุ่ม/กรอง'},
+ {q:'ข้อใดอธิบาย Measure ได้ถูกต้อง?',
+  a:['คำนวณตอนโหลดข้อมูลและเก็บผลไว้ในหน่วยความจำ','คำนวณตอนแสดงผลตามบริบทของตัวกรอง ไม่เก็บข้อมูล','ใช้เป็นแกน X ของกราฟได้เสมอ','เปลี่ยนค่าไม่ได้หลังสร้าง'],
+  c:1, e:'Measure คำนวณแบบ on-the-fly ตาม filter context จึงไม่กินพื้นที่จัดเก็บและตอบสนอง Slicer ทันที ส่วน Calculated Column ทำงานตรงข้ามและใช้เป็นแกน/Slicer ได้'},
+ {q:'ต้องการสร้าง Slicer "ระดับของเสีย: สูง/กลาง/ต่ำ" ควรใช้อะไร?',
+  a:['Measure','Calculated Column','Quick Measure','Report-level filter'],
+  c:1, e:'สิ่งที่จะนำไปวางเป็น Slicer หรือแกนของกราฟ ต้องเป็นคอลัมน์จริงที่มีค่าอยู่ทุกแถว จึงต้องใช้ Calculated Column (Measure วางเป็น Slicer ไม่ได้)'},
+ {q:'เพราะเหตุใดจึงควรใช้ DIVIDE(a, b) แทน a / b ใน DAX?',
+  a:['DIVIDE เร็วกว่าเสมอ','DIVIDE จัดการกรณีหารด้วยศูนย์ให้ โดยคืนค่าว่างแทน error','DIVIDE ปัดเศษให้อัตโนมัติ','ไม่ต่างกัน เขียนแบบไหนก็ได้'],
+  c:1, e:'เมื่อ Slicer กรองจนไม่เหลือข้อมูล ตัวหารจะเป็นศูนย์และเครื่องหมาย / จะทำให้ทั้งการ์ดขึ้น error ส่วน DIVIDE จะคืน BLANK ทำให้แดชบอร์ดยังดูเรียบร้อย'},
+ {q:'ต้องการหา "ราคาเฉลี่ยต่อ กก. ถ่วงน้ำหนักด้วยปริมาณ" ควรใช้ฟังก์ชันใด?',
+  a:['AVERAGE(FactHarvest[ราคา])','SUMX แล้วหารด้วย SUM ของปริมาณ','COUNTROWS','MAX(FactHarvest[ราคา])'],
+  c:1, e:'AVERAGE เฉลี่ยทุกแถวเท่ากันหมด ทำให้เดือนที่ขายได้น้อยมีน้ำหนักเท่าเดือนที่ขายเยอะ ต้องใช้ SUMX คูณปริมาณ×ราคาทีละแถวก่อน แล้วหารด้วยปริมาณรวม'},
+ {q:'CALCULATE([ยอดขายรวม], ALL(DimCrop)) ให้ผลอย่างไรเมื่อผู้ใช้เลือก Slicer = "เคล"?',
+  a:['ได้ยอดขายของเคลเท่านั้น','ได้ยอดขายรวมทุกชนิดพืช เพราะ ALL ล้างตัวกรองบน DimCrop','ได้ค่าว่าง','เกิด error เพราะตัวกรองขัดแย้งกัน'],
+  c:1, e:'ALL(ตาราง) ล้างตัวกรองทั้งหมดบนตารางนั้น จึงได้ยอดรวมทั้งฟาร์มเสมอ นี่คือเหตุผลที่ใช้เป็นตัวหารในสูตร "% ของทั้งหมด"'},
+ {q:'ทำไมต้องสร้าง DimDate แยกและ Mark as date table?',
+  a:['เพื่อให้ไฟล์เล็กลง','เพราะฟังก์ชัน Time Intelligence ต้องการตารางวันที่ที่ต่อเนื่องครบทุกวัน','เพื่อให้กราฟมีสีสวยขึ้น','Power BI บังคับ ไม่งั้นเปิดไฟล์ไม่ได้'],
+  c:1, e:'ถ้าใช้วันที่ในตาราง Fact ตรง ๆ วันที่ไม่มีธุรกรรมจะหายไป ทำให้การเทียบช่วงเวลาผิดพลาด และเมื่อมีหลาย Fact ก็ต้องมี DimDate กลางเพื่อกรองพร้อมกัน'},
+ {q:'KPI ใดวัดเป็น "จำนวนออเดอร์" ไม่ใช่ "ปริมาณสินค้า"?',
+  a:['Fill Rate','OTIF','Inventory Turnover','Post-Harvest Loss'],
+  c:1, e:'OTIF นับเป็นออเดอร์ — ออเดอร์จะถูกนับว่าสำเร็จก็ต่อเมื่อส่งครบและตรงเวลา ส่วน Fill Rate วัดจากปริมาณ ดังนั้นออเดอร์ที่ส่งครบแต่ช้าจะทำให้ OTIF ตกแม้ Fill Rate เต็ม 100%'},
+ {q:'ฟาร์มมีต้นทุนขาย 9.6 ล้านบาท สต๊อกเฉลี่ย 0.8 ล้านบาท Inventory Turnover เท่ากับเท่าไร?',
+  a:['8 รอบ/ปี','12 รอบ/ปี','0.083 รอบ/ปี','120 รอบ/ปี'],
+  c:1, e:'Inventory Turnover = ต้นทุนขาย ÷ สต๊อกเฉลี่ย = 9,600,000 ÷ 800,000 = 12 รอบ/ปี หรือประมาณ 30 วันต่อรอบ ซึ่งถือว่าช้ามากสำหรับผักสด'},
+ {q:'ข้อใดเป็นแนวปฏิบัติที่ "ไม่ควรทำ" ในการออกแบบแดชบอร์ด?',
+  a:['วาง KPI สำคัญที่สุดไว้มุมบนซ้าย','ตั้งชื่อกราฟเป็นข้อสรุปแทนชื่อฟิลด์','ใช้กราฟแท่ง 3 มิติเพื่อให้ดูน่าสนใจ','ใส่ค่าเปรียบเทียบกับเป้าหมายหรือปีก่อนควบคู่กับตัวเลข'],
+  c:2, e:'กราฟ 3 มิติบิดเบือนการรับรู้ความยาวของแท่งทำให้อ่านค่าผิด และเพิ่ม "หมึกที่ไม่ใช่ข้อมูล" โดยไม่ให้สารสนเทศเพิ่ม จึงควรเลี่ยงเสมอ'}
+];
+</script>
+<script>
+/* ===== navigation ===== */
+var PAGES = document.querySelectorAll('section.page');
+var TABS  = document.querySelectorAll('#tabs button');
+function go(i){
+  if(i<0) i=0; if(i>=PAGES.length) i=PAGES.length-1;
+  PAGES.forEach(function(p,k){ p.classList.toggle('active', k===i); });
+  TABS.forEach(function(b,k){ b.classList.toggle('active', k===i); });
+  document.getElementById('pbar').style.width = ((i+1)/PAGES.length*100)+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(typeof onPage==='function') onPage(i);
+}
+TABS.forEach(function(b){ b.addEventListener('click', function(){ go(+b.dataset.p); }); });
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  var cur = 0; PAGES.forEach(function(p,k){ if(p.classList.contains('active')) cur=k; });
+  if(e.key==='ArrowRight') go(cur+1);
+  if(e.key==='ArrowLeft')  go(cur-1);
+});
+go(0);
+
+/* ===== quiz engine ===== */
+(function(){
+  var wrap = document.getElementById('quizWrap');
+  if(!wrap || typeof QUIZ==='undefined') return;
+  var answered = 0, score = 0;
+  QUIZ.forEach(function(q, qi){
+    var d = document.createElement('div');
+    d.className = 'quiz-q';
+    var h = '<div class="qhead">'+(qi+1)+'. '+q.q+'</div>';
+    q.a.forEach(function(opt, oi){
+      h += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</button>';
+    });
+    h += '<div class="explain" id="ex'+qi+'"><b>เฉลย:</b> '+q.e+'</div>';
+    d.innerHTML = h;
+    wrap.appendChild(d);
+  });
+  wrap.addEventListener('click', function(ev){
+    var b = ev.target.closest('.opt');
+    if(!b || b.classList.contains('disabled')) return;
+    var qi = +b.dataset.q, oi = +b.dataset.o;
+    var box = b.parentNode;
+    if(box.dataset.done) return;
+    box.dataset.done = '1';
+    box.querySelectorAll('.opt').forEach(function(o,k){
+      o.classList.add('disabled');
+      if(k===QUIZ[qi].c) o.classList.add('correct');
+    });
+    if(oi!==QUIZ[qi].c) b.classList.add('wrong'); else score++;
+    document.getElementById('ex'+qi).classList.add('show');
+    answered++;
+    var sb = document.getElementById('scorebox');
+    if(answered===QUIZ.length && sb){
+      sb.classList.add('show');
+      document.getElementById('scoreNum').textContent = score+' / '+QUIZ.length;
+      var pct = Math.round(score/QUIZ.length*100);
+      document.getElementById('scoreMsg').textContent =
+        pct>=80 ? 'เยี่ยมมาก! พร้อมไปคาบต่อไปแล้ว 🎉' :
+        pct>=60 ? 'ผ่านเกณฑ์ แต่ควรทบทวนข้อที่ตอบผิดอีกครั้ง' :
+                  'ลองกลับไปทบทวนเนื้อหาแต่ละหน้าอีกรอบนะ';
+      sb.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+  var rb = document.getElementById('resetQuiz');
+  if(rb) rb.addEventListener('click', function(){ location.reload(); });
+})();
+</script>
+</body>
+</html>
