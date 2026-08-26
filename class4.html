@@ -581,7 +581,7 @@ CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
     <span class="kicker">ลงมือทำ</span>
     <h2>🧮 ห้องทดลอง DAX — กดเลือกสูตร แล้วดูผลจริง</h2>
     <p class="lead">ข้อมูลชุดเดียวกันทั้งหน้า: ผลผลิตรายเดือน 2 ปี × 3 ชนิดพืช · เรียงจากง่ายไปยาก
-      <span class="lvl core">พื้นฐาน</span> <span class="lvl plus">ขั้นถัดไป</span></p>
+      <span class="lvl core">พื้นฐาน</span> <span class="lvl plus">ขั้นสูง</span></p>
     <div class="row">
       <div><label class="fld">ปี</label><select id="dxYear"><option value="all">ทั้งหมด</option><option>2025</option><option>2026</option></select></div>
       <div><label class="fld">ชนิดพืช</label><select id="dxCrop"><option value="all">ทั้งหมด</option><option>กรีนโอ๊ค</option><option>คอส</option><option>เคล</option></select></div>
@@ -816,6 +816,31 @@ CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
   <div class="card">
     <h2>✅ เช็กลิสต์ก่อนส่งงาน</h2>
     <p class="note" style="margin-top:0">ไล่ทีละข้อให้ครบก่อนกดส่งงาน</p>
+
+    <h3 style="margin-top:18px">📌 5 อย่างที่ต้องมีในแดชบอร์ด (บังคับ)</h3>
+    <p class="note" style="margin-top:0">ขาดข้อใดข้อหนึ่งถือว่างานยังไม่ครบ — ในวงเล็บคือแนวทางที่ควรใช้</p>
+    <div class="scroll">
+    <table class="cmp">
+      <tr><th style="width:34%">สิ่งที่ต้องมี</th><th>ทำอย่างไร (ใช้ไฟล์ BDA_class4_FarmData.xlsx)</th></tr>
+      <tr><td><b>1. ยอดขายรวม</b></td>
+        <td>การ์ด (Card) 1 ใบ ผูกกับ Measure <code>ยอดขายรวม = SUM( FactHarvest[ยอดขาย] )</code></td></tr>
+      <tr><td><b>2. 10 อันดับแปลงที่ทำยอดขายสูงสุด</b></td>
+        <td>แผนภูมิแท่งแนวนอน แกนเป็น <code>DimPlot[รหัสแปลง]</code> ค่าเป็น <code>[ยอดขายรวม]</code>
+        แล้วตั้ง <code>Filters → Top N → Top 10 by ยอดขายรวม</code> (ฟาร์มมี 12 แปลง จึงจะเห็น 2 แปลงท้ายถูกตัดออก)</td></tr>
+      <tr><td><b>3. อัตราส่วนของเสียหลังเก็บเกี่ยว</b></td>
+        <td>Measure ที่ใช้ <code>DIVIDE</code> เสมอ:<br>
+        <code>% ของเสีย = DIVIDE( SUM(FactHarvest[ของเสีย (กก.)]), SUM(FactHarvest[ปริมาณกก.]) )</code><br>
+        ตั้งรูปแบบเป็นเปอร์เซ็นต์ แสดงเป็นการ์ด และ/หรือกราฟวงกลม (ของเสีย vs ขายได้)</td></tr>
+      <tr><td><b>4. ยอดขายแต่ละปี และไตรมาส</b></td>
+        <td>สร้าง <b>DimDate</b> ด้วย <code>CALENDAR(DATE(2025,1,1), DATE(2026,12,31))</code> → เพิ่มคอลัมน์ <code>ปี</code> กับ <code>ไตรมาส</code> → กด Mark as date table → เชื่อมกับ <code>FactHarvest[วันที่]</code>
+        แล้ววางเป็นแกนของแผนภูมิแท่ง/เส้น หรือ Matrix ปี × ไตรมาส</td></tr>
+      <tr><td><b>5. Slicer อย่างน้อย 1 ตัว</b></td>
+        <td>เลือกจาก <code>DimCrop[ชนิดพืช]</code> · <code>DimPlot[โรงเรือน]</code> · <code>DimDate[ปี]</code> —
+        กดแล้ว<b>ทุกวิชวลในหน้าต้องขยับตาม</b> ถ้าไม่ขยับแปลว่าเส้นความสัมพันธ์ระหว่างตารางยังไม่ถูก</td></tr>
+    </table>
+    </div>
+
+    <h3 style="margin-top:22px">🔧 ความถูกต้องของโมเดลและสูตร</h3>
     <div class="cols2">
       <div>
         <ul class="chk">
@@ -829,15 +854,15 @@ CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
         <ul class="chk">
           <li>ใช้ <code>DIVIDE</code> ทุกที่ที่มีการหาร</li>
           <li>มีสูตรเทียบเวลาอย่างน้อย 1 ตัว (YTD หรือ YoY)</li>
-          <li>มีการ์ดสรุปอย่างน้อย 2 ใบ พร้อมค่าเปรียบเทียบหรือเป้าหมายกำกับ</li>
-          <li>ทุกการ์ด KPI มีค่าเปรียบเทียบ ไม่ใช่ตัวเลขลอย ๆ</li>
-          <li>กดทุก Slicer แล้วไม่มีการ์ดไหนขึ้น error หรือค่าว่างแปลก ๆ</li>
+          <li>การ์ดตัวเลขมีค่าเปรียบเทียบกำกับ ไม่ใช่ตัวเลขลอย ๆ</li>
+          <li>กดทุก Slicer แล้วไม่มีวิชวลไหนขึ้น error หรือค่าว่างแปลก ๆ</li>
+          <li>ครบทั้ง 5 ข้อบังคับในตารางด้านบน</li>
         </ul>
       </div>
     </div>
     <div class="submit-box">
       <b>📤 ส่งงานคาบนี้</b>
-      <p class="note" style="margin:6px 0 10px">ส่ง <b>2 ไฟล์</b> ผ่านฟอร์มด้านล่าง</p>
+      <p class="note" style="margin:6px 0 10px">ส่ง <b>2 ไฟล์</b> ผ่านฟอร์มด้านล่าง — ตรวจให้ครบทั้ง 5 ข้อบังคับก่อนส่ง</p>
       <div class="submit-items">
         <div><b>1. ไฟล์ Power BI (.pbix)</b><div class="note">ไฟล์งานจริงที่มี Data Model, Measure และหน้าแดชบอร์ดครบ ตั้งชื่อไฟล์เป็น <code>รหัสนิสิต_ชื่อ.pbix</code></div></div>
         <div><b>2. ภาพตัวอย่างแดชบอร์ด</b><div class="note">จับภาพหน้าจอแดชบอร์ดที่ทำเสร็จ (.png หรือ .jpg) ให้เห็นการ์ด KPI ตัวกรอง และกราฟครบทั้งหน้า</div></div>
@@ -1001,7 +1026,7 @@ function updDX(){
 }
 var dxb=document.getElementById('dxBtns');
 MEASURES.forEach(function(m,i){
-  var b=document.createElement('button'); b.innerHTML = m.name + ' <span class="lvl '+m.lvl+'">'+(m.lvl==='core'?'พื้นฐาน':'ขั้นถัดไป')+'</span>';
+  var b=document.createElement('button'); b.innerHTML = m.name + ' <span class="lvl '+m.lvl+'">'+(m.lvl==='core'?'พื้นฐาน':'ขั้นสูง')+'</span>';
   if(i===0) b.classList.add('on');
   b.addEventListener('click', function(){
     dxb.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
