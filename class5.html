@@ -14,7 +14,7 @@
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.65}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.7}
   a{color:var(--brand2)}
   header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
   .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
@@ -32,7 +32,7 @@
   @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
   .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
   h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
-  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
   h3{font-size:18px; margin:1.1em 0 .3em}
   .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
   .muted{color:var(--muted)}
@@ -107,6 +107,21 @@
   .callout.good{border-color:var(--brand); background:#f0fdf4}
   .callout.bad{border-color:var(--red); background:#fef2f2}
   .chartbox{position:relative; height:300px; margin-top:14px}
+  /* check-in */
+  .checkin{border:none; background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:2px solid var(--brand)}
+  .ci-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
+  .ci-field{flex:1 1 260px; display:flex; flex-direction:column; gap:6px}
+  .ci-field label{font-weight:700; font-size:13.5px; color:#334155}
+  .ci-field input, .ci-field select{padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; font-family:inherit; font-size:15px; background:#fff; width:100%}
+  .ci-field input:focus, .ci-field select:focus{outline:none; border-color:var(--brand)}
+  .ci-submit{margin-top:14px}
+  .ci-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .ci-msg.ok{color:var(--brand2)}
+  .ci-msg.err{color:var(--red)}
+  .qz-submit-wrap{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px}
+  .qz-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .qz-msg.ok{color:#bbf7d0}
+  .qz-msg.err{color:#fecaca}
 </style>
 </head>
 <body>
@@ -137,12 +152,38 @@ function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th
   <div class="card hero">
     <span class="pill">Descriptive · Diagnostic · Statistics · Storytelling</span>
     <h1>ครั้งที่ 5 — เกิดอะไรขึ้น และทำไม? สถิติกับการเล่าเรื่องด้วยข้อมูล</h1>
-    <p class="lead muted">คาบก่อนเราสร้างแดชบอร์ดที่บอกว่า "<b>ผลผลิตแปลง A ตก 18%</b>" · คาบนี้เราจะตอบให้ได้ว่า <b style="color:#bbf7d0">ตกจริงหรือแค่ความผันผวนปกติ? และตกเพราะอะไร?</b><br>
+    <p class="lead muted">คาบก่อนเราสร้างแดชบอร์ดของ <b>นำชัยฟาร์ม</b> ที่บอกว่า "<b>ผลผลิตรวมของฟาร์มไตรมาส 2 ตก 18%</b>" · คาบนี้เราจะตอบให้ได้ว่า <b style="color:#bbf7d0">ตกจริงหรือแค่ความผันผวนปกติ? และตกเพราะอะไร?</b><br>
     แล้วเปลี่ยนคำตอบนั้นให้เป็นข้อเสนอที่ผู้จัดการฟาร์มลงมือทำได้</p>
     <div class="row" style="margin-top:18px">
       <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
       <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(2)">ลองเล่นสถิติ</button></div>
     </div>
+  </div>
+
+  <div class="card checkin">
+    <span class="kicker">ก่อนเริ่มเรียน</span>
+    <h2>✅ เช็คชื่อเข้าเรียน</h2>
+    <p class="muted" style="margin-top:0">กรอกอีเมล และเลือกชื่อ–รหัสนิสิตของคุณ แล้วกดส่ง — ข้อมูลจะถูกส่งเข้า Google Form ของอาจารย์ทันที (ไม่ต้องออกจากหน้านี้)</p>
+    <div class="ci-row">
+      <div class="ci-field">
+        <label>อีเมล (Email) *</label>
+        <input type="email" id="ci_email" placeholder="you@go.buu.ac.th" autocomplete="email">
+      </div>
+      <div class="ci-field">
+        <label>เลือกข้อมูลนิสิต (ชื่อ–รหัส) *</label>
+        <select id="ci_student"><option value="">— เลือกชื่อของคุณ —</option></select>
+      </div>
+    </div>
+    <button class="btn ci-submit" id="ci_btn" onclick="submitCheckin()">📩 ส่งเช็คชื่อ</button>
+    <div class="ci-msg" id="ci_msg"></div>
+
+    <iframe name="ci_target" id="ci_target" style="display:none" title="hidden"></iframe>
+    <form id="ci_form" action="https://docs.google.com/forms/d/e/1FAIpQLSet6PFlD5fEjmYyDr-hrTV1C_azjr3pT9xNUyrwMlMEtf5aPw/formResponse" method="POST" target="ci_target" style="display:none">
+      <input type="hidden" name="emailAddress" id="ci_f_email">
+      <input type="hidden" name="entry.893657035" id="ci_f_student">
+      <input type="hidden" name="fvv" value="1">
+      <input type="hidden" name="pageHistory" value="0">
+    </form>
   </div>
 
   <div class="card">
@@ -160,7 +201,8 @@ function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th
 
   <div class="card">
     <h2>เคสหลักของคาบนี้</h2>
-    <div class="callout">🍃 <b>โจทย์:</b> ไตรมาส 2 ปีนี้ ผลผลิตผักสลัดของฟาร์มลดลง 18% เทียบไตรมาสเดียวกันปีก่อน และของเสียหลังเก็บเกี่ยวเพิ่มจาก 5.8% เป็น 9.1% — ผู้จัดการฟาร์มขอคำตอบภายในวันศุกร์ว่า "เกิดอะไรขึ้น ทำไม และควรทำอะไร"</div>
+    <div class="callout">🍃 <b>โจทย์:</b> ที่ <b>นำชัยฟาร์ม</b> (12 แปลง · 3 โรงเรือน A/B/C · ผักสลัด 3 ชนิด — ฟาร์มเดียวกับที่ทำแดชบอร์ดในคาบที่ 4) ไตรมาส 2 ปีนี้ ผลผลิตรวมลดลง 18% เทียบไตรมาสเดียวกันปีก่อน และของเสียหลังเก็บเกี่ยวเพิ่มจาก <b>6.8%</b> เป็น <b>9.1%</b> ซึ่งเกินเป้าที่ตั้งไว้ 8% — ผู้จัดการฟาร์มขอคำตอบภายในวันศุกร์ว่า "เกิดอะไรขึ้น ทำไม และควรทำอะไร"<br>
+    <span class="note">หมายเหตุ: ตัวเลข 6.8% และโครงสร้างฟาร์มมาจากไฟล์ <code>BDA_class4_FarmData.xlsx</code> ของคาบที่ 4 ส่วนตัวเลขไตรมาสที่มีปัญหาเป็น <b>ข้อมูลสมมติของไตรมาสถัดไป</b> ที่สร้างขึ้นเพื่อฝึกวิธีคิดแบบ Diagnostic</span></div>
     <p style="margin-top:14px">เราจะเดินตามลำดับนี้ตลอดคาบ: <b>สรุปภาพรวม (Descriptive) → ดูการกระจายและค่าผิดปกติ → หาความสัมพันธ์ → เจาะหาสาเหตุ (Diagnostic) → เล่าเป็นข้อเสนอ</b></p>
   </div>
   <div class="nav-next"><span></span><button class="btn" onclick="go(1)">ถัดไป: Descriptive →</button></div>
@@ -195,10 +237,10 @@ function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th
   <div class="card">
     <span class="kicker">ค่ากลาง</span>
     <h2>🧮 mean · median · mode — เลือกใช้ให้ถูก</h2>
-    <p class="lead">ข้อมูล: ผลผลิตต่อไร่ของ 15 แปลง (กก./ไร่) · ลากแถบเพื่อเปลี่ยนค่าของ <b>แปลง P15</b> แล้วดูว่าค่ากลางไหนสะเทือนบ้าง</p>
+    <p class="lead">ข้อมูล: <b>ผลผลิตต่อไร่ไตรมาส 2 ของทั้ง 12 แปลง</b> (กก./ไร่ · ตัวเลขจริงจากไฟล์คาบที่ 4) · ลากแถบเพื่อเปลี่ยนค่าของ <b>แปลง P12</b> แล้วดูว่าค่ากลางไหนสะเทือนบ้าง</p>
     <div class="row">
-      <div><label class="fld">ผลผลิตของแปลง P15 = <b id="outVal">2400</b> กก./ไร่</label>
-        <input type="range" id="outSlider" min="0" max="12000" step="100" value="2400"></div>
+      <div><label class="fld">ผลผลิตของแปลง P12 = <b id="outVal">171</b> กก./ไร่</label>
+        <input type="range" id="outSlider" min="0" max="600" step="1" value="171"></div>
     </div>
     <div class="kv">
       <div class="box"><div class="v" id="stMean">–</div><div class="l">ค่าเฉลี่ย (mean)</div></div>
@@ -231,7 +273,7 @@ function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th
   <div class="card">
     <span class="kicker">ค่าเฉลี่ยอย่างเดียวไม่พอ</span>
     <h2>📈 การกระจายบอกความเสี่ยง</h2>
-    <p class="lead">สองโรงเรือนมีผลผลิตเฉลี่ยเท่ากัน แต่ความเสี่ยงต่างกันคนละเรื่อง — เลือกดูข้างล่าง</p>
+    <p class="lead">โรงเรือน A และ B มีผลผลิต<b>เฉลี่ยใกล้เคียงกัน</b> แต่ความเสี่ยงต่างกันคนละเรื่อง · ข้อมูล = ผลผลิตรวมของโรงเรือนต่อรอบเก็บเกี่ยว 40 รอบ (กก.) — เลือกดูข้างล่าง</p>
     <div class="row">
       <div><label class="fld">เลือกชุดข้อมูล</label>
         <select id="spSet">
@@ -253,7 +295,7 @@ IQR = Q3 - Q1
 ขอบล่าง = Q1 - 1.5 × IQR        ขอบบน = Q3 + 1.5 × IQR
 ค่าที่อยู่นอกช่วงนี้ = Outlier</div></div>
     <div class="row" style="margin-top:14px">
-      <div><label class="fld">ค่าที่ต้องการตรวจ (กก./ไร่)</label><input type="number" id="olVal" value="4800"></div>
+      <div><label class="fld">ค่าที่ต้องการตรวจ (กก./รอบเก็บเกี่ยว)</label><input type="number" id="olVal" value="300"></div>
     </div>
     <div class="fx"><div class="formula" id="olCalc"></div></div>
     <div class="callout">🧠 <b>เจอ Outlier แล้วทำอย่างไร?</b> <b>อย่าลบทันที!</b> ให้ถามก่อนว่า (1) พิมพ์ผิดหรือเซนเซอร์เสียไหม → แก้/ตัด (2) เป็นเหตุการณ์จริงที่หายากไหม เช่น พายุ น้ำท่วม → <b>เก็บไว้และอธิบาย</b> เพราะนี่มักคือ insight ที่มีค่าที่สุด</div>
@@ -278,7 +320,7 @@ IQR = Q3 - Q1
     <div class="row">
       <div><label class="fld">เลือกคู่ตัวแปร</label>
         <select id="corPair">
-          <option value="0">ความชื้นดิน (%) ↔ ผลผลิต (กก./ไร่)</option>
+          <option value="0">ความชื้นดิน (%) ↔ ผลผลิตต่อไร่ (กก./ไร่/ไตรมาส)</option>
           <option value="1">อุณหภูมิกลางวัน (°C) ↔ % ของเสียหลังเก็บเกี่ยว</option>
           <option value="2">จำนวนวันจาก เก็บเกี่ยว→ส่งถึงลูกค้า ↔ คะแนนความสดที่ลูกค้าให้</option>
           <option value="3">ยอดขายไอศกรีมในตลาด ↔ ผลผลิตผักสลัด (ตัวอย่างเตือนใจ)</option>
@@ -326,7 +368,7 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
   <div class="card">
     <span class="kicker">หาสาเหตุอย่างเป็นระบบ</span>
     <h2>❓ 5 Whys — ถามซ้ำจนถึงต้นตอ</h2>
-    <p class="lead">ปัญหาตั้งต้น: <b>ของเสียหลังเก็บเกี่ยวเพิ่มจาก 5.8% เป็น 9.1%</b> — กดปุ่มเพื่อถาม "ทำไม" ทีละชั้น</p>
+    <p class="lead">ปัญหาตั้งต้น: <b>ของเสียหลังเก็บเกี่ยวเพิ่มจาก 6.8% เป็น 9.1% (เป้า 8%)</b> — กดปุ่มเพื่อถาม "ทำไม" ทีละชั้น</p>
     <div id="whyWrap"></div>
     <div class="row" style="margin-top:12px">
       <div style="flex:0"><button class="btn" id="whyNext">ถาม "ทำไม" ต่อ →</button></div>
@@ -380,7 +422,7 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
           <option value="part">สัดส่วนของทั้งหมด (สัดส่วนยอดขายแต่ละพืช)</option>
           <option value="rel">ความสัมพันธ์ 2 ตัวแปร (ความชื้น ↔ ผลผลิต)</option>
           <option value="dist">การกระจายของค่า (ผลผลิตต่อไร่ทุกแปลง)</option>
-          <option value="kpi">ค่าเดียวเทียบเป้า (OTIF เทียบเป้า 95%)</option>
+          <option value="kpi">ค่าเดียวเทียบเป้า (% ของเสียเทียบเป้า 8%)</option>
         </select></div>
     </div>
     <div class="grid g2" id="chOut" style="margin-top:14px"></div>
@@ -393,7 +435,7 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
         <h3 style="color:var(--red)">❌ แบบที่ไม่มีใครอ่าน</h3>
         <div class="example-box">
           <div class="lbl">รายงาน</div>
-          <p style="font-size:14px">"ผลผลิตไตรมาส 2 อยู่ที่ 42,180 กก. ค่าเฉลี่ยต่อไร่ 2,331 กก. ส่วนเบี่ยงเบนมาตรฐาน 412 อุณหภูมิเฉลี่ย 33.2 องศา ความชื้นดินเฉลี่ย 58.4% ของเสีย 9.1% correlation ระหว่างอุณหภูมิกับของเสียเท่ากับ 0.78"</p>
+          <p style="font-size:14px">"ผลผลิตไตรมาส 2 อยู่ที่ 11,270 กก. ค่าเฉลี่ยต่อไร่ 148 กก. ส่วนเบี่ยงเบนมาตรฐาน 21 อุณหภูมิเฉลี่ย 33.2 องศา ความชื้นดินเฉลี่ย 58.4% ของเสีย 9.1% correlation ระหว่างอุณหภูมิกับของเสียเท่ากับ 0.78"</p>
         </div>
         <div class="note">→ ถูกต้องทุกตัวเลข แต่ผู้อ่านไม่รู้ว่าต้องทำอะไรต่อ</div>
       </div>
@@ -401,9 +443,9 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
         <h3 style="color:var(--brand2)">✅ แบบที่ได้รับอนุมัติงบ</h3>
         <div class="example-box">
           <div class="lbl">รายงาน</div>
-          <p style="font-size:14px"><b>ของเสียหลังเก็บเกี่ยวเพิ่มขึ้นเกือบเท่าตัว (5.8% → 9.1%) คิดเป็นมูลค่าที่หายไป 287,000 บาทในไตรมาสเดียว</b><br><br>
+          <p style="font-size:14px"><b>ของเสียหลังเก็บเกี่ยวเพิ่มจาก 6.8% เป็น 9.1% (เกินเป้า 8%) คิดเป็นมูลค่าที่หายไปราว 23,000 บาทในไตรมาสเดียว</b><br><br>
           สาเหตุหลักมาจากโรงเรือน B ซึ่งอุณหภูมิช่วงบ่ายเกิน 35°C ถึง 12 วัน หลังพัดลมระบายอากาศตัวที่ 3 เสียเมื่อ 8 เม.ย. (ความสัมพันธ์กับของเสีย r = 0.78)<br><br>
-          <b>ข้อเสนอ:</b> ซ่อมพัดลม (18,000 บาท) และตั้งการแจ้งเตือนเมื่ออุณหภูมิ &gt; 33°C — คาดว่าลดของเสียกลับสู่ระดับเดิม คืนทุนภายใน 3 สัปดาห์</p>
+          <b>ข้อเสนอ:</b> ซ่อมพัดลม (18,000 บาท) และตั้งการแจ้งเตือนเมื่ออุณหภูมิ &gt; 33°C — คาดว่าลดของเสียกลับสู่ระดับเดิม <b>คืนทุนภายในไตรมาสเดียว</b></p>
         </div>
         <div class="note">→ มีผลกระทบเป็นเงิน มีสาเหตุพร้อมหลักฐาน มีข้อเสนอที่ตัดสินใจได้</div>
       </div>
@@ -424,7 +466,18 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
       <div>คะแนนของคุณ</div>
       <div class="big" id="scoreNum"></div>
       <div id="scoreMsg"></div>
-      <button class="btn ghost" id="resetQuiz" style="margin-top:14px">ทำใหม่อีกครั้ง</button>
+      <div class="qz-submit-wrap">
+        <button class="btn" id="qz_btn" style="background:#fff;color:#15803d" onclick="submitQuizScore()">📤 ส่งคะแนนเข้า Google Form</button>
+        <button class="btn ghost" id="resetQuiz" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)">🔄 ทำใหม่อีกครั้ง</button>
+      </div>
+      <div class="qz-msg" id="qz_msg"></div>
+      <iframe name="qz_target" id="qz_target" style="display:none" title="hidden"></iframe>
+      <form id="qz_form" action="https://docs.google.com/forms/d/e/1FAIpQLSeIKFNFOrOlJoRfuntsKD6i0pe2NusQewjrOtKgBlymAmfDTw/formResponse" method="POST" target="qz_target" style="display:none">
+        <input type="hidden" name="entry.893657035" id="qz_f_student">
+        <input type="hidden" name="entry.1362746898" id="qz_f_score">
+        <input type="hidden" name="fvv" value="1">
+        <input type="hidden" name="pageHistory" value="0">
+      </form>
     </div>
   </div>
   <div class="foot">Business Data Analytics · ครั้งที่ 5 — Descriptive &amp; Diagnostic · สถิติ · Storytelling</div>
@@ -452,13 +505,13 @@ function rnd(seed){ var s=seed; return function(){ s=(s*1103515245+12345)%214748
 /* ===== PAGE 1 : drill down ===== */
 var DRILL = {
   root:{label:'ทั้งฟาร์ม · ผลผลิต Q2', delta:'-18%', children:[
-    {label:'โรงเรือน A', delta:'-3%', children:[
+    {label:'โรงเรือน A (4 แปลง)', delta:'-3%', children:[
       {label:'กรีนโอ๊ค', delta:'-2%'},{label:'คอส', delta:'-4%'},{label:'เคล', delta:'-3%'}]},
-    {label:'โรงเรือน B', delta:'-41%', children:[
-      {label:'กรีนโอ๊ค', delta:'-46%', children:[
-        {label:'เม.ย. (หลัง 8 เม.ย.)', delta:'-58%'},{label:'พ.ค.', delta:'-49%'},{label:'มิ.ย.', delta:'-31%'}]},
-      {label:'คอส', delta:'-39%'},{label:'เคล', delta:'-37%'}]},
-    {label:'โรงเรือน C', delta:'-6%', children:[
+    {label:'โรงเรือน B (4 แปลง)', delta:'-45%', children:[
+      {label:'กรีนโอ๊ค', delta:'-50%', children:[
+        {label:'เม.ย. (หลัง 8 เม.ย.)', delta:'-62%'},{label:'พ.ค.', delta:'-53%'},{label:'มิ.ย.', delta:'-35%'}]},
+      {label:'คอส', delta:'-43%'},{label:'เคล', delta:'-42%'}]},
+    {label:'โรงเรือน C (4 แปลง)', delta:'-6%', children:[
       {label:'กรีนโอ๊ค', delta:'-7%'},{label:'คอส', delta:'-5%'},{label:'เคล', delta:'-6%'}]}
   ]}
 };
@@ -486,7 +539,7 @@ function drawDrill(){
   var last=drillPath[drillPath.length-1];
   var n=document.getElementById('drillNote');
   if(drillPath.length===1) n.innerHTML='👆 ภาพรวมบอกว่าลด 18% — แต่ยังไม่รู้ว่าลดทั่วทั้งฟาร์ม หรือกระจุกอยู่ที่เดียว คลิกเจาะลงไปดู';
-  else if(drillPath.length===2) n.innerHTML='🔎 <b>เจอแล้ว!</b> ปัญหาไม่ได้กระจายทั่วฟาร์ม — โรงเรือน B ลดถึง 41% ขณะที่ A และ C แทบไม่เปลี่ยน · <b>นี่คือค่าของการ Drill-down: ค่าเฉลี่ยรวมซ่อนปัญหาไว้</b>';
+  else if(drillPath.length===2) n.innerHTML='🔎 <b>เจอแล้ว!</b> ปัญหาไม่ได้กระจายทั่วฟาร์ม — โรงเรือน B ลดถึง 45% ขณะที่ A และ C แทบไม่เปลี่ยน (พื้นที่ทั้ง 3 โรงเรือนใกล้เคียงกัน ~25 ไร่ ค่าเฉลี่ยถ่วงน้ำหนักจึงออกมาที่ -18%) · <b>นี่คือค่าของการ Drill-down: ค่าเฉลี่ยรวมซ่อนปัญหาไว้</b>';
   else if(last.label.indexOf('เม.ย.')>=0) n.innerHTML='🎯 <b>ถึงต้นตอเชิงเวลาแล้ว:</b> ผลผลิตดิ่งหนักที่สุดหลังวันที่ 8 เม.ย. → ไปหาว่ามีอะไรเกิดขึ้นวันนั้น (บันทึกซ่อมบำรุงบอกว่าพัดลมระบายอากาศตัวที่ 3 เสีย)';
   else n.innerHTML='ลงลึกต่อได้อีก — สังเกตว่าเราเลือกเจาะเฉพาะกิ่งที่ตัวเลข <b>ผิดปกติที่สุด</b> ไม่ใช่เจาะทุกกิ่งเท่า ๆ กัน';
   if(drillPath.length>1){
@@ -500,7 +553,7 @@ function drawDrill(){
 drawDrill();
 
 /* ===== PAGE 2 : central tendency ===== */
-var YIELD = [2150,2280,2310,2400,2400,2450,2480,2520,2550,2600,2640,2700,2750,2820];
+var YIELD = [198,187,172,192,177,194,176,191,164,177,164]; /* P01–P11 · กก./ไร่ ไตรมาส 2 จาก BDA_class4_FarmData.xlsx */
 var stChart=null;
 function updStats(){
   var extra=+document.getElementById('outSlider').value;
@@ -509,10 +562,11 @@ function updStats(){
   var m=mean(arr), md=median(arr), s=sd(arr);
   var q1=quantile(arr,.25), q3=quantile(arr,.75);
   var counts={}; arr.forEach(function(v){counts[v]=(counts[v]||0)+1;});
-  var mode=Object.keys(counts).reduce(function(a,b){ return counts[b]>counts[a]?b:a; });
+  var maxc=0; Object.keys(counts).forEach(function(k){ if(counts[k]>maxc) maxc=counts[k]; });
+  var modes=Object.keys(counts).filter(function(k){ return counts[k]===maxc; }).map(Number).sort(function(a,b){return a-b;});
   document.getElementById('stMean').textContent=fmt(m,0);
   document.getElementById('stMedian').textContent=fmt(md,0);
-  document.getElementById('stMode').textContent=(counts[mode]>1? fmt(+mode,0) : 'ไม่มี');
+  document.getElementById('stMode').textContent=(maxc>1 ? modes.map(function(v){return fmt(v,0);}).join(' / ') : 'ไม่มี');
   document.getElementById('stSD').textContent=fmt(s,0);
   document.getElementById('stIQR').textContent=fmt(q3-q1,0);
   document.getElementById('stCV').textContent=fmt(s/m*100,1)+'%';
@@ -527,8 +581,8 @@ function updStats(){
   });
   var gap=Math.abs(m-md);
   var n=document.getElementById('stNote');
-  if(extra>6000) n.innerHTML='🚨 แปลง P15 กลายเป็น <b>Outlier</b> รุนแรง · สังเกตว่า <b>mean กระโดดขึ้นไป '+fmt(m,0)+'</b> แต่ <b>median แทบไม่ขยับ ('+fmt(md,0)+')</b> — ถ้ารายงานแค่ค่าเฉลี่ย ผู้อ่านจะเข้าใจผิดว่าทั้งฟาร์มผลผลิตดี ทั้งที่มีแค่แปลงเดียวที่พุ่ง<br>ห่างกัน '+fmt(gap,0)+' กก./ไร่ · CV พุ่งเป็น '+fmt(sd(arr)/m*100,1)+'% แสดงว่าข้อมูลกระจายมาก';
-  else if(extra<1200) n.innerHTML='📉 P15 ต่ำผิดปกติ → mean ถูกดึงลงมาที่ '+fmt(m,0)+' ขณะที่ median = '+fmt(md,0)+' · ควรตรวจว่าแปลงนี้มีปัญหาจริง (โรคระบาด? เซนเซอร์เสีย?) ก่อนสรุปว่าทั้งฟาร์มแย่ลง';
+  if(extra>400) n.innerHTML='🚨 แปลง P12 กลายเป็น <b>Outlier</b> รุนแรง · สังเกตว่า <b>mean กระโดดขึ้นไป '+fmt(m,0)+'</b> แต่ <b>median แทบไม่ขยับ ('+fmt(md,0)+')</b> — ถ้ารายงานแค่ค่าเฉลี่ย ผู้อ่านจะเข้าใจผิดว่าทั้งฟาร์มผลผลิตดี ทั้งที่มีแค่แปลงเดียวที่พุ่ง<br>ห่างกัน '+fmt(gap,0)+' กก./ไร่ · CV พุ่งเป็น '+fmt(s/m*100,1)+'% แสดงว่าข้อมูลกระจายมาก';
+  else if(extra<110) n.innerHTML='📉 P12 ต่ำผิดปกติ → mean ถูกดึงลงมาที่ '+fmt(m,0)+' ขณะที่ median = '+fmt(md,0)+' · ควรตรวจว่าแปลงนี้มีปัญหาจริง (โรคระบาด? เซนเซอร์เสีย? บันทึกตกหล่น?) ก่อนสรุปว่าทั้งฟาร์มแย่ลง';
   else n.innerHTML='✅ ตอนนี้ mean ('+fmt(m,0)+') และ median ('+fmt(md,0)+') ใกล้กันมาก แปลว่าข้อมูลค่อนข้างสมมาตร ไม่มีค่าสุดโต่ง — ในกรณีแบบนี้ใช้ค่าเฉลี่ยรายงานได้อย่างสบายใจ · ลองลากไปสุดขวาเพื่อดูผลของ Outlier';
 }
 document.getElementById('outSlider').addEventListener('input', updStats);
@@ -537,8 +591,8 @@ document.getElementById('outSlider').addEventListener('input', updStats);
 var rA=rnd(7), rB=rnd(31);
 var HOUSE_A=[], HOUSE_B=[];
 for(var i=0;i<40;i++){
-  HOUSE_A.push(Math.round(2400 + (rA()+rA()+rA()-1.5)*220));
-  HOUSE_B.push(Math.round(2400 + (rB()+rB()+rB()-1.5)*900));
+  HOUSE_A.push(Math.round(220 + (rA()+rA()+rA()-1.5)*36));
+  HOUSE_B.push(Math.round(220 + (rB()+rB()+rB()-1.5)*132));
 }
 var spChart=null;
 function hist(data, bins, lo, hi){
@@ -548,7 +602,7 @@ function hist(data, bins, lo, hi){
 }
 function updSpread(){
   var mode=document.getElementById('spSet').value;
-  var lo=800, hi=4000, bins=16;
+  var lo=0, hi=400, bins=16;
   var labels=[]; for(var i=0;i<bins;i++) labels.push(Math.round(lo+(hi-lo)/bins*i));
   var ds=[];
   if(mode==='both'||mode==='A') ds.push({label:'โรงเรือน A', data:hist(HOUSE_A,bins,lo,hi), backgroundColor:'rgba(22,163,74,.75)'});
@@ -556,7 +610,7 @@ function updSpread(){
   if(spChart) spChart.destroy();
   spChart=new Chart(document.getElementById('spChart'),{
     type:'bar', data:{labels:labels, datasets:ds},
-    options:{responsive:true, maintainAspectRatio:false, scales:{x:{title:{display:true,text:'ผลผลิต (กก./ไร่)'}}, y:{title:{display:true,text:'จำนวนวัน'}, beginAtZero:true}}}
+    options:{responsive:true, maintainAspectRatio:false, scales:{x:{title:{display:true,text:'ผลผลิตต่อรอบเก็บเกี่ยว (กก.)'}}, y:{title:{display:true,text:'จำนวนรอบเก็บเกี่ยว'}, beginAtZero:true}}}
   });
   var t=document.getElementById('spTbl');
   function row(name,a){
@@ -565,9 +619,10 @@ function updSpread(){
            '</td><td>'+fmt(q3-q1,0)+'</td><td>'+fmt(sd(a)/mean(a)*100,1)+'%</td><td>'+fmt(Math.min.apply(null,a),0)+' – '+fmt(Math.max.apply(null,a),0)+'</td></tr>';
   }
   t.innerHTML='<tr><th>ชุดข้อมูล</th><th>Mean</th><th>Median</th><th>SD</th><th>IQR</th><th>CV</th><th>ต่ำสุด – สูงสุด</th></tr>'+row('โรงเรือน A',HOUSE_A)+row('โรงเรือน B',HOUSE_B);
+  var sdA=sd(HOUSE_A), sdB=sd(HOUSE_B);
   document.getElementById('spNote').innerHTML=
-    'ค่าเฉลี่ยของสองโรงเรือน <b>ใกล้เคียงกันมาก</b> แต่ SD ของโรงเรือน B สูงกว่าเกือบ 4 เท่า → บางวันผลผลิตดีมาก บางวันแทบไม่ได้อะไร<br>'+
-    'ในเชิงธุรกิจ โรงเรือน B <b>วางแผนส่งของยากกว่ามาก</b> เพราะพยากรณ์ไม่ได้ ต้องเผื่อ safety stock สูงกว่า → ต้นทุนสูงกว่าทั้งที่ผลผลิตเฉลี่ยเท่ากัน<br>'+
+    'ค่าเฉลี่ยของสองโรงเรือน <b>ใกล้เคียงกัน</b> ('+fmt(mean(HOUSE_A),0)+' กับ '+fmt(mean(HOUSE_B),0)+' กก.) แต่ SD ของโรงเรือน B สูงกว่า <b>'+fmt(sdB/sdA,1)+' เท่า</b> → บางรอบผลผลิตดีมาก บางรอบแทบไม่ได้อะไร<br>'+
+    'ในเชิงธุรกิจ โรงเรือน B <b>วางแผนส่งของยากกว่ามาก</b> เพราะพยากรณ์ไม่ได้ ต้องเผื่อสต็อกสำรองสูงกว่า → ต้นทุนสูงกว่าทั้งที่ผลผลิตเฉลี่ยพอกัน<br>'+
     '<b>บทเรียน: อย่ารายงานค่าเฉลี่ยโดยไม่รายงานการกระจาย</b>';
 }
 document.getElementById('spSet').addEventListener('change', updSpread);
@@ -577,7 +632,7 @@ function updOutlier(){
   var v=+document.getElementById('olVal').value;
   var isOut = v<lo || v>hi;
   document.getElementById('olCalc').innerHTML=
-    'ชุดข้อมูล: ผลผลิตรายวันโรงเรือน A (40 วัน)\n'+
+    'ชุดข้อมูล: ผลผลิตต่อรอบเก็บเกี่ยวของโรงเรือน A (40 รอบ)\n'+
     'Q1 = '+fmt(q1,0)+'   Q3 = '+fmt(q3,0)+'   IQR = '+fmt(iqr,0)+'\n'+
     'ขอบล่าง = '+fmt(q1,0)+' - 1.5×'+fmt(iqr,0)+' = <span class="res">'+fmt(lo,0)+'</span>\n'+
     'ขอบบน  = '+fmt(q3,0)+' + 1.5×'+fmt(iqr,0)+' = <span class="res">'+fmt(hi,0)+'</span>\n\n'+
@@ -587,18 +642,18 @@ document.getElementById('olVal').addEventListener('input', updOutlier);
 
 /* ===== PAGE 4 : correlation ===== */
 var PAIRS=[
- {xl:'ความชื้นดิน (%)', yl:'ผลผลิต (กก./ไร่)', seed:11, n:45,
-  gen:function(r){ var x=45+r()*40; var y=1200+ (x-45)*38 + (r()+r()-1)*900; return [x, y]; },
+ {xl:'ความชื้นดิน (%)', yl:'ผลผลิตต่อไร่ (กก./ไร่/ไตรมาส)', seed:11, n:45,
+  gen:function(r){ var x=45+r()*40; var y=140+(x-45)*1.5+(r()+r()-1)*30; return [x, y]; },
   note:'<b>r เป็นบวกค่อนข้างสูง</b> — ความชื้นดินที่เหมาะสมสัมพันธ์กับผลผลิตที่ดีขึ้น · มีกลไกทางชีววิทยารองรับชัดเจน (รากดูดซึมธาตุอาหารได้ดีขึ้น) จึงมีเหตุผลที่จะเชื่อว่าเป็นความสัมพันธ์เชิงสาเหตุจริง <b>แต่ยังต้องระวังว่าเกินจุดหนึ่งความชื้นสูงเกินจะทำให้รากเน่า</b> — ความสัมพันธ์จริงอาจเป็นเส้นโค้ง ไม่ใช่เส้นตรง'},
  {xl:'อุณหภูมิกลางวัน (°C)', yl:'% ของเสียหลังเก็บเกี่ยว', seed:23, n:45,
-  gen:function(r){ var x=27+r()*12; var y=2.0+(x-27)*0.62+(r()+r()-1)*2.8; return [x,y]; },
-  note:'<b>นี่คือหลักฐานหลักของเคสเรา</b> — ยิ่งอุณหภูมิสูง ของเสียยิ่งเพิ่ม สอดคล้องกับกลไก (การหายใจของผักเร่งขึ้น สูญเสียน้ำเร็ว) และสอดคล้องกับไทม์ไลน์ที่พัดลมเสีย → มีน้ำหนักพอที่จะเสนอให้ซ่อมพัดลม'},
+  gen:function(r){ var x=27+r()*12; var y=4.0+(x-27)*0.45+(r()+r()-1)*4.0; return [x,y]; },
+  note:'<b>นี่คือหลักฐานหลักของเคสเรา (r ≈ 0.78)</b> — ยิ่งอุณหภูมิสูง ของเสียยิ่งเพิ่ม สอดคล้องกับกลไก (การหายใจของผักเร่งขึ้น สูญเสียน้ำเร็ว) และสอดคล้องกับไทม์ไลน์ที่พัดลมเสีย → มีน้ำหนักพอที่จะเสนอให้ซ่อมพัดลม · สังเกตว่าจุดกระจายรอบเส้นพอสมควร แปลว่ายังมีปัจจัยอื่นร่วมด้วย'},
  {xl:'วันจากเก็บเกี่ยว → ถึงลูกค้า', yl:'คะแนนความสด (1–10)', seed:37, n:45,
-  gen:function(r){ var x=0.5+r()*6; var y=9.6-x*0.85+(r()+r()-1)*1.5; return [x,y]; },
-  note:'<b>r เป็นลบชัดเจน</b> — ทุกวันที่ช้าลง คะแนนความสดลดลงประมาณ 0.85 คะแนน · นี่คือเหตุผลเชิงตัวเลขที่ทำให้ Order Cycle Time เป็น KPI สำคัญของโซ่อุปทานสินค้าเกษตร'},
- {xl:'ยอดขายไอศกรีมในตลาด (หมื่นบาท)', yl:'ผลผลิตผักสลัด (กก./ไร่)', seed:59, n:45,
+  gen:function(r){ var x=0.5+r()*6; var y=Math.max(1,Math.min(10, 9.3-x*0.75+(r()+r()-1)*1.9)); return [x,y]; },
+  note:'<b>r เป็นลบชัดเจน</b> — ทุกวันที่ส่งช้าลง คะแนนความสดลดลงราว 0.75 คะแนน · นี่คือเหตุผลเชิงตัวเลขที่ทำให้ <b>เวลาตั้งแต่เก็บเกี่ยวจนถึงมือลูกค้า</b> เป็นตัวชี้วัดสำคัญของสินค้าเกษตร (ตรงกับคอลัมน์ "เวลารอบออเดอร์" ในตาราง FactShipment ของคาบที่ 4)'},
+ {xl:'ยอดขายไอศกรีมในตลาด (หมื่นบาท)', yl:'ผลผลิตผักสลัด (กก./ไร่/ไตรมาส)', seed:59, n:45,
   note:'⚠️ <b>ตัวอย่างเตือนใจ:</b> ตัวเลข r ดูสูงพอสมควร แต่ไม่มีใครเชื่อว่าไอศกรีมทำให้ผักโต — ตัวแปรที่สามคือ <b>ฤดูกาล/อุณหภูมิ</b> ที่ทำให้ทั้งสองอย่างขยับไปพร้อมกัน<br><b>บทเรียน: ก่อนเชื่อ r ให้ถามว่ามีกลไกอะไรอธิบายได้ไหม และมีอะไรที่ขับเคลื่อนทั้งสองตัวพร้อมกันหรือเปล่า</b>',
-  gen:function(r){ var season=r(); var x=20+season*60+(r()-0.5)*12; var y=1500+season*900+(r()-0.5)*380; return [x,y]; }}
+  gen:function(r){ var season=r(); var x=20+season*60+(r()-0.5)*17; var y=150+season*90+(r()-0.5)*55; return [x,y]; }}
 ];
 var corChart=null;
 function updCorr(){
@@ -626,7 +681,7 @@ document.getElementById('corPair').addEventListener('change', updCorr);
 
 /* ===== PAGE 5 : 5 whys ===== */
 var WHYS=[
- {q:'ปัญหา: ของเสียหลังเก็บเกี่ยวเพิ่มจาก 5.8% เป็น 9.1%', a:'', d:'เริ่มจากปัญหาที่วัดเป็นตัวเลขได้และระบุช่วงเวลาชัดเจน'},
+ {q:'ปัญหา: ของเสียหลังเก็บเกี่ยวเพิ่มจาก 6.8% เป็น 9.1% (เป้า 8%)', a:'', d:'เริ่มจากปัญหาที่วัดเป็นตัวเลขได้และระบุช่วงเวลาชัดเจน'},
  {q:'ทำไมของเสียถึงเพิ่ม?', a:'เพราะผักจากโรงเรือน B เหี่ยวเร็วผิดปกติ (คิดเป็น 78% ของของเสียทั้งหมด)', d:'ยืนยันด้วยข้อมูล: แยกของเสียตามโรงเรือน'},
  {q:'ทำไมผักโรงเรือน B ถึงเหี่ยวเร็ว?', a:'เพราะอุณหภูมิช่วงบ่ายในโรงเรือน B เกิน 35°C ถึง 12 วันใน 1 เดือน', d:'ยืนยันด้วยข้อมูล: log เซนเซอร์อุณหภูมิรายชั่วโมง'},
  {q:'ทำไมอุณหภูมิถึงสูงเกิน?', a:'เพราะพัดลมระบายอากาศตัวที่ 3 หยุดทำงานตั้งแต่ 8 เม.ย.', d:'ยืนยันด้วยข้อมูล: บันทึกการทำงานของอุปกรณ์ + วันที่ตรงกับจุดที่กราฟดิ่ง'},
@@ -711,36 +766,36 @@ function onPage(i){
 
 /* ===== QUIZ ===== */
 var QUIZ=[
- {q:'ข้อมูลรายได้ของเกษตรกร 20 ราย มีรายหนึ่งเป็นเจ้าของฟาร์มขนาดใหญ่ที่รายได้สูงกว่าคนอื่น 30 เท่า ควรรายงานค่ากลางแบบใด?',
-  a:['Mean เพราะใช้ข้อมูลทุกค่า','Median เพราะไม่ถูกดึงโดยค่าสุดโต่ง','Mode เพราะพบบ่อยที่สุด','ไม่ต้องรายงานค่ากลาง'],
-  c:1, e:'Median ทนต่อค่าสุดโต่ง (robust) จึงสะท้อน "เกษตรกรทั่วไป" ได้ดีกว่า แนวปฏิบัติที่ดีคือรายงานทั้ง mean และ median คู่กัน แล้วอธิบายว่าทำไมต่างกัน'},
- {q:'โรงเรือน A และ B มีผลผลิตเฉลี่ยเท่ากันที่ 2,400 กก./ไร่ แต่ SD ของ A = 220 และ B = 900 ข้อสรุปใดถูกต้อง?',
-  a:['A ให้ผลผลิตดีกว่า B','B ให้ผลผลิตดีกว่า A','ผลผลิตเท่ากัน แต่ B ผันผวนสูงกว่ามาก วางแผนส่งของยากกว่า','ข้อมูลผิด เพราะค่าเฉลี่ยเท่ากันต้องมี SD เท่ากัน'],
-  c:2, e:'ค่าเฉลี่ยบอกแค่ "ระดับ" ส่วน SD บอก "ความเสี่ยง" · โรงเรือนที่ผันผวนสูงต้องเผื่อ safety stock มากกว่า ทำให้ต้นทุนสูงกว่าแม้ผลผลิตเฉลี่ยเท่ากัน'},
- {q:'ชุดข้อมูลมี Q1 = 2,300 และ Q3 = 2,700 ค่าใดถือเป็น Outlier ตามกฎ 1.5 × IQR?',
-  a:['2,100','3,200','1,500','2,900'],
-  c:2, e:'IQR = 2,700 − 2,300 = 400 · ขอบล่าง = 2,300 − (1.5 × 400) = 1,700 · ขอบบน = 2,700 + (1.5 × 400) = 3,300 · มีเพียง 1,500 ที่อยู่ต่ำกว่าขอบล่าง จึงเป็น Outlier ส่วน 2,100 / 2,900 / 3,200 ยังอยู่ในช่วงปกติทั้งหมด'},
- {q:'ค่า r = 0.85 ระหว่างยอดขายไอศกรีมกับผลผลิตผักสลัด ควรตีความอย่างไร?',
-  a:['ไอศกรีมทำให้ผักโตดีขึ้น','ผักที่โตดีทำให้คนซื้อไอศกรีม','น่าจะมีตัวแปรที่สาม เช่น ฤดูกาล ที่ขับเคลื่อนทั้งสองอย่าง','r สูงแปลว่าเป็นสาเหตุกันเสมอ'],
-  c:2, e:'นี่คือกรณี confounding variable คลาสสิก — ฤดูกาลและอุณหภูมิส่งผลต่อทั้งสองตัวแปรพร้อมกัน ก่อนสรุปสาเหตุต้องถามเสมอว่ามีกลไกอธิบายได้จริงไหม'},
- {q:'R² = 0.49 หมายความว่าอย่างไร?',
-  a:['ตัวแปรต้นอธิบายความผันแปรของตัวแปรตามได้ประมาณ 49%','มีโอกาสผิด 49%','ความสัมพันธ์เป็นลบ','ข้อมูล 49% เป็น outlier'],
-  c:0, e:'R² คือสัดส่วนความผันแปรของตัวแปรตามที่อธิบายได้ด้วยตัวแปรต้น ส่วนที่เหลืออีก 51% มาจากปัจจัยอื่นที่ยังไม่ได้ใส่ในโมเดล'},
+ {q:'รายได้ของเกษตรกร 20 ราย มีอยู่หนึ่งรายที่รายได้สูงกว่าคนอื่นราว 30 เท่า ควรรายงานค่ากลางแบบใด?',
+  a:['ค่าเฉลี่ย เพราะคำนวณจากข้อมูลครบทุกราย','มัธยฐาน เพราะไม่ถูกดึงด้วยค่าสุดโต่ง','ฐานนิยม เพราะเป็นค่าที่พบบ่อยที่สุด','พิสัย เพราะบอกช่วงของข้อมูลได้ครบ'],
+  c:1, e:'มัธยฐานทนต่อค่าสุดโต่ง (robust) จึงสะท้อน "เกษตรกรทั่วไป" ได้ดีกว่า · แนวปฏิบัติที่ดีคือรายงานทั้งค่าเฉลี่ยและมัธยฐานคู่กัน แล้วอธิบายว่าทำไมสองค่านี้ต่างกัน'},
+ {q:'โรงเรือน A และ B มีผลผลิตเฉลี่ยต่อรอบใกล้เคียงกัน (~220 กก.) แต่ SD ของ A = 18 และ B = 68 ควรสรุปว่าอย่างไร?',
+  a:['โรงเรือน A ให้ผลผลิตมากกว่าโรงเรือน B ชัดเจน','โรงเรือน B ให้ผลผลิตมากกว่าโรงเรือน A ชัดเจน','ผลผลิตพอกัน แต่ B ผันผวนกว่า วางแผนส่งของยากกว่า','ข้อมูลผิดพลาด เพราะค่าเฉลี่ยเท่ากันต้องมี SD เท่ากัน'],
+  c:2, e:'ค่าเฉลี่ยบอกแค่ "ระดับ" ส่วน SD บอก "ความเสี่ยง" · โรงเรือนที่ผันผวนสูงต้องเผื่อสต็อกสำรองมากกว่า ทำให้ต้นทุนสูงกว่าแม้ผลผลิตเฉลี่ยจะพอกัน'},
+ {q:'ผลผลิตต่อไร่ของ 12 แปลงมี Q1 = 170 และ Q3 = 190 กก./ไร่ ค่าใดเข้าข่ายเป็น Outlier ตามกฎ 1.5 × IQR?',
+  a:['145 กก./ไร่ เพราะต่ำกว่าค่าเฉลี่ยอยู่มาก','132 กก./ไร่ เพราะต่ำกว่าขอบล่างที่คำนวณได้','205 กก./ไร่ เพราะสูงกว่าควอไทล์ที่สาม','215 กก./ไร่ เพราะสูงกว่าค่าเฉลี่ยอยู่มาก'],
+  c:1, e:'IQR = 190 − 170 = 20 · ขอบล่าง = 170 − (1.5 × 20) = 140 · ขอบบน = 190 + (1.5 × 20) = 220 · มีเพียง 132 ที่หลุดออกนอกช่วง 140–220 ส่วน 145 / 205 / 215 ยังอยู่ในช่วงปกติทั้งหมด'},
+ {q:'พบว่า r = 0.84 ระหว่างยอดขายไอศกรีมในตลาดกับผลผลิตผักสลัด ควรตีความอย่างไร?',
+  a:['ไอศกรีมที่ขายดีทำให้ผักสลัดเติบโตดีขึ้น','ผักสลัดที่ผลผลิตดีทำให้คนซื้อไอศกรีมมากขึ้น','น่าจะมีตัวแปรที่สาม เช่น ฤดูกาล ขับเคลื่อนทั้งคู่','ค่า r ที่สูงยืนยันความเป็นเหตุเป็นผลได้เสมอ'],
+  c:2, e:'นี่คือกรณีตัวแปรกวน (confounding variable) คลาสสิก — ฤดูกาลและอุณหภูมิส่งผลต่อทั้งสองตัวแปรพร้อมกัน · ก่อนสรุปเรื่องสาเหตุต้องถามเสมอว่ามีกลไกอธิบายได้จริงหรือไม่'},
+ {q:'ผลวิเคราะห์ระบุว่า R² = 0.49 ระหว่างความชื้นดินกับผลผลิต หมายความว่าอย่างไร?',
+  a:['ความชื้นดินอธิบายความผันแปรของผลผลิตได้ราว 49%','ข้อสรุปนี้มีโอกาสผิดพลาดประมาณ 49 เปอร์เซ็นต์','ความสัมพันธ์เป็นลบ เพราะค่าน้อยกว่า 1 อยู่มาก','ข้อมูลราว 49 เปอร์เซ็นต์เป็นค่าผิดปกติที่ต้องตัด'],
+  c:0, e:'R² คือสัดส่วนความผันแปรของตัวแปรตามที่อธิบายได้ด้วยตัวแปรต้น · ส่วนที่เหลืออีก 51% มาจากปัจจัยอื่นที่ยังไม่ได้ใส่ไว้ในแบบจำลอง'},
  {q:'ข้อใดคือการใช้ 5 Whys ที่ถูกต้อง?',
-  a:['ถามจนได้คำตอบว่า "พนักงานไม่ระวัง" แล้วจบ','ทุกคำตอบต้องมีข้อมูลยืนยัน และถามต่อจนถึงสาเหตุเชิงระบบ','ถามให้ครบ 5 ครั้งพอดีเสมอไม่ว่าอย่างไร','ถามคนเดียวจนได้คำตอบที่ต้องการ'],
-  c:1, e:'หัวใจของ 5 Whys คือทุกชั้นต้องมีหลักฐานข้อมูลรองรับ และเป้าหมายคือหาสาเหตุเชิงระบบที่แก้แล้วป้องกันการเกิดซ้ำ ไม่ใช่หาคนผิด (จำนวน 5 เป็นแนวทาง ไม่ใช่กฎตายตัว)'},
+  a:['ถามจนได้คำตอบว่าพนักงานไม่ระมัดระวัง แล้วจบ','ถามให้ครบ 5 ครั้งพอดีเสมอ ไม่ว่าปัญหาแบบใด','ถามจนถึงสาเหตุเชิงระบบ โดยทุกชั้นมีข้อมูลยืนยัน','ถามผู้เกี่ยวข้องเพียงคนเดียวจนได้คำตอบที่ต้องการ'],
+  c:2, e:'หัวใจของ 5 Whys คือทุกชั้นต้องมีหลักฐานข้อมูลรองรับ และเป้าหมายคือสาเหตุเชิงระบบที่แก้แล้วป้องกันการเกิดซ้ำ ไม่ใช่การหาคนผิด (เลข 5 เป็นแนวทาง ไม่ใช่กฎตายตัว)'},
  {q:'ควรใช้ Fishbone Diagram ร่วมกับ 5 Whys อย่างไร?',
-  a:['ใช้แทนกัน เลือกอย่างใดอย่างหนึ่ง','Fishbone กวาดสาเหตุให้ครบทุกด้านก่อน แล้วเลือกกิ่งที่มีหลักฐานไปเจาะลึกด้วย 5 Whys','ใช้ 5 Whys ก่อนเสมอ แล้วค่อยทำ Fishbone','Fishbone ใช้กับข้อมูลตัวเลขเท่านั้น'],
-  c:1, e:'Fishbone ให้ความ "กว้าง" (6M: คน เครื่องจักร วิธีการ วัตถุดิบ การวัด สภาพแวดล้อม) ส่วน 5 Whys ให้ความ "ลึก" การใช้คู่กันช่วยลดความเสี่ยงที่จะเจาะผิดสาย'},
- {q:'p-value = 0.03 หมายความว่าอย่างไร?',
-  a:['ความต่างที่พบมีความสำคัญทางธุรกิจมาก','มีโอกาส 3% ที่จะเห็นความต่างมากขนาดนี้ ถ้าจริง ๆ แล้วไม่มีความต่าง','สมมติฐานทางเลือกมีโอกาสถูก 97%','ข้อมูล 3% เป็นค่าผิดปกติ'],
-  c:1, e:'p-value คือความน่าจะเป็นของการเห็นผลลัพธ์แบบนี้หรือสุดโต่งกว่า ภายใต้สมมติฐานว่าง · มันไม่ได้บอกว่าความต่างนั้นใหญ่พอจะสำคัญทางธุรกิจ จึงต้องดู effect size ควบคู่'},
- {q:'ต้องการแสดง "สัดส่วนยอดขายของพืช 9 ชนิด" ควรเลือกกราฟใด?',
-  a:['กราฟวงกลม 9 ชิ้น','กราฟแท่งเรียงจากมากไปน้อย พร้อมกำกับ %','กราฟเส้น','กราฟเรดาร์'],
-  c:1, e:'สายตามนุษย์เปรียบเทียบความยาวได้แม่นกว่ามุมมาก กราฟวงกลมที่มีชิ้นเกิน 4–5 ชิ้นจะอ่านยากและเปรียบเทียบไม่ได้'},
- {q:'ข้อใดคือสรุปเชิงข้อมูลที่ "ใช้ตัดสินใจได้" มากที่สุด?',
-  a:['ของเสียเท่ากับ 9.1% correlation กับอุณหภูมิเท่ากับ 0.78','ผลผลิตลดลง กรุณาตรวจสอบ','ของเสียเพิ่มเป็น 9.1% คิดเป็นเงิน 287,000 บาท สาเหตุจากพัดลมโรงเรือน B เสียตั้งแต่ 8 เม.ย. เสนอซ่อม 18,000 บาท คืนทุนใน 3 สัปดาห์','ค่าเฉลี่ยอุณหภูมิ 33.2°C ค่าเบี่ยงเบนมาตรฐาน 2.1'],
-  c:2, e:'สรุปที่ดีต้องครบ 4 ส่วน: เกิดอะไรขึ้น (พร้อมมูลค่าเป็นเงิน) → ที่ไหน → เพราะอะไรพร้อมหลักฐาน → เสนอให้ทำอะไรและคาดว่าได้ผลอย่างไร'}
+  a:['เลือกใช้อย่างใดอย่างหนึ่ง เพราะให้ผลเหมือนกัน','ใช้ Fishbone กวาดสาเหตุให้ครบ แล้วเจาะด้วย 5 Whys','ใช้ 5 Whys ให้จบก่อน แล้วค่อยทำ Fishbone ทีหลัง','ใช้ Fishbone ได้เฉพาะกับข้อมูลที่เป็นตัวเลขเท่านั้น'],
+  c:1, e:'Fishbone ให้ความ "กว้าง" (6M: คน เครื่องจักร วิธีการ วัตถุดิบ การวัด สภาพแวดล้อม) ส่วน 5 Whys ให้ความ "ลึก" · การใช้คู่กันช่วยลดความเสี่ยงที่จะเจาะผิดสายตั้งแต่ต้น'},
+ {q:'ผลทดสอบสมมติฐานได้ p-value = 0.03 หมายความว่าอย่างไร?',
+  a:['ความต่างที่พบมีความสำคัญทางธุรกิจอย่างแน่นอน','ถ้าไม่มีความต่างจริง โอกาสเห็นผลแบบนี้มีราว 3%','สมมติฐานทางเลือกมีโอกาสถูกต้องถึง 97 เปอร์เซ็นต์','ข้อมูลราว 3 เปอร์เซ็นต์เป็นค่าผิดปกติที่ต้องตัด'],
+  c:1, e:'p-value คือความน่าจะเป็นที่จะเห็นผลแบบนี้หรือสุดโต่งกว่า ภายใต้สมมติฐานว่าง · มันไม่ได้บอกว่าความต่างนั้นใหญ่พอจะสำคัญทางธุรกิจ จึงต้องดูขนาดของผล (effect size) ควบคู่เสมอ'},
+ {q:'ต้องการแสดงสัดส่วนยอดขายของพืช 9 ชนิด ควรเลือกกราฟแบบใด?',
+  a:['กราฟวงกลมแบ่ง 9 ชิ้น พร้อมกำกับเปอร์เซ็นต์','กราฟแท่งเรียงมากไปน้อย พร้อมกำกับเปอร์เซ็นต์','กราฟเส้นเรียงตามชื่อพืชจาก ก ถึง ฮ ตามลำดับ','กราฟเรดาร์แสดงพืชทั้ง 9 ชนิดพร้อมกันในภาพเดียว'],
+  c:1, e:'สายตามนุษย์เปรียบเทียบ "ความยาว" ได้แม่นกว่า "มุม" มาก · กราฟวงกลมที่มีชิ้นเกิน 4–5 ชิ้นจะอ่านยากและเปรียบเทียบขนาดกันแทบไม่ได้'},
+ {q:'ข้อใดคือข้อสรุปที่ผู้จัดการฟาร์มนำไปตัดสินใจต่อได้มากที่สุด?',
+  a:['ของเสียอยู่ที่ 9.1% และมีความสัมพันธ์กับอุณหภูมิที่ค่า r = 0.78 ซึ่งถือว่าอยู่ในระดับสูง','ผลผลิตไตรมาสนี้ลดลงจากไตรมาสเดียวกันของปีก่อนพอสมควร ขอให้ทุกฝ่ายช่วยกันตรวจสอบสาเหตุต่อไป','อุณหภูมิเฉลี่ยในโรงเรือนอยู่ที่ 33.2°C ส่วนเบี่ยงเบนมาตรฐาน 2.1°C สูงกว่าปีก่อนเล็กน้อย','ของเสียเพิ่มเป็น 9.1% เสียหายราว 23,000 บาท/ไตรมาส เหตุจากพัดลมโรงเรือน B เสีย 8 เม.ย. เสนอซ่อม 18,000 บาท'],
+  c:3, e:'สรุปที่ดีต้องครบ 4 ส่วน: เกิดอะไรขึ้น (พร้อมมูลค่าเป็นเงิน) → เกิดที่ไหน → เพราะอะไรพร้อมหลักฐาน → เสนอให้ทำอะไรและคาดว่าจะได้ผลอย่างไร'}
 ];
 </script>
 <script>
@@ -796,6 +851,7 @@ go(0);
     answered++;
     var sb = document.getElementById('scorebox');
     if(answered===QUIZ.length && sb){
+      window.__quizScore = score; window.__quizTotal = QUIZ.length;
       sb.classList.add('show');
       document.getElementById('scoreNum').textContent = score+' / '+QUIZ.length;
       var pct = Math.round(score/QUIZ.length*100);
@@ -809,6 +865,42 @@ go(0);
   var rb = document.getElementById('resetQuiz');
   if(rb) rb.addEventListener('click', function(){ location.reload(); });
 })();
+</script>
+<script>
+/* ---------- Page 0: Check-in (Google Form) ---------- */
+var ROSTER=["67090218 นางสาวเบญจรัตน์ กาศา","67090219 นางสาวมาริษา ชินสุข","67090220 นางสาวริลลดา อัตรา","67090221 นางสาววิจิตรา แนวคำพา","67090379 นางสาวจิรนันท์ ทองดอนน้อย","67090380 นางสาวชรินพัชร พรมกุล","67090382 นายธัญวิชญ์ แอบศรีหาด","67090383 นางสาวนิศากร จะคำรัมย์","67090384 นายบริรักษ์ ปัตตานัง","67090385 นางสาวปาลิดา อินทรคุ้มวงค์","67090386 นางสาวรุจิรดา ยอดทอง","67090387 นายวุฒิชัย ปัญจกะบุตร","67090388 นางสาวศุพิชญ์ทิญา เครือแก้ว","67090389 นางสาวสาธิดา ฤกษมงคล","67090390 นางสาวสิฐิตา บุญโยประการ","67090391 นางสาวอนัญพร ทวีพจน์","67090392 นายอนุพล นามสาม","67090393 นายก้องภพ เทินสระเกษ","67090394 นางสาวขวัญข้าว พุ่มทอง","67090395 นางสาวจิรัศยา พันธุ์ครุฑ","67090396 นายณฐนนท์ กองสุข","67090397 นายณภัทร ศิริโชติรุ่งขจร","67090398 นายณัฏฐวุฒิ พงศ์ภัคพันธุ์","67090401 นายธีรเดช โซว","67090403 นายนันทกร ธรรมวงศ์","67090404 นางสาวใบเฟิร์น บุญทูล","67090405 นางสาวปานไพลิน ชานาเมือง","67090407 นางสาวภนิดา สุทธิธรรมานันต์","67090408 นายรวิช ทองมี","67090409 นางสาวสิวพร หิรัญโท","67090410 นางสาวสุธาสินี อู่นอก","67090412 นางสาวสุภาพร แก่นการ","67090413 นางสาวหทัยภัทร รัตนรุ่งเรือง","67090414 นายอภิสิทธิ์ ตรงต่อกิจ","67090434 นายกฤตภัค ห้วยลำดวน","67090436 นายศิวนาถ ราศรีจันทร์","67090437 นางสาวกรณิศ กลั่นอักโข","67090441 นางสาวนันทิกา สะอาดประโคน","67090443 นางสาวปวีณอร เพ็งวิสาภาพพงษ์","67090445 นายรัฐภูมิ สว่างภพ"];
+(function(){
+  var sel=document.getElementById('ci_student'); if(!sel) return;
+  ROSTER.forEach(function(name){var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);});
+  try{ var st=localStorage.getItem('bda2_student'); if(st){ sel.value=st; } }catch(e){}
+  try{ var em=localStorage.getItem('bda2_email'); if(em){ var el=document.getElementById('ci_email'); if(el) el.value=em; } }catch(e){}
+  try{ var prev=localStorage.getItem('bda5_checkin'); if(prev){ var m=document.getElementById('ci_msg'); if(m){ m.className='ci-msg ok'; m.textContent='\u2139\ufe0f เคยเช็คชื่อคาบนี้จากเครื่องนี้: '+prev; } } }catch(e){}
+})();
+function submitCheckin(){
+  var email=(document.getElementById('ci_email').value||'').trim();
+  var student=document.getElementById('ci_student').value;
+  var msg=document.getElementById('ci_msg');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณากรอกอีเมลให้ถูกต้อง'; return; }
+  if(!student){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณาเลือกชื่อ–รหัสนิสิตของคุณ'; return; }
+  document.getElementById('ci_f_email').value=email;
+  document.getElementById('ci_f_student').value=student;
+  document.getElementById('ci_form').submit();
+  msg.className='ci-msg ok'; msg.textContent='✅ ส่งเช็คชื่อแล้ว: '+student;
+  try{ localStorage.setItem('bda2_student', student); localStorage.setItem('bda2_email', email); localStorage.setItem('bda5_checkin', student+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
+function submitQuizScore(){
+  var student=(document.getElementById('ci_student')||{}).value||'';
+  var msg=document.getElementById('qz_msg');
+  var sc=window.__quizScore, tot=window.__quizTotal||10;
+  if(sc===undefined){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาทำแบบทดสอบให้ครบทุกข้อก่อนส่งคะแนน'; return; }
+  if(!student){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาไปที่หน้าแรก แล้วเลือกชื่อของคุณในส่วน "เช็คชื่อเข้าเรียน" ก่อนส่งคะแนน'; return; }
+  document.getElementById('qz_f_student').value=student;
+  document.getElementById('qz_f_score').value=sc;
+  document.getElementById('qz_form').submit();
+  var btn=document.getElementById('qz_btn'); if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='default'; }
+  msg.className='qz-msg ok'; msg.textContent='✅ ส่งคะแนนแล้ว: '+student+' — '+sc+'/'+tot+' คะแนน';
+  try{ localStorage.setItem('bda5_quiz', student+' : '+sc+'/'+tot+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
 </script>
 </body>
 </html>
