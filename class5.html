@@ -122,6 +122,19 @@
   .qz-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
   .qz-msg.ok{color:#bbf7d0}
   .qz-msg.err{color:#fecaca}
+  .chk{list-style:none; padding-left:0; margin:12px 0 0}
+  .chk li{padding:9px 0 9px 30px; position:relative; border-bottom:1px dashed var(--line); font-size:14.5px}
+  .chk li:before{content:"☐"; position:absolute; left:0; top:8px; font-size:17px; color:var(--brand2)}
+  a.submit-link{display:inline-block; margin-top:12px; text-decoration:none}
+  .must{border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:14px}
+  .must table{border-collapse:collapse; width:100%; font-size:14px}
+  .must th, .must td{border-bottom:1px solid var(--line); padding:11px 13px; text-align:left; vertical-align:top}
+  .must th{background:#1e293b; color:#fff; font-weight:700}
+  .must td:first-child{width:32%; font-weight:700}
+  .must .pts{white-space:nowrap; color:var(--brand2); font-weight:800}
+  .builder textarea{width:100%; min-height:64px; resize:vertical}
+  .builder .out{background:#f0fdf4; border:1px solid var(--brand); border-radius:12px; padding:14px 16px; margin-top:12px; font-size:14.5px; white-space:pre-wrap; display:none}
+  .builder .out.show{display:block}
 </style>
 </head>
 <body>
@@ -139,7 +152,8 @@ function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th
       <button data-p="4">Correlation</button>
       <button data-p="5">Diagnostic</button>
       <button data-p="6">Storytelling</button>
-      <button data-p="7">แบบทดสอบ</button>
+      <button data-p="7">งานส่งท้ายคาบ</button>
+      <button data-p="8">แบบทดสอบ</button>
     </nav>
   </div>
   <div class="progressbar"><div id="pbar"></div></div>
@@ -452,11 +466,98 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
     </div>
     <div class="callout good">📋 <b>สูตรเขียนสรุป 4 บรรทัด:</b> (1) เกิดอะไรขึ้น + มูลค่าเป็นเงิน (2) เกิดที่ไหน/กับใคร (3) เพราะอะไร + หลักฐาน (4) เสนอให้ทำอะไร + ผลที่คาดว่าจะได้</div>
   </div>
-  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ทำแบบทดสอบ →</button></div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: งานส่งท้ายคาบ →</button></div>
 </section>
 
-<!-- ===== PAGE 7 : QUIZ ===== -->
+<!-- ===== PAGE 7 : ASSIGNMENT ===== -->
 <section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">งานส่งท้ายคาบ · 10 คะแนน</span>
+    <h2>📤 รายงานหน้าเดียวถึงผู้จัดการฟาร์ม</h2>
+    <p class="lead">ใช้ทุกอย่างที่เรียนวันนี้กับ<b>ข้อมูลจริงของนำชัยฟาร์ม</b> — สรุปให้เป็น หาสาเหตุให้ได้ แล้วเสนอให้ผู้จัดการตัดสินใจ</p>
+    <div class="callout">🎯 <b>โจทย์:</b> ทั้งปีของเสียหลังเก็บเกี่ยวเฉลี่ยยัง<b>ต่ำกว่าเป้า 8%</b> ผู้จัดการฟาร์มจึงคิดว่าไม่มีปัญหา — แต่พอดูรายเดือนกลับมี<b>บางช่วงที่ทะลุเป้า</b> · งานของคุณคือตอบ 3 คำถาม: <b>เกิดอะไรขึ้น · เกิดที่ไหน/เมื่อไร และทำไม · ควรทำอะไรต่อ</b></div>
+    <div class="row" style="margin-top:14px">
+      <div><b>ไฟล์ข้อมูล:</b> <code>BDA_class4_FarmData.xlsx</code> (ไฟล์เดียวกับคาบที่ 4 — ชีต FactHarvest, FactShipment, DimPlot, DimCrop, DimCustomer)<br>
+      <b>เครื่องมือ:</b> Excel (PivotTable + <code>AVERAGE</code> <code>MEDIAN</code> <code>STDEV.S</code> <code>QUARTILE.INC</code> <code>CORREL</code>) หรือ Power BI ก็ได้ — เลือกที่ถนัด</div>
+    </div>
+    <div class="callout good">💡 <b>คำใบ้จากหน้า Drill-down:</b> ลองเจาะของเสียทีละมิติ — <b>เดือน · โรงเรือน · แปลง · ชนิดพืช</b> — แล้วดูว่ามิติไหนทำให้ตัวเลข<b>กระจายตัวมากที่สุด</b> มิติที่ทุกกลุ่มย่อยเท่ากันหมดคือมิติที่<b>ไม่ใช่</b>สาเหตุ</div>
+  </div>
+
+  <div class="card">
+    <h2>📌 5 อย่างที่ต้องมีในรายงาน (ข้อละ 2 คะแนน)</h2>
+    <p class="note">ขาดข้อใดข้อหนึ่งถือว่างานยังไม่ครบ — ในวงเล็บคือแนวทางที่ควรใช้</p>
+    <div class="must">
+      <table>
+        <tr><th>สิ่งที่ต้องมี</th><th>ทำอย่างไร</th></tr>
+        <tr><td>1. ตารางสถิติสรุป <span class="pts">2 คะแนน</span></td>
+            <td>% ของเสียรายเดือน (หรือรายแปลง) พร้อม <b>mean · median · SD · IQR หรือ CV</b> และเขียน 1–2 ประโยคว่า<b>ทำไมถึงเลือกค่ากลางตัวนั้น</b>มารายงาน</td></tr>
+        <tr><td>2. กราฟ 2 รูป <span class="pts">2 คะแนน</span></td>
+            <td>เลือกประเภทให้ตรงกับสิ่งที่จะสื่อ (แนวโน้ม / เปรียบเทียบ / การกระจาย / ความสัมพันธ์) และ <b>ตั้งชื่อกราฟเป็นข้อสรุป</b> เช่น "ของเสียเดือน มี.ค. ทะลุเป้าทุกโรงเรือน" ไม่ใช่ "ของเสียแยกตามเดือน"</td></tr>
+        <tr><td>3. หลักฐานว่าปัญหาอยู่ตรงไหน <span class="pts">2 คะแนน</span></td>
+            <td>Drill-down อย่างน้อย 2 ชั้น (เช่น ปี → เดือน → โรงเรือน) <b>หรือ</b> ค่า <code>CORREL</code> อย่างน้อย 1 คู่ พร้อมบอกว่ามี<b>กลไกอะไรอธิบายได้</b> และมีตัวแปรที่สามหรือไม่</td></tr>
+        <tr><td>4. การหาสาเหตุอย่างเป็นระบบ <span class="pts">2 คะแนน</span></td>
+            <td>Fishbone 6M <b>หรือ</b> 5 Whys อย่างน้อย 3 ชั้น โดย<b>ทุกชั้นต้องอ้างตัวเลขจากไฟล์</b> — ชั้นไหนที่ยังเดา ให้เขียนกำกับว่า "ต้องขอข้อมูลเพิ่ม: ..."</td></tr>
+        <tr><td>5. ข้อเสนอที่ตัดสินใจได้ <span class="pts">2 คะแนน</span></td>
+            <td>เขียนตามสูตร 4 บรรทัด พร้อม<b>มูลค่าเป็นเงิน</b> (คำนวณจากคอลัมน์ ของเสีย (กก.) × ราคาต่อกก. ใน DimCrop) และผลที่คาดว่าจะได้</td></tr>
+      </table>
+    </div>
+    <div class="callout bad">❌ <b>สิ่งที่ทำให้ถูกหักคะแนน:</b> รายงานค่าเฉลี่ยโดยไม่บอกการกระจาย · ตัด Outlier ทิ้งโดยไม่อธิบายเหตุผล · สรุปว่า "A ทำให้เกิด B" เพราะ r สูงอย่างเดียว · ข้อเสนอที่วัดผลไม่ได้ เช่น "ควรดูแลให้ดีขึ้น"</div>
+  </div>
+
+  <div class="card builder">
+    <h2>✍️ ตัวช่วยเขียนสรุป 4 บรรทัด</h2>
+    <p class="note">กรอกทีละช่อง แล้วกดปุ่มเพื่อประกอบเป็นย่อหน้าสรุป — คัดลอกไปวางในรายงานได้เลย (ข้อมูลอยู่ในเครื่องคุณเท่านั้น ไม่ได้ส่งไปไหน)</p>
+    <div style="margin-top:12px">
+      <label class="fld">1. เกิดอะไรขึ้น + มูลค่าเป็นเงิน</label>
+      <textarea id="ab1" placeholder="เช่น ของเสียหลังเก็บเกี่ยวเดือน มี.ค. อยู่ที่ 8.1% เกินเป้า 8% คิดเป็นมูลค่าที่หายไปราว ..... บาท"></textarea>
+      <label class="fld" style="margin-top:10px">2. เกิดที่ไหน / กับใคร</label>
+      <textarea id="ab2" placeholder="เช่น เกิดขึ้นพร้อมกันทั้ง 3 โรงเรือน โดยแปลงและชนิดพืชไม่ต่างกันอย่างมีนัย"></textarea>
+      <label class="fld" style="margin-top:10px">3. เพราะอะไร + หลักฐาน</label>
+      <textarea id="ab3" placeholder="เช่น เพราะ ..... (หลักฐาน: ค่าจากชีต ..... / r = ..... / drill-down ชั้นที่ .....)"></textarea>
+      <label class="fld" style="margin-top:10px">4. เสนอให้ทำอะไร + ผลที่คาดว่าจะได้</label>
+      <textarea id="ab4" placeholder="เช่น เสนอ ..... งบประมาณ ..... บาท คาดว่าลดของเสียลง ..... จุด คืนทุนภายใน ....."></textarea>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <div style="flex:0"><button class="btn" id="abBuild">ประกอบเป็นย่อหน้าสรุป</button></div>
+      <div style="flex:0"><button class="btn ghost" id="abCopy">คัดลอก</button></div>
+    </div>
+    <div class="out" id="abOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>✅ เช็กลิสต์ก่อนส่งงาน</h2>
+    <div class="cols2">
+      <ul class="chk">
+        <li>รายงานยาว <b>1 หน้า</b> (ไม่เกิน 1 หน้ากระดาษ A4)</li>
+        <li>มีครบทั้ง 5 ข้อบังคับในตารางด้านบน</li>
+        <li>รายงานค่ากลาง <b>คู่กับ</b> การกระจาย (SD / IQR / CV)</li>
+        <li>ทุกกราฟมีชื่อที่เป็นข้อสรุป และระบุหน่วยครบ</li>
+      </ul>
+      <ul class="chk">
+        <li>ถ้าตัดข้อมูลออก มีเหตุผลกำกับว่าตัดเพราะอะไร</li>
+        <li>ไม่มีประโยคที่สรุปสาเหตุจากค่า r เพียงอย่างเดียว</li>
+        <li>ตัวเลขในรายงานตรงกับไฟล์คำนวณที่แนบมา</li>
+        <li>ข้อเสนอมีตัวเลข งบประมาณ และวิธีวัดผล</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📮 ส่งงานคาบนี้</h2>
+    <p>ส่ง <b>2 ไฟล์</b> ผ่านฟอร์มด้านล่าง — ตรวจเช็กลิสต์ให้ครบก่อนส่ง</p>
+    <ol class="steps">
+      <li><b>ไฟล์คำนวณ</b> — ไฟล์ที่ใช้วิเคราะห์จริง (<code>.xlsx</code> ที่มี PivotTable/สูตร หรือ <code>.pbix</code>) ตั้งชื่อไฟล์เป็น <code>รหัสนิสิต_ชื่อ</code></li>
+      <li><b>รายงาน 1 หน้า</b> — บันทึกเป็น <code>.pdf</code> ให้เห็นตารางสถิติ กราฟ 2 รูป และข้อเสนอครบในหน้าเดียว</li>
+    </ol>
+    <div class="callout">⏰ <b>กำหนดส่ง:</b> ภายในวันอาทิตย์ที่ 6 กันยายน 2569 (เวลา 23:59 น.)</div>
+    <!-- TODO: ใส่ลิงก์ Google Form สำหรับส่งงานคาบ 5 ในแอตทริบิวต์ href ด้านล่าง -->
+    <a class="btn submit-link" id="hwLink" href="#" onclick="return false;" style="opacity:.55; cursor:not-allowed">เปิดฟอร์มส่งงาน ↗ (อาจารย์จะแจ้งลิงก์ในคาบ)</a>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn" onclick="go(8)">ทำแบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 8 : QUIZ ===== -->
+<section class="page" id="p8">
   <div class="card">
     <span class="kicker">ทบทวน</span>
     <h2>📝 แบบทดสอบครั้งที่ 5</h2>
@@ -756,6 +857,29 @@ function updChart(){
 }
 document.getElementById('chGoal').addEventListener('change', updChart);
 updChart();
+
+/* ===== PAGE 7 : summary builder ===== */
+(function(){
+  var b=document.getElementById('abBuild'); if(!b) return;
+  function text(){
+    var v=['ab1','ab2','ab3','ab4'].map(function(id){ return (document.getElementById(id).value||'').trim(); });
+    if(v.every(function(x){return !x;})) return '';
+    return v[0]+(v[0]?'\n\n':'')+v[1]+(v[1]?'\n\n':'')+v[2]+(v[2]?'\n\n':'')+(v[3]?'ข้อเสนอ: '+v[3]:'');
+  }
+  b.addEventListener('click', function(){
+    var out=document.getElementById('abOut'), t=text();
+    out.textContent = t || 'กรอกอย่างน้อย 1 ช่องก่อนกดประกอบย่อหน้า';
+    out.classList.add('show');
+  });
+  document.getElementById('abCopy').addEventListener('click', function(){
+    var t=text(); if(!t) return;
+    var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    var out=document.getElementById('abOut'); out.textContent=t; out.classList.add('show');
+    this.textContent='คัดลอกแล้ว ✓'; var self=this; setTimeout(function(){ self.textContent='คัดลอก'; },1600);
+  });
+})();
 
 /* ===== page hooks ===== */
 function onPage(i){
