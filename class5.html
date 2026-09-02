@@ -135,9 +135,6 @@
   .must th, .must td{border-bottom:1px solid var(--line); padding:11px 13px; text-align:left; vertical-align:top}
   .must th{background:#1e293b; color:#fff; font-weight:700}
   .must td:first-child{width:32%; font-weight:700}
-  .builder textarea{width:100%; min-height:64px; resize:vertical}
-  .builder .out{background:#f0fdf4; border:1px solid var(--brand); border-radius:12px; padding:14px 16px; margin-top:12px; font-size:14.5px; white-space:pre-wrap; display:none}
-  .builder .out.show{display:block}
 </style>
 </head>
 <body>
@@ -536,7 +533,7 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
 <section class="page" id="p7">
   <div class="card">
     <span class="kicker">งานส่งท้ายคาบ</span>
-    <h2>📤 รายงานหน้าเดียวถึงผู้จัดการฟาร์ม</h2>
+    <h2>📤 รายงานสั้นถึงผู้จัดการฟาร์ม</h2>
     <p class="lead">ใช้ทุกอย่างที่เรียนวันนี้กับ<b>ข้อมูลของนำชัยฟาร์ม</b> — สรุปให้เป็น หาสาเหตุให้ได้ แล้วเสนอให้ผู้จัดการตัดสินใจ</p>
     <div class="callout">🎯 <b>โจทย์:</b> ทั้งปีของเสียหลังเก็บเกี่ยวเฉลี่ยยัง<b>ต่ำกว่าเป้า 8%</b> ผู้จัดการฟาร์มจึงคิดว่าไม่มีปัญหา — แต่พอดูรายเดือนกลับมี<b>บางช่วงที่ทะลุเป้า</b> · งานของคุณคือตอบ 3 คำถาม: <b>เกิดอะไรขึ้น · เกิดที่ไหน/เมื่อไร และทำไม · ควรทำอะไรต่อ</b></div>
     <div class="row" style="margin-top:14px">
@@ -567,31 +564,30 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
     <div class="callout bad">❌ <b>ข้อผิดพลาดที่พบบ่อย — เลี่ยงให้ได้:</b> รายงานค่าเฉลี่ยโดยไม่บอกการกระจาย · ตัด Outlier ทิ้งโดยไม่อธิบายเหตุผล · สรุปว่า "A ทำให้เกิด B" เพราะ r สูงอย่างเดียว · ข้อเสนอที่วัดผลไม่ได้ เช่น "ควรดูแลให้ดีขึ้น"</div>
   </div>
 
-  <div class="card builder">
-    <h2>✍️ ตัวช่วยเขียนสรุป 4 บรรทัด</h2>
-    <p class="note">กรอกทีละช่อง แล้วกดปุ่มเพื่อประกอบเป็นย่อหน้าสรุป — คัดลอกไปวางในรายงานได้เลย (ข้อมูลอยู่ในเครื่องคุณเท่านั้น ไม่ได้ส่งไปไหน)</p>
-    <div style="margin-top:12px">
-      <label class="fld">1. เกิดอะไรขึ้น + มูลค่าเป็นเงิน</label>
-      <textarea id="ab1" placeholder="เช่น ของเสียหลังเก็บเกี่ยวเดือน มี.ค. อยู่ที่ 8.1% เกินเป้า 8% คิดเป็นมูลค่าที่หายไปราว ..... บาท"></textarea>
-      <label class="fld" style="margin-top:10px">2. เกิดที่ไหน / กับใคร</label>
-      <textarea id="ab2" placeholder="เช่น เกิดขึ้นพร้อมกันทั้ง 3 โรงเรือน โดยแปลงและชนิดพืชไม่ต่างกันอย่างมีนัย"></textarea>
-      <label class="fld" style="margin-top:10px">3. เพราะอะไร + หลักฐาน</label>
-      <textarea id="ab3" placeholder="เช่น เพราะ ..... (หลักฐาน: ค่าจากชีต ..... / r = ..... / drill-down ชั้นที่ .....)"></textarea>
-      <label class="fld" style="margin-top:10px">4. เสนอให้ทำอะไร + ผลที่คาดว่าจะได้</label>
-      <textarea id="ab4" placeholder="เช่น เสนอ ..... งบประมาณ ..... บาท คาดว่าลดของเสียลง ..... จุด คืนทุนภายใน ....."></textarea>
+  <div class="card">
+    <h2>✍️ สูตรเขียนสรุป 4 บรรทัด</h2>
+    <p class="lead">ย่อหน้าสรุปของคุณควรตอบ 4 คำถามนี้ตามลำดับ — ตัวอย่างคำตอบด้านล่างเป็นแนวทาง ไม่ใช่เฉลย ตัวเลขและสาเหตุต้องมาจากที่คุณวิเคราะห์เอง</p>
+    <div class="must">
+      <table>
+        <tr><th>คำถามที่ต้องตอบ</th><th>ตัวอย่างคำตอบ</th></tr>
+        <tr><td>1. เกิดอะไรขึ้น + มูลค่าเป็นเงิน</td>
+            <td>"ของเสียหลังเก็บเกี่ยวเดือนมีนาคมอยู่ที่ 8.1% เกินเป้าที่ตั้งไว้ 8% คิดเป็นมูลค่าที่หายไปราว 12,000 บาทในเดือนเดียว"</td></tr>
+        <tr><td>2. เกิดที่ไหน / กับใคร</td>
+            <td>"เกิดขึ้นพร้อมกันทั้ง 3 โรงเรือน โดยแยกตามแปลงและชนิดพืชแล้วตัวเลขไม่ต่างกัน — ปัญหาจึงไม่ได้อยู่ที่แปลงใดแปลงหนึ่ง แต่อยู่ที่ช่วงเวลา"</td></tr>
+        <tr><td>3. เพราะอะไร + หลักฐาน</td>
+            <td>"เดือนที่ของเสียสูงเป็นเดือนที่อากาศร้อนที่สุดของปี (มี.ค. และ ต.ค.) สอดคล้องกับกลไกที่ผักหายใจเร็วขึ้นและสูญเสียน้ำไว หลักฐาน: ของเสียรายเดือนจากชีต FactHarvest เทียบกับเดือน ค่า r = ... "</td></tr>
+        <tr><td>4. เสนอให้ทำอะไร + ผลที่คาดว่าจะได้</td>
+            <td>"เสนอเพิ่มรอบพรีคูลในช่วงเดือนที่ร้อนที่สุด งบประมาณ ... บาท คาดว่าลดของเสียลงกลับสู่ระดับ 7% วัดผลจาก % ของเสียรายเดือนในไตรมาสถัดไป"</td></tr>
+      </table>
     </div>
-    <div class="row" style="margin-top:14px">
-      <div style="flex:0"><button class="btn" id="abBuild">ประกอบเป็นย่อหน้าสรุป</button></div>
-      <div style="flex:0"><button class="btn ghost" id="abCopy">คัดลอก</button></div>
-    </div>
-    <div class="out" id="abOut"></div>
+    <div class="callout good">💡 <b>เขียนให้สั้นแต่ครบ:</b> ทั้ง 4 บรรทัดรวมกันควรอยู่ในย่อหน้าเดียวที่ผู้จัดการอ่านจบใน 30 วินาที · ถ้าบรรทัดไหนยังเขียนไม่ได้ แปลว่าการวิเคราะห์ยังไม่เสร็จ ไม่ใช่เขียนไม่เก่ง</div>
   </div>
 
   <div class="card">
     <h2>✅ เช็กลิสต์ก่อนส่งงาน</h2>
     <div class="cols2">
       <ul class="chk">
-        <li>รายงานยาว <b>1 หน้า</b> (ไม่เกิน 1 หน้ากระดาษ A4)</li>
+        <li>รายงานยาว <b>1–2 หน้า</b> (ไม่เกิน 2 หน้ากระดาษ A4)</li>
         <li>มีครบทั้ง 5 ข้อบังคับในตารางด้านบน</li>
         <li>รายงานค่ากลาง <b>คู่กับ</b> การกระจาย (SD / IQR / CV)</li>
         <li>ทุกกราฟมีชื่อที่เป็นข้อสรุป และระบุหน่วยครบ</li>
@@ -610,7 +606,7 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
     <p>ส่ง <b>2 ไฟล์</b> ผ่านฟอร์มด้านล่าง — ตรวจเช็กลิสต์ให้ครบก่อนส่ง</p>
     <ol class="steps">
       <li><b>ไฟล์คำนวณ</b> — ไฟล์ที่ใช้วิเคราะห์จริง (<code>.xlsx</code> ที่มี PivotTable/สูตร หรือ <code>.pbix</code>) ตั้งชื่อไฟล์เป็น <code>รหัสนิสิต_ชื่อ</code></li>
-      <li><b>รายงาน 1 หน้า</b> — บันทึกเป็น <code>.pdf</code> ให้เห็นตารางสถิติ กราฟ 2 รูป และข้อเสนอครบในหน้าเดียว</li>
+      <li><b>รายงาน 1–2 หน้า</b> — บันทึกเป็น <code>.pdf</code> ให้เห็นตารางสถิติ กราฟ 2 รูป และข้อเสนอครบ</li>
     </ol>
     <div class="callout">⏰ <b>กำหนดส่ง:</b> ภายในวันอาทิตย์ที่ 13 กันยายน 2569 (เวลา 23:59 น.)</div>
     <a class="btn submit-link" id="hwLink" href="https://docs.google.com/forms/d/e/1FAIpQLScmaOwA9y3Hj1UcPhmL5j6tf8Q8PlrQKWFQQiyLjqC90XgL_g/viewform" target="_blank" rel="noopener">เปิดฟอร์มส่งงาน ↗</a>
@@ -952,29 +948,6 @@ function updChart(){
 }
 document.getElementById('chGoal').addEventListener('change', updChart);
 updChart();
-
-/* ===== PAGE 7 : summary builder ===== */
-(function(){
-  var b=document.getElementById('abBuild'); if(!b) return;
-  function text(){
-    var v=['ab1','ab2','ab3','ab4'].map(function(id){ return (document.getElementById(id).value||'').trim(); });
-    if(v.every(function(x){return !x;})) return '';
-    return v[0]+(v[0]?'\n\n':'')+v[1]+(v[1]?'\n\n':'')+v[2]+(v[2]?'\n\n':'')+(v[3]?'ข้อเสนอ: '+v[3]:'');
-  }
-  b.addEventListener('click', function(){
-    var out=document.getElementById('abOut'), t=text();
-    out.textContent = t || 'กรอกอย่างน้อย 1 ช่องก่อนกดประกอบย่อหน้า';
-    out.classList.add('show');
-  });
-  document.getElementById('abCopy').addEventListener('click', function(){
-    var t=text(); if(!t) return;
-    var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); }catch(e){}
-    document.body.removeChild(ta);
-    var out=document.getElementById('abOut'); out.textContent=t; out.classList.add('show');
-    this.textContent='คัดลอกแล้ว ✓'; var self=this; setTimeout(function(){ self.textContent='คัดลอก'; },1600);
-  });
-})();
 
 /* ===== page hooks ===== */
 function onPage(i){
