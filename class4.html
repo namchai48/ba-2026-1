@@ -334,8 +334,15 @@ function fmt(n, d){ d = (d===undefined?2:d); return Number(n).toLocaleString('th
       <div class="node" style="border-color:var(--brand);background:#f0fdf4"><b>4. เขียนสูตร</b><div class="note">DAX / Measure<br><b>คาบนี้</b></div></div>
       <div class="arw">→</div>
       <div class="node" style="border-color:var(--brand);background:#f0fdf4"><b>5. วางหน้าจอ</b><div class="note">Report view<br><b>คาบนี้</b></div></div>
+      <div class="arw">→</div>
+      <div class="node"><b>6. เผยแพร่</b><div class="note">Publish ขึ้น Power BI Service<br>+ ตั้ง Refresh</div></div>
     </div>
     <div class="callout good">✅ ข้อ 1–2 เราทำไปแล้วในคาบที่ 3 คาบนี้เริ่มที่ข้อ 3 — <b>ข้อมูลที่สะอาดจากคาบที่แล้ว คือวัตถุดิบของคาบนี้</b></div>
+    <div class="callout">📌 <b>จำเส้นทาง 6 ขั้นนี้ให้ได้</b> — เวลาถูกถามว่า "ทำแดชบอร์ดด้วย Power BI อย่างไร" ให้ตอบไล่ตามลำดับนี้:
+      <b>Get Data</b> (ดึงข้อมูลจาก Excel / CSV / ฐานข้อมูล) → <b>Transform</b> ใน Power Query (ทำสะอาด รวมไฟล์ แก้ชนิดข้อมูล) →
+      <b>Model</b> (จัดเป็น Star Schema ลากเส้นความสัมพันธ์ มี DimDate) → <b>Measure</b> (เขียน DAX สร้างตัวเลขที่ต้องการ) →
+      <b>Visualize</b> ใน Report view (เลือกวิชวลให้ตรงคำถาม วาง Slicer) →
+      <b>Publish &amp; Refresh</b> (ส่งขึ้น Power BI Service แชร์ให้ทีม และตั้งเวลารีเฟรชข้อมูลอัตโนมัติ)</div>
   </div>
 
   <div class="card">
@@ -440,6 +447,9 @@ CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
         <b>ฟังก์ชัน</b> → คำสั่งสำเร็จรูป (SUM, AVERAGE, DIVIDE, CALCULATE …) ·
         <b>ตาราง[คอลัมน์]</b> → บอกว่าจะเอาข้อมูลจากไหน
       </div></div>
+    <div class="callout">✍️ <b>เรื่องเครื่องหมายที่ต้องรู้:</b> ชื่อคอลัมน์ครอบด้วยวงเล็บเหลี่ยม <code>[ ]</code> เสมอ ส่วนชื่อตารางถ้า<b>มีช่องว่างหรืออักขระพิเศษ</b>
+      ต้องครอบด้วยอัญประกาศเดี่ยว <code>' '</code> เช่น <code>Total = SUM('Order Detail'[Sales])</code> ถ้าไม่มีช่องว่างจะเขียนแบบไม่ครอบก็ได้
+      เช่น <code>SUM( FactHarvest[ยอดขาย] )</code> — ทั้งสองแบบหมายถึงสิ่งเดียวกัน คือ <b>ตาราง[คอลัมน์]</b></div>
 
     <div class="scroll" style="margin-top:16px">
     <table class="term">
@@ -756,6 +766,12 @@ CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
       <tr><td>ตัวกรอง<span class="en">Slicer</span></td>
         <td>ให้ผู้ใช้<b>เลือกกรองเอง</b> แล้วทุกวิชวลในหน้าขยับพร้อมกัน</td>
         <td>เลือกปี / ชนิดพืช / โรงเรือน</td></tr>
+      <tr><td>แผนภูมิกระจาย<span class="en">Scatter Chart</span></td>
+        <td>ดู<b>ความสัมพันธ์ระหว่างตัวเลข 2 ตัว</b> ว่าไปทางเดียวกันหรือสวนทางกัน — 1 จุด = 1 หน่วยที่สังเกต</td>
+        <td>อุณหภูมิเฉลี่ยในโรงเรือน (แกน X) กับอัตราของเสียหลังเก็บเกี่ยว (แกน Y) — 1 จุด = 1 โรงเรือน</td></tr>
+      <tr><td>ตารางไขว้<span class="en">Matrix</span></td>
+        <td>ดูตัวเลข<b>ไขว้สองมิติ</b> พร้อมยุบ/ขยายลำดับชั้นได้ — เทียบได้กับ Pivot Table ใน Excel</td>
+        <td>ผลผลิต แถว = โรงเรือน คอลัมน์ = เดือน</td></tr>
       <tr><td>เคพีไอ<span class="en">KPI</span></td>
         <td>แสดงค่าปัจจุบัน<b>เทียบกับเป้าหมาย</b>พร้อมทิศทางในตัวเดียว</td>
         <td>ของเสียหลังเก็บเกี่ยวเทียบเป้า 8%, ผลผลิตต่อไร่เทียบเป้าของฟาร์ม</td></tr>
@@ -763,6 +779,10 @@ CALENDAR(DATE(2024,1,1), DATE(2026,12,31))
     </div>
     <div class="callout good">✅ <b>วิธีจำแบบสั้นที่สุด:</b> อยากดู<b>อันดับ</b> → แท่ง · อยากดู<b>แนวโน้ม</b> → เส้น · อยากดู<b>สัดส่วน</b> → วงกลม/Treemap ·
       อยากดู<b>ตัวเลขเดียว</b> → การ์ด · อยากเทียบ<b>กับเป้า</b> → KPI · อยากให้ผู้ใช้<b>เลือกเอง</b> → Slicer</div>
+    <div class="callout good">🎯 <b>เลือกวิชวลแล้วต้องบอกได้ด้วยว่า "ลากฟิลด์อะไรไปวางตรงไหน"</b> — ช่องใส่ฟิลด์ (Field wells) ของแต่ละวิชวลมีชื่อต่างกัน:
+      <b>แกน X (Axis)</b> = สิ่งที่ใช้แบ่งกลุ่มหรือเวลา · <b>แกน Y (Values)</b> = ตัวเลขที่ต้องการวัด ซึ่งควรเป็น Measure ·
+      <b>Legend</b> = ตัวแปรที่ใช้แยกสี เช่น แยกเส้นปีนี้กับปีก่อน · <b>Tooltips</b> = ค่าที่โผล่ตอนเอาเมาส์ชี้<br>
+      ตัวอย่าง: "แนวโน้มผลผลิตรายเดือนเทียบปีก่อน" = แผนภูมิเส้น · แกน X = DimDate[เดือน] · แกน Y = [ผลผลิตรวม] · Legend = DimDate[ปี]</div>
     <div class="callout">💡 ลองย้อนกลับไปดูภาพหน้าจอ Power BI ในหน้า <b>"รู้จัก Power BI"</b> อีกครั้ง — จะเห็นครบทั้ง Card, Slicer, Line, Pie, Treemap และตาราง อยู่ในหน้าเดียวกัน</div>
   </div>
 
