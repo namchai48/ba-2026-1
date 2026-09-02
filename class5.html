@@ -107,6 +107,10 @@
   .callout.good{border-color:var(--brand); background:#f0fdf4}
   .callout.bad{border-color:var(--red); background:#fef2f2}
   .chartbox{position:relative; height:300px; margin-top:14px}
+  .distbox{position:relative; height:150px; margin-top:10px}
+  .diststat{font-size:12.5px; font-weight:700; margin-top:8px; display:flex; gap:12px; flex-wrap:wrap}
+  .diststat .m{display:inline-flex; align-items:center; gap:5px}
+  .diststat .dot{width:10px; height:10px; border-radius:3px; display:inline-block}
   /* check-in */
   .checkin{border:none; background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:2px solid var(--brand)}
   .ci-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
@@ -317,11 +321,28 @@ IQR = Q3 - Q1
 
   <div class="card">
     <h2>รูปร่างการแจกแจง</h2>
+    <p class="lead">ก่อนจะเลือกค่ากลาง ให้ดู "หน้าตา" ของข้อมูลก่อนเสมอ — สามแบบนี้เจอบ่อยที่สุดในงานฟาร์ม</p>
     <div class="grid g3">
-      <div class="tile"><b>สมมาตร (Normal)</b><div class="note">mean ≈ median<br>ตัวอย่าง: น้ำหนักผักต่อถุงจากเครื่องบรรจุ</div></div>
-      <div class="tile"><b>เบ้ขวา (Right-skewed)</b><div class="note">mean &gt; median<br>ตัวอย่าง: มูลค่าคำสั่งซื้อ — ส่วนใหญ่เล็ก มีรายใหญ่ไม่กี่ราย</div></div>
-      <div class="tile"><b>สองยอด (Bimodal)</b><div class="note">มีสองกลุ่มปนกัน<br>ตัวอย่าง: ผลผลิตจากแปลงในโรงเรือน + แปลงกลางแจ้ง → <b>ควรแยกวิเคราะห์</b></div></div>
+      <div class="tile">
+        <b>สมมาตร (Normal)</b>
+        <div class="distbox"><canvas id="dist0"></canvas></div>
+        <div class="diststat" id="dstat0"></div>
+        <div class="note">ตัวอย่าง: น้ำหนักผักต่อถุงจากเครื่องบรรจุ (กรัม)<br><b>ใช้ค่าเฉลี่ยรายงานได้สบายใจ</b> เพราะ mean กับ median แทบเท่ากัน</div>
+      </div>
+      <div class="tile">
+        <b>เบ้ขวา (Right-skewed)</b>
+        <div class="distbox"><canvas id="dist1"></canvas></div>
+        <div class="diststat" id="dstat1"></div>
+        <div class="note">ตัวอย่าง: มูลค่าคำสั่งซื้อ (พันบาท) — ส่วนใหญ่เป็นออเดอร์เล็ก มีรายใหญ่ไม่กี่ราย<br><b>ควรรายงาน median</b> เพราะหางขวาดึง mean ให้สูงกว่าความจริง</div>
+      </div>
+      <div class="tile">
+        <b>สองยอด (Bimodal)</b>
+        <div class="distbox"><canvas id="dist2"></canvas></div>
+        <div class="diststat" id="dstat2"></div>
+        <div class="note">ตัวอย่าง: ผลผลิตต่อไร่ของแปลงในโรงเรือน + แปลงกลางแจ้งรวมกัน<br><b>ควรแยกวิเคราะห์เป็นสองกลุ่ม</b> เพราะค่ากลางตัวเดียวตกอยู่ตรงช่องว่างที่แทบไม่มีแปลงจริง</div>
+      </div>
     </div>
+    <div class="callout">📌 <b>อ่านกราฟให้เป็นนิสัย:</b> ถ้า mean กับ median ห่างกันมาก แปลว่าข้อมูล<b>เบ้</b> · ถ้าเห็นสองยอด แปลว่ามี<b>สองกลุ่มปนกัน</b> — ทั้งสองกรณีการรายงานค่าเฉลี่ยตัวเดียวจะทำให้ผู้อ่านเข้าใจผิด</div>
   </div>
   <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: Correlation →</button></div>
 </section>
@@ -741,6 +762,39 @@ function updOutlier(){
 }
 document.getElementById('olVal').addEventListener('input', updOutlier);
 
+/* ===== PAGE 3 : distribution shapes ===== */
+var DIST=[
+ {c:'#16a34a', xl:'น้ำหนักต่อถุง (กรัม)',
+  x:[180,185,190,195,200,205,210,215,220], f:[1,4,10,20,26,20,10,4,1]},
+ {c:'#d97706', xl:'มูลค่าคำสั่งซื้อ (พันบาท)',
+  x:[5,15,25,35,45,55,65,75,85,95], f:[28,22,15,10,7,5,4,3,2,1]},
+ {c:'#7c3aed', xl:'ผลผลิตต่อไร่ (กก./ไร่)',
+  x:[120,135,150,165,180,195,210,225,240], f:[4,12,16,8,3,7,17,13,4]}
+];
+var distDrawn=false;
+function drawDist(){
+  if(distDrawn || typeof Chart==='undefined') return;
+  distDrawn=true;
+  DIST.forEach(function(d,i){
+    var n=d.f.reduce(function(a,b){return a+b;},0);
+    var mn=0; for(var k=0;k<d.x.length;k++) mn+=d.x[k]*d.f[k]; mn/=n;
+    var half=n/2, cum=0, md=d.x[0];
+    for(var k=0;k<d.x.length;k++){ cum+=d.f[k]; if(cum>=half){ md=d.x[k]; break; } }
+    new Chart(document.getElementById('dist'+i),{
+      type:'bar',
+      data:{labels:d.x, datasets:[{data:d.f, backgroundColor:d.c, borderRadius:3, barPercentage:1, categoryPercentage:.92}]},
+      options:{responsive:true, maintainAspectRatio:false, animation:false,
+        plugins:{legend:{display:false}, tooltip:{callbacks:{title:function(t){return d.xl+' ≈ '+t[0].label;},
+          label:function(t){ return 'จำนวน '+t.raw+' รายการ'; }}}},
+        scales:{x:{title:{display:true,text:d.xl, font:{size:10}}, ticks:{font:{size:9}, maxRotation:0, autoSkip:true}, grid:{display:false}},
+                y:{display:false, beginAtZero:true}}}
+    });
+    document.getElementById('dstat'+i).innerHTML=
+      '<span class="m"><span class="dot" style="background:'+d.c+'"></span>mean = '+fmt(mn,0)+'</span>'+
+      '<span class="m"><span class="dot" style="background:#0f172a"></span>median = '+fmt(md,0)+'</span>';
+  });
+}
+
 /* ===== PAGE 4 : correlation ===== */
 var PAIRS=[
  {xl:'ความชื้นดิน (%)', yl:'ผลผลิตต่อไร่ (กก./ไร่/ไตรมาส)', seed:11, n:45,
@@ -884,7 +938,7 @@ updChart();
 /* ===== page hooks ===== */
 function onPage(i){
   if(i===2) updStats();
-  if(i===3){ updSpread(); updOutlier(); }
+  if(i===3){ updSpread(); updOutlier(); drawDist(); }
   if(i===4) updCorr();
 }
 
