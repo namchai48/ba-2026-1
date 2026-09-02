@@ -135,7 +135,6 @@
   .must th, .must td{border-bottom:1px solid var(--line); padding:11px 13px; text-align:left; vertical-align:top}
   .must th{background:#1e293b; color:#fff; font-weight:700}
   .must td:first-child{width:32%; font-weight:700}
-  .must .pts{white-space:nowrap; color:var(--brand2); font-weight:800}
   .builder textarea{width:100%; min-height:64px; resize:vertical}
   .builder .out{background:#f0fdf4; border:1px solid var(--brand); border-radius:12px; padding:14px 16px; margin-top:12px; font-size:14.5px; white-space:pre-wrap; display:none}
   .builder .out.show{display:block}
@@ -548,20 +547,20 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
   </div>
 
   <div class="card">
-    <h2>📌 5 อย่างที่ต้องมีในรายงาน (ข้อละ 2 คะแนน)</h2>
+    <h2>📌 5 อย่างที่ต้องมีในรายงาน</h2>
     <p class="note">ขาดข้อใดข้อหนึ่งถือว่างานยังไม่ครบ — ในวงเล็บคือแนวทางที่ควรใช้</p>
     <div class="must">
       <table>
         <tr><th>สิ่งที่ต้องมี</th><th>ทำอย่างไร</th></tr>
-        <tr><td>1. ตารางสถิติสรุป <span class="pts">2 คะแนน</span></td>
+        <tr><td>1. ตารางสถิติสรุป</td>
             <td>% ของเสียรายเดือน (หรือรายแปลง) พร้อม <b>mean · median · SD · IQR หรือ CV</b> และเขียน 1–2 ประโยคว่า<b>ทำไมถึงเลือกค่ากลางตัวนั้น</b>มารายงาน</td></tr>
-        <tr><td>2. กราฟ 2 รูป <span class="pts">2 คะแนน</span></td>
+        <tr><td>2. กราฟ 2 รูป</td>
             <td>เลือกประเภทให้ตรงกับสิ่งที่จะสื่อ (แนวโน้ม / เปรียบเทียบ / การกระจาย / ความสัมพันธ์) และ <b>ตั้งชื่อกราฟเป็นข้อสรุป</b> เช่น "ของเสียเดือน มี.ค. ทะลุเป้าทุกโรงเรือน" ไม่ใช่ "ของเสียแยกตามเดือน"</td></tr>
-        <tr><td>3. หลักฐานว่าปัญหาอยู่ตรงไหน <span class="pts">2 คะแนน</span></td>
+        <tr><td>3. หลักฐานว่าปัญหาอยู่ตรงไหน</td>
             <td>Drill-down อย่างน้อย 2 ชั้น (เช่น ปี → เดือน → โรงเรือน) <b>หรือ</b> ค่า <code>CORREL</code> อย่างน้อย 1 คู่ พร้อมบอกว่ามี<b>กลไกอะไรอธิบายได้</b> และมีตัวแปรที่สามหรือไม่</td></tr>
-        <tr><td>4. การหาสาเหตุอย่างเป็นระบบ <span class="pts">2 คะแนน</span></td>
+        <tr><td>4. การหาสาเหตุอย่างเป็นระบบ</td>
             <td>Fishbone 6M <b>หรือ</b> 5 Whys อย่างน้อย 3 ชั้น โดย<b>ทุกชั้นต้องอ้างตัวเลขจากไฟล์</b> — ชั้นไหนที่ยังเดา ให้เขียนกำกับว่า "ต้องขอข้อมูลเพิ่ม: ..."</td></tr>
-        <tr><td>5. ข้อเสนอที่ตัดสินใจได้ <span class="pts">2 คะแนน</span></td>
+        <tr><td>5. ข้อเสนอที่ตัดสินใจได้</td>
             <td>เขียนตามสูตร 4 บรรทัด พร้อม<b>มูลค่าเป็นเงิน</b> (คำนวณจากคอลัมน์ ของเสีย (กก.) × ราคาต่อกก. ใน DimCrop) และผลที่คาดว่าจะได้</td></tr>
       </table>
     </div>
