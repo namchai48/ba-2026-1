@@ -442,26 +442,39 @@ p &lt; 0.05  → ปฏิเสธ H₀ : ความต่างนี้ "�
 <!-- ===== PAGE 5 : DIAGNOSTIC ===== -->
 <section class="page" id="p5">
   <div class="card">
-    <span class="kicker">หาสาเหตุอย่างเป็นระบบ</span>
+    <span class="kicker">หาสาเหตุอย่างเป็นระบบ · ลำดับการทำงาน</span>
+    <h2>🧭 ทำตามลำดับนี้ อย่าข้ามขั้น</h2>
+    <div class="grid g3">
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><div class="n">1</div><b>ข้อมูลชี้จุด</b><div class="note">Drill-down / Correlation บอกว่าปัญหา<b>กระจุกอยู่ตรงไหน</b> (ทำไปแล้วในหน้าก่อน ๆ)</div></div>
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><div class="n">2</div><b>Fishbone — กวาดให้กว้าง</b><div class="note">ระดมสาเหตุที่เป็นไปได้ให้ครบ 6 ด้าน<br><span class="badge">การ์ดถัดไป</span></div></div>
+      <div class="tile" style="background:#f0fdf4;border-color:var(--brand)"><div class="n">3</div><b>5 Whys — เจาะให้ลึก</b><div class="note">เลือกกิ่งที่หลักฐานหนุนที่สุด แล้วถาม "ทำไม" ต่อจนถึงต้นตอ</div></div>
+    </div>
+    <div class="callout">⚠️ <b>ทำไมต้อง Fishbone ก่อน:</b> 5 Whys ไล่ได้ทีละ <b>สายเดียว</b> — ถ้าเลือกสายแรกผิด เราจะไล่ลึกลงไปผิดทางถึง 5 ชั้นโดยไม่รู้ตัว การกวาดให้ครบก่อนคือประกันว่าเราไม่ได้เจาะสายที่มโนขึ้นมาเอง<br>
+    <span class="note">ข้อยกเว้น: ถ้าข้อมูลชี้ชัดมากอยู่แล้ว (เช่น ปัญหาเกิดวันเดียวหลังอุปกรณ์เสีย) จะข้ามไป 5 Whys เลยก็ได้ — และถ้า 5 Whys ตัน ให้ถอยกลับมาเลือกกิ่งใหม่จาก Fishbone</span></div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">ขั้นที่ 2 — กว้าง</span>
+    <h2>🐟 Fishbone Diagram (6M) — กวาดสาเหตุให้ครบก่อนเจาะ</h2>
+    <p class="lead">ปัญหาตั้งต้น: <b>ของเสียหลังเก็บเกี่ยวเพิ่มจาก 6.8% เป็น 9.1% (เป้า 8%)</b> · กดดูสาเหตุที่เป็นไปได้ทีละด้าน แล้วสังเกตว่าด้านไหนมี ✅ <b>หลักฐานหนุน</b> จากข้อมูลจริง</p>
+    <div class="fn-list" id="fishBtns"></div>
+    <div class="example-box">
+      <div class="lbl" id="fishTitle"></div>
+      <div id="fishBody"></div>
+    </div>
+    <div class="callout good">🎯 <b>สรุปจากการกวาด:</b> กิ่งที่มีข้อมูลหนุนคือ <b>Machine</b> (พัดลมตัวที่ 3 เสีย) กับ <b>Method</b> (ไม่มีระบบแจ้งเตือน) ส่วน Environment เป็นปัจจัยร่วม — <b>เราจะเอาสองกิ่งนี้ไปเจาะต่อด้วย 5 Whys ในการ์ดถัดไป</b> · กิ่งที่เหลือยังไม่ตัดทิ้ง แต่พักไว้ก่อนเพราะยังไม่มีหลักฐาน</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">ขั้นที่ 3 — ลึก</span>
     <h2>❓ 5 Whys — ถามซ้ำจนถึงต้นตอ</h2>
-    <p class="lead">ปัญหาตั้งต้น: <b>ของเสียหลังเก็บเกี่ยวเพิ่มจาก 6.8% เป็น 9.1% (เป้า 8%)</b> — กดปุ่มเพื่อถาม "ทำไม" ทีละชั้น</p>
+    <p class="lead">เจาะจากกิ่ง <b>Machine + Method</b> ที่ Fishbone ชี้ไว้ — กดปุ่มเพื่อถาม "ทำไม" ทีละชั้น และดูว่าแต่ละชั้นยืนยันด้วยข้อมูลอะไร</p>
     <div id="whyWrap"></div>
     <div class="row" style="margin-top:12px">
       <div style="flex:0"><button class="btn" id="whyNext">ถาม "ทำไม" ต่อ →</button></div>
       <div style="flex:0"><button class="btn ghost" id="whyReset">เริ่มใหม่</button></div>
     </div>
     <div class="callout" id="whyNote">เริ่มจากปัญหาที่วัดได้เป็นตัวเลขเสมอ — ห้ามเริ่มด้วย "พนักงานไม่ตั้งใจ"</div>
-  </div>
-
-  <div class="card">
-    <h2>🐟 Fishbone Diagram (6M) — กวาดสาเหตุให้ครบก่อนเจาะ</h2>
-    <p>5 Whys เก่งเรื่อง "เจาะลึกสายเดียว" แต่มองข้ามสาเหตุอื่นได้ง่าย — Fishbone ช่วยให้กวาดครบทุกด้านก่อน แล้วค่อยเลือกสายที่มีหลักฐานหนุนที่สุดไปเจาะต่อ</p>
-    <div class="fn-list" id="fishBtns"></div>
-    <div class="example-box">
-      <div class="lbl" id="fishTitle"></div>
-      <div id="fishBody"></div>
-    </div>
-    <div class="callout good">💡 <b>ใช้คู่กัน:</b> Fishbone (กว้าง) → เลือกกิ่งที่ข้อมูลชี้ → 5 Whys (ลึก) → ยืนยันด้วยข้อมูลจริงทุกชั้น</div>
   </div>
 
   <div class="card">
