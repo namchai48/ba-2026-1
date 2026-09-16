@@ -51,6 +51,7 @@
   .btn:hover{background:var(--brand2)}
   .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
   .btn.sm{padding:8px 14px; font-size:13.5px}
+  a.submit-link{display:inline-block; margin-top:12px; text-decoration:none}
   .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
   .nav-next .btn{box-shadow:var(--shadow)}
   select, input[type=text], input[type=email], input[type=number]{
@@ -790,7 +791,9 @@ total <span class="kw">=</span> <span class="nu">0</span>
       <li>ชื่อไฟล์ตั้งเป็น <code>BDA7_รหัสนิสิต_ชื่อ</code></li>
       <li>กดแชร์แล้วตั้งเป็น "ทุกคนที่มีลิงก์ · ผู้อ่าน" — <b>ลองเปิดลิงก์ในโหมดไม่ระบุตัวตนเพื่อตรวจว่าเปิดได้จริง</b></li>
     </ul>
-    <div class="callout">📮 <b>ส่งงาน:</b> ส่งลิงก์ Colab ผ่านช่องทางที่อาจารย์แจ้งในคาบ · กำหนดส่ง: ก่อนเริ่มคาบที่ 8 · <b>ทำคนเดียว</b></div>
+    <div class="callout">📮 <b>ส่งงาน:</b> ส่งลิงก์ Colab ผ่านฟอร์มด้านล่าง · <b>ทำคนเดียว</b></div>
+    <div class="callout">⏰ <b>กำหนดส่ง:</b> ภายในวันอาทิตย์ที่ 20 กันยายน 2569</div>
+    <a class="btn submit-link" id="hwLink" href="https://docs.google.com/forms/d/e/1FAIpQLSfzyc6QlyKCr2GLS29UGOLWJkIW-Um83IreXZM8HenN7dPbzA/viewform" target="_blank" rel="noopener">เปิดฟอร์มส่งงาน ↗</a>
     <div class="callout bad">🚫 <b>ข้อผิดพลาดที่พบบ่อย:</b> ลืมตั้งค่าแชร์ทำให้เปิดไม่ได้ · ลืม <code>round()</code> ทำให้ทศนิยมยาว · ใช้ <code>=</code> แทน <code>==</code> ในเงื่อนไข · เว้นวรรคหน้าบรรทัดไม่เท่ากันในบล็อกเดียวกัน</div>
   </div>
   <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn" onclick="go(8)">ถัดไป: แบบทดสอบ →</button></div>
