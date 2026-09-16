@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 7 (Python พื้นฐาน · สื่อ Interactive)</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.7}
+  a{color:var(--brand2)}
+  header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 11px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; transition:.15s; font-family:inherit}
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none}
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  select, input[type=text], input[type=email], input[type=number]{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink)}
+  select:focus, input:focus{outline:none; border-color:var(--brand)}
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row > div{flex:1; min-width:150px}
+  input[type=range]{width:100%; accent-color:var(--brand)}
+  table.xl{border-collapse:collapse; width:100%; font-size:13.5px; margin-top:10px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 9px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700}
+  table.xl tr:nth-child(even) td{background:#f8fafc}
+  table.xl td.hl{background:#dcfce7 !important; font-weight:700}
+  table.xl td.warn{background:#fef2f2 !important; color:#b91c1c; font-weight:700}
+  table.cmp{border-collapse:collapse; width:100%; font-size:14px; margin-top:12px}
+  table.cmp th, table.cmp td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top}
+  table.cmp th{background:#1e293b; color:#fff; font-weight:700}
+  table.cmp td:first-child{font-weight:700; background:#f8fafc}
+  table.cmp td.old{color:#b91c1c}
+  table.cmp td.new{background:#f0fdf4; color:#166534; font-weight:600}
+  table.term{border-collapse:collapse; width:100%; font-size:14.5px; margin-top:12px}
+  table.term th,table.term td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top}
+  table.term th{background:#1e293b; color:#fff}
+  table.term td:first-child{white-space:nowrap; font-weight:700; background:#f8fafc; width:1%; font-family:"Consolas",monospace}
+  .device-box{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .device-box h3{margin:0 0 8px; font-size:15.5px}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .note{font-size:13px; color:var(--muted)}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .kv .box{flex:1; min-width:120px; text-align:center; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb}
+  .kv .box .v{font-size:22px; font-weight:800; color:var(--brand2)}
+  .kv .box .l{font-size:12px; color:var(--muted)}
+  /* code blocks */
+  .py{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px 16px; font-family:"Consolas","Cascadia Mono",monospace; font-size:14px; margin-top:12px; overflow-x:auto; white-space:pre; line-height:1.65}
+  .py .kw{color:#c084fc}   .py .st{color:#86efac}   .py .nu{color:#fbbf24}
+  .py .cm{color:#64748b; font-style:italic}  .py .fn{color:#38bdf8}
+  .py .hi{background:rgba(74,222,128,.16); display:block; margin:0 -16px; padding:0 16px}
+  .out{background:#f8fafc; border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:0 12px 12px 0; padding:12px 16px; font-family:"Consolas",monospace; font-size:14px; white-space:pre-wrap; margin-top:0; color:#0f172a}
+  .out .lbl{display:block; font-family:inherit; font-size:11px; font-weight:800; letter-spacing:.6px; color:var(--muted); margin-bottom:6px; text-transform:uppercase}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .steps{counter-reset:s; padding-left:0; list-style:none}
+  .steps li{position:relative; padding:10px 0 10px 42px; border-bottom:1px dashed var(--line)}
+  .steps li:before{counter-increment:s; content:counter(s); position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:9px; background:var(--brand-soft); color:var(--brand2); font-weight:800; display:grid; place-items:center; font-size:13px}
+  code{background:#f1f5f9; padding:2px 6px; border-radius:6px; font-family:"Consolas",monospace; font-size:.92em; color:#0f172a}
+  .cols2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+  .callout{border-left:4px solid var(--amber); background:#fffbeb; padding:12px 16px; border-radius:0 12px 12px 0; margin-top:14px; font-size:14.5px}
+  .callout.good{border-color:var(--brand); background:#f0fdf4}
+  .callout.bad{border-color:var(--red); background:#fef2f2}
+  .callout.info{border-color:var(--blue); background:#eff6ff}
+  .checkin{background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:2px solid var(--brand)}
+  .ci-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
+  .ci-field{flex:1 1 260px; display:flex; flex-direction:column; gap:6px}
+  .ci-field label{font-weight:700; font-size:13.5px; color:#334155}
+  .ci-field input, .ci-field select{padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; font-family:inherit; font-size:15px; background:#fff; width:100%}
+  .ci-submit{margin-top:14px}
+  .ci-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .ci-msg.ok{color:var(--brand2)}
+  .ci-msg.err{color:var(--red)}
+  .qz-submit-wrap{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px}
+  .qz-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .qz-msg.ok{color:#bbf7d0}
+  .qz-msg.err{color:#fecaca}
+  .chk{list-style:none; padding-left:0; margin:12px 0 0}
+  .chk li{padding:9px 0 9px 30px; position:relative; border-bottom:1px dashed var(--line); font-size:14.5px}
+  .chk li:before{content:"☐"; position:absolute; left:0; top:8px; font-size:17px; color:var(--brand2)}
+  .must{border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:14px}
+  .must table{border-collapse:collapse; width:100%; font-size:14px}
+  .must th, .must td{border-bottom:1px solid var(--line); padding:11px 13px; text-align:left; vertical-align:top}
+  .must th{background:#1e293b; color:#fff; font-weight:700}
+  .must td:first-child{width:30%; font-weight:700}
+  .levels{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+  .levels .lv{flex:1; min-width:150px; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb; text-align:center}
+  .levels .lv.now{background:var(--brand-soft); border-color:var(--brand)}
+  .levels .lv .t{font-weight:800; font-size:14.5px}
+  .levels .lv .q{font-size:12.5px; color:var(--muted)}
+  .levels .lv .tool{font-size:12px; margin-top:6px; color:#334155}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 7</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">ทำไมต้อง Python</button>
+      <button data-p="2">เริ่มใช้ Colab</button>
+      <button data-p="3">ตัวแปร &amp; การคำนวณ</button>
+      <button data-p="4">เงื่อนไข</button>
+      <button data-p="5">List &amp; Dictionary</button>
+      <button data-p="6">วนซ้ำ &amp; ฟังก์ชัน</button>
+      <button data-p="7">งานส่งท้ายคาบ</button>
+      <button data-p="8">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ===== PAGE 0 ===== -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">Python · Google Colab · ก้าวแรกสู่ Predictive</span>
+    <h1>ครั้งที่ 7 — เขียนโค้ดครั้งแรก กับข้อมูลฟาร์มที่คุณรู้จักอยู่แล้ว</h1>
+    <p class="lead muted">หกคาบที่ผ่านมาเราตอบได้ว่า <b>เกิดอะไรขึ้น</b> และ <b>ทำไม</b> — โรงเรือน B ผลผลิตตก 44% เพราะพัดลมเสียตั้งแต่ 8 เม.ย. แต่กว่าจะรู้ก็ 24 มิ.ย.<br>
+    <b style="color:#bbf7d0">คำถามใหม่ของคาบนี้: ถ้าเรารู้ล่วงหน้าได้ล่ะ?</b> การรู้ล่วงหน้าคือระดับที่ 3 ของ Analytics และเครื่องมือของมันชื่อ Python</p>
+    <div class="row" style="margin-top:18px">
+      <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(2)">เปิด Colab ก่อน</button></div>
+    </div>
+  </div>
+
+  <div class="card checkin">
+    <span class="kicker">ก่อนเริ่มเรียน</span>
+    <h2>✅ เช็คชื่อเข้าเรียน</h2>
+    <p class="muted" style="margin-top:0">กรอกอีเมล และเลือกชื่อ–รหัสนิสิตของคุณ แล้วกดส่ง — ข้อมูลจะถูกส่งเข้า Google Form ของอาจารย์ทันที (ไม่ต้องออกจากหน้านี้)</p>
+    <div class="ci-row">
+      <div class="ci-field">
+        <label>อีเมล (Email) *</label>
+        <input type="email" id="ci_email" placeholder="you@go.buu.ac.th" autocomplete="email">
+      </div>
+      <div class="ci-field">
+        <label>เลือกข้อมูลนิสิต (ชื่อ–รหัส) *</label>
+        <select id="ci_student"><option value="">— เลือกชื่อของคุณ —</option></select>
+      </div>
+    </div>
+    <button class="btn ci-submit" id="ci_btn" onclick="submitCheckin()">📩 ส่งเช็คชื่อ</button>
+    <div class="ci-msg" id="ci_msg"></div>
+
+    <iframe name="ci_target" id="ci_target" style="display:none" title="hidden"></iframe>
+    <form id="ci_form" action="https://docs.google.com/forms/d/e/1FAIpQLSe0KYt4xW-e8kJkYJv1jjXA5dzu9II1BcmplKOlQnkWiyOCYw/formResponse" method="POST" target="ci_target" style="display:none">
+      <input type="hidden" name="emailAddress" id="ci_f_email">
+      <input type="hidden" name="entry.893657035" id="ci_f_student">
+      <input type="hidden" name="fvv" value="1">
+      <input type="hidden" name="pageHistory" value="0">
+    </form>
+  </div>
+
+  <div class="card">
+    <span class="kicker">เป้าหมาย</span>
+    <h2>จบคาบนี้แล้วต้องทำอะไรได้</h2>
+    <div class="grid g2">
+      <div class="tile"><div class="n">1</div><b>บอกได้ว่าเมื่อไรใช้ Python</b><div class="note">และเมื่อไรที่ Excel หรือ Power BI ยังเป็นทางที่ดีกว่า</div></div>
+      <div class="tile"><div class="n">2</div><b>ใช้ Google Colab เป็น</b><div class="note">สร้าง รัน บันทึก แชร์ และอ่าน error ได้ด้วยตัวเอง</div></div>
+      <div class="tile"><div class="n">3</div><b>เขียนการคำนวณ</b><div class="note">ตัวแปร ชนิดข้อมูล และแสดงผลเป็นทศนิยมตามที่ต้องการ</div></div>
+      <div class="tile"><div class="n">4</div><b>เขียนเงื่อนไข</b><div class="note">if / elif / else เพื่อจัดกลุ่มข้อมูลตามเกณฑ์</div></div>
+      <div class="tile"><div class="n">5</div><b>เก็บข้อมูลหลายค่า</b><div class="note">List และ Dictionary — คือตารางหนึ่งแถวและหนึ่งคอลัมน์</div></div>
+      <div class="tile"><div class="n">6</div><b>วนซ้ำและสรุปผล</b><div class="note">for loop + sum/len/min/max แล้วได้ค่าเท่ากับที่เคยทำใน Excel</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>เราอยู่ตรงไหนของวิชานี้</h2>
+    <div class="levels">
+      <div class="lv"><div class="t">1 · Descriptive</div><div class="q">เกิดอะไรขึ้น</div><div class="tool">Excel · Power Query · Power BI</div></div>
+      <div class="lv"><div class="t">2 · Diagnostic</div><div class="q">ทำไมถึงเกิด</div><div class="tool">สถิติ · Drill-down · 5 Whys</div></div>
+      <div class="lv now"><div class="t">3 · Predictive</div><div class="q">จะเกิดอะไรขึ้นต่อ</div><div class="tool">Python · Machine Learning<br><b>คาบ 7–11 · คุณอยู่ที่นี่</b></div></div>
+      <div class="lv"><div class="t">4 · Prescriptive</div><div class="q">ควรทำอย่างไร</div><div class="tool">คาบ 12</div></div>
+    </div>
+    <div class="callout good" style="margin-top:16px">🍃 <b>ข้อมูลที่ใช้ตลอดคาบนี้คือข้อมูลเดิม:</b> นำชัยฟาร์ม 12 แปลง 3 โรงเรือน จากไฟล์ <code>BDA_class5_FarmData.xlsx</code> ที่ใช้มาตั้งแต่คาบที่ 4 — <b>คุณรู้จักตัวเลขชุดนี้ดีอยู่แล้ว</b> คาบนี้จึงไม่ต้องเรียนข้อมูลใหม่ เรียนแค่วิธีสั่งงานแบบใหม่ และทุกคำตอบที่ได้จะเอาไปเทียบกับที่เคยคำนวณใน Excel ได้ทันที</div>
+  </div>
+
+  <div class="card">
+    <h2>แผนของคาบนี้</h2>
+    <ol class="steps">
+      <li><b>ทำไมต้อง Python</b> — เทียบกับ Power Query บนงานเดียวกัน แล้วตอบว่ามันเก่งกว่าตรงไหน และแพ้ตรงไหน</li>
+      <li><b>เริ่มใช้ Colab</b> — เครื่องมือที่ทุกคนใช้ได้เท่ากัน ไม่ว่าจะเป็น Windows Mac หรือแท็บเล็ต</li>
+      <li><b>ตัวแปรและการคำนวณ</b> — คำนวณผลผลิตต่อไร่ของแต่ละแปลง</li>
+      <li><b>เงื่อนไข</b> — จัดกลุ่มแปลงตาม % ของเสียเทียบเป้า 8%</li>
+      <li><b>List และ Dictionary</b> — เก็บข้อมูลทั้ง 12 แปลงไว้ในตัวแปรเดียว</li>
+      <li><b>วนซ้ำและฟังก์ชัน</b> — หาค่าเฉลี่ยและพิสัย แล้วตรวจกับคำตอบจากคาบ 5</li>
+    </ol>
+  </div>
+  <div class="nav-next"><span></span><button class="btn" onclick="go(1)">ถัดไป: ทำไมต้อง Python →</button></div>
+</section>
+
+<!-- ===== PAGE 1 ===== -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">เหตุผล</span>
+    <h2>งานเดียวกัน · สองวิธี</h2>
+    <p class="lead">โจทย์: ไฟล์ยอดขายมีช่องว่างในคอลัมน์ยอดขายอยู่หลายแถว ต้องการเติมด้วยค่าเฉลี่ยของคอลัมน์นั้น</p>
+    <table class="cmp">
+      <thead><tr><th style="width:22%">&nbsp;</th><th>วิธีเดิม — Power Query (คาบ 3)</th><th>วิธีใหม่ — Python</th></tr></thead>
+      <tbody>
+        <tr><td>ขั้นตอน</td>
+          <td class="old">1. โหลดข้อมูล<br>2. เข้า Transform<br>3. เลือกคอลัมน์<br>4. เลือก Replace Values<br>5. กำหนดค่าที่ต้องการเปลี่ยน<br>6. กำหนดว่าเปลี่ยนเป็นอะไร</td>
+          <td class="new"><code>import pandas as pd</code><br><code>df = pd.read_csv('sales.csv')</code><br><code>df['Sales'] = df['Sales'].fillna(df['Sales'].mean())</code></td></tr>
+        <tr><td>ทำซ้ำเดือนหน้า</td><td class="old">กด Refresh (ถ้าไฟล์โครงสร้างเหมือนเดิม)</td><td class="new">รันเซลล์เดิมอีกครั้ง</td></tr>
+        <tr><td>ส่งต่อให้เพื่อน</td><td class="old">ส่งไฟล์ .xlsx ทั้งไฟล์</td><td class="new">ส่งลิงก์ หรือส่งโค้ด 3 บรรทัด</td></tr>
+      </tbody>
+    </table>
+    <div class="callout info" style="margin-top:16px">💡 <b>ประเด็นไม่ใช่ว่าอันไหนสั้นกว่า</b> — Power Query เก่งมากในงานประจำที่ทำซ้ำทุกเดือน และคนที่ไม่เขียนโค้ดก็ใช้ต่อได้ · สิ่งที่ Python มีแล้ว Power Query กับ Power BI ไม่มีคือ <b>ความสามารถในการสร้างแบบจำลองเพื่อทำนายอนาคต</b> ซึ่งเป็นเป้าหมายของ 5 คาบข้างหน้า</div>
+  </div>
+
+  <div class="card">
+    <h2>เลือกเครื่องมือให้ถูกงาน</h2>
+    <p>คำถามที่จะถูกถามในการทำงานจริงคือ "ทำไมไม่ทำใน Excel ให้จบ" — ตารางนี้คือคำตอบ</p>
+    <table class="term">
+      <thead><tr><th style="width:34%">งาน</th><th>เครื่องมือที่เหมาะ</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:inherit">ดูข้อมูลไม่กี่ร้อยแถว แก้เองทีละช่อง</td><td><b>Excel</b> — เร็วที่สุด เห็นข้อมูลกับตา</td></tr>
+        <tr><td style="font-family:inherit">รวมไฟล์รายเดือนแล้วทำความสะอาดซ้ำทุกเดือน</td><td><b>Power Query</b> — ตั้งครั้งเดียว กด Refresh ตลอดไป</td></tr>
+        <tr><td style="font-family:inherit">แดชบอร์ดให้ผู้บริหารกดดูเอง</td><td><b>Power BI</b> — คนอื่นใช้ต่อได้โดยไม่ต้องเขียนอะไร</td></tr>
+        <tr><td style="font-family:inherit">ข้อมูลหลายแสนแถว หรือหลายสิบไฟล์</td><td><b>Python</b> — Excel เริ่มช้าและค้าง</td></tr>
+        <tr><td style="font-family:inherit">ทำงานเดิมซ้ำ 50 รอบด้วยเงื่อนไขต่างกัน</td><td><b>Python</b> — เขียนครั้งเดียวแล้ววนลูป</td></tr>
+        <tr><td style="font-family:inherit"><b>พยากรณ์ผลผลิตเดือนหน้า / ทำนายว่าออเดอร์จะส่งทันไหม</b></td><td><b>Python เท่านั้น</b> — เครื่องมือ 3 ตัวข้างบนทำไม่ได้</td></tr>
+      </tbody>
+    </table>
+    <div class="callout" style="margin-top:16px">⚠️ <b>Python ไม่ได้มาแทน Excel</b> — ในงานจริงคนหนึ่งคนใช้ทั้งสองอย่างสลับกันตลอดวัน · ตอนจบคาบ 8 คุณจะเห็นว่างานที่เคยทำใน Excel ทำใน Python ได้เกือบทั้งหมด และเลือกได้เองว่าอันไหนคุ้มกว่า</div>
+  </div>
+
+  <div class="card">
+    <h2>Python ในสายงานเกษตรและโลจิสติกส์</h2>
+    <div class="grid g3">
+      <div class="tile"><div class="n">1</div><b>พยากรณ์ผลผลิต</b><div class="note">ใช้อุณหภูมิ ความชื้น และปริมาณปุ๋ยย้อนหลัง ทำนายผลผลิตรอบหน้า เพื่อวางแผนรับออเดอร์ล่วงหน้า</div></div>
+      <div class="tile"><div class="n">2</div><b>เตือนออเดอร์เสี่ยงส่งช้า</b><div class="note">ดูจากลูกค้า ระยะทาง ชนิดสินค้า และช่วงเวลา แล้วบอกล่วงหน้าว่าออเดอร์ไหนน่าจะไม่ทัน</div></div>
+      <div class="tile"><div class="n">3</div><b>จัดกลุ่มแปลงหรือลูกค้า</b><div class="note">แบ่งกลุ่มที่มีพฤติกรรมคล้ายกันโดยอัตโนมัติ เพื่อวางแผนดูแลแยกกลุ่ม</div></div>
+    </div>
+    <p class="note" style="margin-top:14px">ทั้งสามงานนี้คือเนื้อหาของคาบ 9 10 และ 11 ตามลำดับ — คาบนี้กับคาบหน้าคือการปูพื้นให้ทำสามอย่างนั้นได้</p>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← ย้อนกลับ</button><button class="btn" onclick="go(2)">ถัดไป: เริ่มใช้ Colab →</button></div>
+</section>
+
+<!-- ===== PAGE 2 ===== -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">เตรียมเครื่องมือ</span>
+    <h2>💻 Google Colab — เขียน Python ในเบราว์เซอร์</h2>
+    <p class="lead">Colab คือสมุดสำหรับเขียนและรัน Python บนเว็บ ไม่ต้องติดตั้งโปรแกรมอะไรลงเครื่อง ใช้แค่บัญชี Google</p>
+    <div class="callout good">🎉 <b>ข่าวดีสำหรับคนที่ลำบากมาตั้งแต่คาบ 3–4:</b> Power Query และ Power BI Desktop ใช้ได้เต็มที่เฉพาะ Windows — แต่ Colab ทำงานบนเบราว์เซอร์ <b>ทุกอุปกรณ์ใช้ได้เหมือนกันหมด</b> ตั้งแต่คาบนี้เป็นต้นไปไม่มีใครเสียเปรียบเรื่องเครื่องอีก</div>
+    <div class="cols2" style="margin-top:16px">
+      <div class="device-box">
+        <h3>💻 คอมพิวเตอร์ (Windows / Mac)</h3>
+        <ol class="steps">
+          <li>เข้า <a href="https://colab.research.google.com" target="_blank" rel="noopener"><code>colab.research.google.com</code></a></li>
+          <li>ล็อกอินด้วยบัญชี Google (ใช้อีเมลมหาวิทยาลัยได้)</li>
+          <li>กด <b>ไฟล์ → สร้างสมุดบันทึกใหม่</b></li>
+        </ol>
+      </div>
+      <div class="device-box">
+        <h3>📱 แท็บเล็ต / มือถือ</h3>
+        <ol class="steps">
+          <li>เปิดเบราว์เซอร์แล้วเข้าที่อยู่เดียวกัน (อย่าใช้แอป Colab บนมือถือ ใช้ยาก)</li>
+          <li>ควร<b>ต่อคีย์บอร์ดภายนอก</b> เพราะต้องพิมพ์สัญลักษณ์เยอะ</li>
+          <li>ถ้าจอเล็กมาก ให้จับคู่กับเพื่อนหนึ่งเครื่องต่อสองคน</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>สิ่งที่ต้องรู้ก่อนพิมพ์บรรทัดแรก</h2>
+    <table class="term">
+      <thead><tr><th style="width:26%">สิ่งที่เห็นบนหน้าจอ</th><th>คืออะไร</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:inherit">เซลล์โค้ด<br><span class="note">Code cell</span></td><td>ช่องสีเทาที่พิมพ์คำสั่ง Python ลงไปได้ · กดปุ่ม ▶ ข้างซ้าย หรือ <b>Ctrl + Enter</b> เพื่อรัน · ผลลัพธ์จะขึ้นใต้เซลล์นั้น</td></tr>
+        <tr><td style="font-family:inherit">เซลล์ข้อความ<br><span class="note">Text cell</span></td><td>ช่องสำหรับเขียนคำอธิบาย ไม่ใช่โค้ด · ใช้แบ่งหัวข้อในงานที่ส่ง ทำให้อาจารย์อ่านง่ายขึ้น</td></tr>
+        <tr><td style="font-family:inherit">ลำดับการรัน</td><td><b>ต้องรันจากบนลงล่าง</b> — ถ้าข้ามเซลล์ที่สร้างตัวแปรไว้ เซลล์ล่างจะหาตัวแปรไม่เจอ · ตัวเลขในวงเล็บ [1] [2] บอกว่าเซลล์ไหนรันไปแล้วเป็นลำดับที่เท่าไร</td></tr>
+        <tr><td style="font-family:inherit">อัปโหลดไฟล์</td><td>ไอคอนโฟลเดอร์ทางซ้าย → ปุ่มอัปโหลด · ไฟล์จะไปอยู่ที่ <code>/content/ชื่อไฟล์</code> · <b>ไฟล์จะหายเมื่อปิดไปนาน ๆ</b> ต้องอัปโหลดใหม่</td></tr>
+        <tr><td style="font-family:inherit">บันทึกและแชร์</td><td>บันทึกอัตโนมัติลง Google Drive ของตัวเอง · กดปุ่ม <b>แชร์</b> มุมขวาบน แล้วตั้งเป็น "ทุกคนที่มีลิงก์ · ผู้อ่าน" ก่อนส่งงาน ไม่งั้นอาจารย์เปิดไม่ได้</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>กฎการเว้นวรรค — เรื่องที่ทำให้พลาดมากที่สุด</h2>
+    <p>Python ใช้ <b>การเว้นวรรคหน้าบรรทัด</b> บอกว่าคำสั่งไหนอยู่ในเงื่อนไขหรือในลูป ต่างจากภาษาอื่นที่ใช้วงเล็บปีกกา · มาตรฐานคือ <b>4 เคาะ</b> ต่อหนึ่งระดับ (กด Tab หนึ่งครั้งใน Colab ได้ 4 เคาะพอดี)</p>
+    <div class="cols2">
+      <div>
+        <h3 style="color:var(--brand2)">✅ ถูก</h3>
+<div class="py"><span class="kw">if</span> waste <span class="kw">&gt;</span> <span class="nu">8</span>:
+    <span class="fn">print</span>(<span class="st">"เกินเป้า"</span>)
+<span class="fn">print</span>(<span class="st">"ตรวจเสร็จ"</span>)</div>
+        <div class="note">บรรทัด <code>print("เกินเป้า")</code> เว้น 4 เคาะ แปลว่าอยู่ในเงื่อนไข ส่วนบรรทัดสุดท้ายชิดซ้าย จึงทำงานเสมอ</div>
+      </div>
+      <div>
+        <h3 style="color:var(--red)">❌ ผิด</h3>
+<div class="py"><span class="kw">if</span> waste <span class="kw">&gt;</span> <span class="nu">8</span>:
+<span class="fn">print</span>(<span class="st">"เกินเป้า"</span>)</div>
+        <div class="note">ไม่เว้นวรรค → ขึ้น <code>IndentationError</code> · Python ไม่รู้ว่าบรรทัดนี้อยู่ในเงื่อนไขหรือไม่</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>อ่าน error 3 แบบที่จะเจอบ่อยที่สุด</h2>
+    <p>ข้อความ error ยาว ๆ สีแดงไม่ได้แปลว่าเครื่องพัง — <b>ให้อ่านบรรทัดสุดท้ายบรรทัดเดียวก่อน</b> เพราะมันบอกชนิดของปัญหาไว้แล้ว</p>
+    <table class="term">
+      <thead><tr><th style="width:24%">ข้อความ</th><th>แปลว่า</th><th style="width:34%">วิธีแก้</th></tr></thead>
+      <tbody>
+        <tr><td>NameError</td><td>เรียกใช้ตัวแปรที่ยังไม่เคยสร้าง หรือสะกดชื่อผิด</td><td>ตรวจการสะกด และตรวจว่ารันเซลล์ที่สร้างตัวแปรนั้นแล้วหรือยัง</td></tr>
+        <tr><td>TypeError</td><td>เอาข้อมูลคนละชนิดมาทำด้วยกัน เช่น เอาข้อความบวกกับตัวเลข</td><td>แปลงชนิดก่อนด้วย <code>int()</code> <code>float()</code> หรือ <code>str()</code></td></tr>
+        <tr><td>IndentationError</td><td>เว้นวรรคหน้าบรรทัดไม่ถูก</td><td>ให้บรรทัดในบล็อกเดียวกันเว้นเท่ากันทุกบรรทัด (4 เคาะ)</td></tr>
+      </tbody>
+    </table>
+    <div class="callout info">🔎 <b>เคล็ดลับ:</b> ถ้าอ่านแล้วยังไม่เข้าใจ ให้คัดลอกเฉพาะ<b>บรรทัดสุดท้าย</b>ของข้อความ error ไปค้นหา จะเจอคำอธิบายตรงประเด็นกว่าการคัดลอกทั้งก้อน</div>
+  </div>
+
+  <div class="card">
+    <h2>คอมเมนต์และการตั้งชื่อ — เพื่อให้งานที่ส่งอ่านรู้เรื่อง</h2>
+<div class="py"><span class="cm"># ผลผลิตต่อไร่ของแปลง P01 ไตรมาส 2 ปี 2569</span>
+kg_p01 <span class="kw">=</span> <span class="nu">1384</span>       <span class="cm"># ปริมาณเก็บเกี่ยวรวม (กก.)</span>
+rai_p01 <span class="kw">=</span> <span class="nu">7.0</span>       <span class="cm"># พื้นที่ (ไร่)</span></div>
+    <ul>
+      <li>ทุกอย่างหลังเครื่องหมาย <code>#</code> Python จะไม่อ่าน — ใช้เขียนอธิบายให้คนอ่าน</li>
+      <li>ตั้งชื่อตัวแปรเป็นภาษาอังกฤษ ไม่มีเว้นวรรค ใช้ขีดล่างแทน เช่น <code>kg_p01</code> ไม่ใช่ <code>a</code> หรือ <code>x1</code></li>
+      <li>งานที่ส่งในคาบนี้ <b>ต้องมีคอมเมนต์อธิบายอย่างน้อยจุดสำคัญ</b> — เป็นข้อหนึ่งในเช็กลิสต์</li>
+    </ul>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: ตัวแปร &amp; การคำนวณ →</button></div>
+</section>
+
+<!-- ===== PAGE 3 ===== -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">พื้นฐาน</span>
+    <h2>📦 ตัวแปร — กล่องที่มีชื่อสำหรับเก็บค่า</h2>
+<div class="py">plot <span class="kw">=</span> <span class="st">"P01"</span>
+kg <span class="kw">=</span> <span class="nu">1384</span>
+rai <span class="kw">=</span> <span class="nu">7.0</span></div>
+    <p><code>plot</code> <code>kg</code> <code>rai</code> คือ<b>ชื่อ</b>ของตัวแปร ส่วนค่าทางขวาของเครื่องหมายเท่ากับคือ<b>ค่า</b>ที่เก็บไว้ · เครื่องหมาย <code>=</code> ใน Python แปลว่า "กำหนดค่าให้" ไม่ได้แปลว่า "เท่ากับ"</p>
+    <h3>ชนิดข้อมูลพื้นฐาน 4 แบบ</h3>
+    <table class="term">
+      <thead><tr><th style="width:20%">ชนิด</th><th style="width:26%">ตัวอย่าง</th><th>ใช้กับข้อมูลฟาร์มแบบไหน</th></tr></thead>
+      <tbody>
+        <tr><td>int</td><td><code>kg = 1384</code></td><td>จำนวนเต็ม เช่น ปริมาณเก็บเกี่ยวเป็นกิโลกรัม จำนวนออเดอร์</td></tr>
+        <tr><td>float</td><td><code>rai = 7.0</code></td><td>เลขทศนิยม เช่น พื้นที่เป็นไร่ อุณหภูมิ เปอร์เซ็นต์ของเสีย</td></tr>
+        <tr><td>str</td><td><code>plot = "P01"</code></td><td>ข้อความ เช่น รหัสแปลง ชื่อโรงเรือน ชนิดผัก · <b>ต้องอยู่ในเครื่องหมายคำพูดเสมอ</b></td></tr>
+        <tr><td>bool</td><td><code>on_time = True</code></td><td>จริงหรือเท็จ เช่น ส่งตรงเวลาไหม เกินเป้าของเสียไหม</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">⚠️ <code>"1384"</code> ที่มีเครื่องหมายคำพูดคือ<b>ข้อความ</b> ไม่ใช่ตัวเลข — เอาไปคำนวณไม่ได้ ต้องแปลงด้วย <code>int()</code> ก่อน · นี่คือที่มาของ <code>TypeError</code> ส่วนใหญ่</div>
+  </div>
+
+  <div class="card">
+    <h2>แสดงผลให้อ่านง่าย</h2>
+    <p>ค่าที่คำนวณได้มักมีทศนิยมยาวเกินจำเป็น การรายงานผลจึงต้องกำหนดจำนวนทศนิยมเอง</p>
+<div class="py">yield_per_rai <span class="kw">=</span> <span class="nu">1384</span> <span class="kw">/</span> <span class="nu">7.0</span>
+
+<span class="cm"># แบบที่ 1 — ต่อข้อความด้วยเครื่องหมายจุลภาค</span>
+<span class="fn">print</span>(<span class="st">"ผลผลิตต่อไร่คือ"</span>, yield_per_rai)
+
+<span class="cm"># แบบที่ 2 — f-string กำหนดทศนิยม 1 ตำแหน่ง (แนะนำ)</span>
+<span class="fn">print</span>(<span class="st">f"ผลผลิตต่อไร่คือ {yield_per_rai:.1f} กก./ไร่"</span>)
+
+<span class="cm"># แบบที่ 3 — ปัดค่าก่อนแล้วค่อยแสดง</span>
+<span class="fn">print</span>(<span class="st">"ผลผลิตต่อไร่คือ"</span>, <span class="fn">round</span>(yield_per_rai, <span class="nu">1</span>))</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>ผลผลิตต่อไร่คือ 197.71428571428572
+ผลผลิตต่อไร่คือ 197.7 กก./ไร่
+ผลผลิตต่อไร่คือ 197.7</div>
+    <div class="callout good">✅ <b>f-string คือรูปแบบที่จะใช้ตลอดวิชานี้</b> — มี <code>f</code> นำหน้าเครื่องหมายคำพูด แล้วใส่ชื่อตัวแปรในวงเล็บปีกกา · <code>:.1f</code> แปลว่าทศนิยม 1 ตำแหน่ง ถ้าอยาก 2 ตำแหน่งก็ <code>:.2f</code></div>
+  </div>
+
+  <div class="card">
+    <h2>ตัวดำเนินการทางคณิตศาสตร์</h2>
+    <div class="cols2">
+      <table class="term">
+        <thead><tr><th style="width:22%">เครื่องหมาย</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td>+ − * /</td><td style="font-family:inherit">บวก ลบ คูณ หาร (เหมือน Excel)</td></tr>
+          <tr><td>**</td><td style="font-family:inherit">ยกกำลัง เช่น <code>2 ** 3</code> ได้ 8</td></tr>
+          <tr><td>//</td><td style="font-family:inherit">หารแล้วปัดลงเป็นจำนวนเต็ม เช่น <code>17 // 5</code> ได้ 3</td></tr>
+          <tr><td>%</td><td style="font-family:inherit">เศษที่เหลือจากการหาร เช่น <code>17 % 5</code> ได้ 2</td></tr>
+        </tbody>
+      </table>
+      <div>
+        <h3>ใช้งานจริงในฟาร์ม</h3>
+<div class="py"><span class="cm"># กี่ลังพอดี และเหลือเศษกี่กิโล (ลังละ 25 กก.)</span>
+kg <span class="kw">=</span> <span class="nu">1384</span>
+crates <span class="kw">=</span> kg <span class="kw">//</span> <span class="nu">25</span>
+left <span class="kw">=</span> kg <span class="kw">%</span> <span class="nu">25</span>
+<span class="fn">print</span>(<span class="st">f"บรรจุได้ {crates} ลัง เหลือ {left} กก."</span>)</div>
+        <div class="out"><span class="lbl">ผลลัพธ์</span>บรรจุได้ 55 ลัง เหลือ 9 กก.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>รับค่าจากผู้ใช้ด้วย input</h2>
+    <p>ในกรณีที่อยากให้ผู้ใช้กรอกค่าเองแทนที่จะแก้โค้ด ใช้คำสั่ง <code>input()</code> — <b>ค่าที่ได้จะเป็นข้อความเสมอ</b> ถ้าจะคำนวณต้องแปลงเป็นตัวเลขก่อน</p>
+<div class="py">kg_text <span class="kw">=</span> <span class="fn">input</span>(<span class="st">"ปริมาณเก็บเกี่ยว (กก.): "</span>)   <span class="cm"># ได้ข้อความ</span>
+rai_text <span class="kw">=</span> <span class="fn">input</span>(<span class="st">"พื้นที่ (ไร่): "</span>)          <span class="cm"># ได้ข้อความ</span>
+
+kg <span class="kw">=</span> <span class="fn">int</span>(kg_text)          <span class="cm"># แปลงเป็นจำนวนเต็ม</span>
+rai <span class="kw">=</span> <span class="fn">float</span>(rai_text)      <span class="cm"># แปลงเป็นทศนิยม</span>
+
+<span class="fn">print</span>(<span class="st">f"ผลผลิตต่อไร่ {kg / rai:.1f} กก./ไร่"</span>)</div>
+    <div class="callout bad">❌ <b>ถ้าลืมแปลงชนิด</b> แล้วเขียน <code>kg_text / rai_text</code> จะได้ <code>TypeError</code> ทันที เพราะเอาข้อความมาหารกันไม่ได้</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 1</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>สร้างตัวแปรเก็บ<b>ปริมาณเก็บเกี่ยว</b>และ<b>พื้นที่</b>ของแปลง P06 (1,361 กก. · 7.0 ไร่) แล้วแสดงผลผลิตต่อไร่เป็นทศนิยม 1 ตำแหน่ง</li>
+      <li>แปลง P06 มีของเสีย 100 กก. — คำนวณ<b>เปอร์เซ็นต์ของเสีย</b>แล้วแสดงเป็นทศนิยม 1 ตำแหน่งพร้อมเครื่องหมายเปอร์เซ็นต์</li>
+      <li>ผักของแปลงนี้คือคอส ราคากิโลกรัมละ 72 บาท — คำนวณ<b>มูลค่าของเสียเป็นเงิน</b>แล้วแสดงผล</li>
+    </ol>
+    <div class="note" style="margin-top:10px">เฉลยอยู่ท้ายไฟล์ Colab ของคาบนี้ · ข้อ 3 เป็นตัวอย่างของสิ่งที่คาบ 5 ย้ำไว้ว่า <b>ตัวเลขที่แปลงเป็นเงินได้จะมีน้ำหนักกว่าตัวเลขเปอร์เซ็นต์เสมอ</b></div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: เงื่อนไข →</button></div>
+</section>
+
+<!-- ===== PAGE 4 ===== -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">ตรรกะ</span>
+    <h2>🔀 if / elif / else — ให้โค้ดตัดสินใจแทนเรา</h2>
+    <p class="lead">ในคาบ 2 เราเขียน <code>IF</code> ใน Excel เพื่อจัดกลุ่มข้อมูลตามเกณฑ์ · Python ทำสิ่งเดียวกันแต่เขียนเป็นบรรทัด</p>
+    <table class="cmp">
+      <thead><tr><th style="width:20%">งาน</th><th>Excel (คาบ 2)</th><th>Python</th></tr></thead>
+      <tbody><tr><td>จัดกลุ่มของเสีย</td>
+        <td class="old"><code>=IF(A2&lt;=6.5,"ดีมาก",IF(A2&lt;=8,"ผ่านเกณฑ์","ต้องแก้ไข"))</code></td>
+        <td class="new"><code>if waste &lt;= 6.5: ... elif waste &lt;= 8: ... else: ...</code></td></tr></tbody>
+    </table>
+    <h3>เครื่องหมายเปรียบเทียบ</h3>
+    <table class="term">
+      <thead><tr><th style="width:16%">เครื่องหมาย</th><th style="width:34%">ความหมาย</th><th>ตัวอย่าง</th></tr></thead>
+      <tbody>
+        <tr><td>&gt; &nbsp; &lt;</td><td style="font-family:inherit">มากกว่า · น้อยกว่า</td><td><code>waste &gt; 8</code></td></tr>
+        <tr><td>&gt;= &nbsp; &lt;=</td><td style="font-family:inherit">มากกว่าหรือเท่ากับ · น้อยกว่าหรือเท่ากับ</td><td><code>temp &gt;= 35</code></td></tr>
+        <tr><td>==</td><td style="font-family:inherit"><b>เท่ากับ</b> (สองขีด) — ใช้เปรียบเทียบ</td><td><code>house == "B"</code></td></tr>
+        <tr><td>!=</td><td style="font-family:inherit">ไม่เท่ากับ</td><td><code>status != "ส่งแล้ว"</code></td></tr>
+        <tr><td>and &nbsp; or</td><td style="font-family:inherit">ต้องจริงทั้งคู่ · จริงอย่างใดอย่างหนึ่ง</td><td><code>temp &gt; 35 and waste &gt; 8</code></td></tr>
+      </tbody>
+    </table>
+    <div class="callout">⚠️ <b>จุดพลาดคลาสสิก:</b> <code>=</code> หนึ่งขีดคือ "กำหนดค่าให้" ส่วน <code>==</code> สองขีดคือ "เท่ากับหรือเปล่า" · เขียน <code>if house = "B"</code> จะขึ้น error ทันที</div>
+  </div>
+
+  <div class="card">
+    <h2>🎚️ ห้องทดลอง: จัดกลุ่มแปลงตามเปอร์เซ็นต์ของเสีย</h2>
+    <p>เกณฑ์ของฟาร์มคือ <b>ของเสียไม่เกิน 8%</b> · เราแบ่งเป็น 3 กลุ่ม แล้วเลื่อนค่าดูว่าบรรทัดไหนทำงาน</p>
+    <div class="row" style="margin-top:12px">
+      <div>
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">เปอร์เซ็นต์ของเสีย: <span id="wLbl" style="color:var(--brand2)">6.4</span>%</label>
+        <input type="range" id="wSlider" min="0" max="20" step="0.1" value="6.4" oninput="runCond()">
+      </div>
+    </div>
+    <div class="badge-row" id="wPresets"></div>
+    <div class="py" id="condCode" style="margin-top:14px"></div>
+    <div class="out" id="condOut"><span class="lbl">ผลลัพธ์</span></div>
+    <div class="note" style="margin-top:10px" id="condNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>เงื่อนไขซ้อนกันหลายตัวแปร</h2>
+    <p>สถานการณ์จริงมักต้องดูมากกว่าหนึ่งเงื่อนไข เช่น <b>ของเสียเกินเป้า พร้อมกับอุณหภูมิสูงผิดปกติ</b> ซึ่งเป็นสัญญาณที่คาบ 5 ชี้ว่าเป็นต้นตอของโรงเรือน B</p>
+<div class="py">waste <span class="kw">=</span> <span class="nu">15.7</span>    <span class="cm"># % ของเสีย โรงเรือน B ไตรมาส 2 ปี 2570</span>
+temp <span class="kw">=</span> <span class="nu">35.1</span>     <span class="cm"># อุณหภูมิสูงสุดช่วงบ่ายเฉลี่ย เม.ย. (°C)</span>
+
+<span class="kw">if</span> waste <span class="kw">&gt;</span> <span class="nu">8</span> <span class="kw">and</span> temp <span class="kw">&gt;</span> <span class="nu">35</span>:
+    <span class="fn">print</span>(<span class="st">"เข้าข่ายปัญหาระบบระบายอากาศ — ตรวจพัดลมด่วน"</span>)
+<span class="kw">elif</span> waste <span class="kw">&gt;</span> <span class="nu">8</span>:
+    <span class="fn">print</span>(<span class="st">"ของเสียเกินเป้า แต่ไม่ใช่เพราะอุณหภูมิ — หาสาเหตุอื่น"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"อยู่ในเกณฑ์"</span>)</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>เข้าข่ายปัญหาระบบระบายอากาศ — ตรวจพัดลมด่วน</div>
+    <div class="callout info">💡 <b>นี่คือระบบแจ้งเตือนอย่างง่ายที่สุด</b> — ถ้าฟาร์มมีโค้ดสามบรรทัดนี้รันทุกวันตั้งแต่เดือนเมษายน จะรู้เรื่องพัดลมเสียภายในไม่กี่วัน แทนที่จะรู้ตอนตรวจรอบวันที่ 24 มิถุนายน · ในคาบ 5 เราสรุปว่าต้นตอที่แท้จริงคือ "ตั้งเซนเซอร์ไว้บันทึกอย่างเดียว ไม่ได้ตั้งให้แจ้งเตือน" — โค้ดชุดนี้คือสิ่งที่ขาดไป</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 2</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>เขียนโค้ดรับค่า<b>ผลผลิตต่อไร่</b>จากคีย์บอร์ด แล้วจัดกลุ่มเป็น 3 ระดับ: น้อยกว่า 170 แสดง "ต่ำกว่าค่ากลาง" · ตั้งแต่ 170 ถึง 190 แสดง "ปกติ" · มากกว่า 190 แสดง "ดีเยี่ยม"</li>
+      <li>เพิ่มเงื่อนไขว่า ถ้าผลผลิตต่อไร่ต่ำกว่า 170 <b>และ</b> ของเสียเกิน 8% ให้แสดงข้อความว่า "ต้องเข้าตรวจแปลงทันที"</li>
+    </ol>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(3)">← ย้อนกลับ</button><button class="btn" onclick="go(5)">ถัดไป: List &amp; Dictionary →</button></div>
+</section>
+
+<!-- ===== PAGE 5 ===== -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">เก็บหลายค่า</span>
+    <h2>📋 List — เก็บหลายค่าไว้ในตัวแปรเดียว</h2>
+    <p class="lead">ถ้าต้องเก็บผลผลิตของ 12 แปลง เราคงไม่สร้างตัวแปร 12 ตัว — ใช้ List ตัวเดียวจบ</p>
+<div class="py"><span class="cm"># ผลผลิตต่อไร่ (กก./ไร่) ของ 12 แปลง ไตรมาส 2 ปี 2569</span>
+yields <span class="kw">=</span> [<span class="nu">198</span>, <span class="nu">187</span>, <span class="nu">172</span>, <span class="nu">192</span>, <span class="nu">177</span>, <span class="nu">194</span>, <span class="nu">176</span>, <span class="nu">191</span>, <span class="nu">164</span>, <span class="nu">177</span>, <span class="nu">164</span>, <span class="nu">171</span>]
+
+<span class="fn">print</span>(yields[<span class="nu">0</span>])       <span class="cm"># ค่าแรกสุด</span>
+<span class="fn">print</span>(<span class="fn">len</span>(yields))     <span class="cm"># มีกี่ค่า</span></div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>198
+12</div>
+    <div class="callout bad">⚠️ <b>สิ่งที่ต้องจำให้ได้ตั้งแต่วันนี้: Python นับตำแหน่งเริ่มจาก 0</b> — ค่าแรกคือ <code>yields[0]</code> ไม่ใช่ <code>yields[1]</code> · แปลงที่ 12 คือ <code>yields[11]</code> · ถ้าเรียก <code>yields[12]</code> จะขึ้น <code>IndexError</code></div>
+  </div>
+
+  <div class="card">
+    <h2>🔢 ห้องทดลอง: ลองเรียกค่าตามตำแหน่ง</h2>
+    <div class="row">
+      <div style="max-width:320px">
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">ตำแหน่งที่เรียก (index): <span id="idxLbl" style="color:var(--brand2)">0</span></label>
+        <input type="range" id="idxSlider" min="-2" max="13" step="1" value="0" oninput="runIdx()">
+      </div>
+    </div>
+    <div class="py" id="idxCode" style="margin-top:14px"></div>
+    <div class="out" id="idxOut"><span class="lbl">ผลลัพธ์</span></div>
+    <div class="note" style="margin-top:10px" id="idxNote"></div>
+    <table class="xl" style="margin-top:14px">
+      <thead><tr><th>index</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th></tr></thead>
+      <tbody>
+        <tr><td><b>แปลง</b></td><td>P01</td><td>P02</td><td>P03</td><td>P04</td><td>P05</td><td>P06</td><td>P07</td><td>P08</td><td>P09</td><td>P10</td><td>P11</td><td>P12</td></tr>
+        <tr id="yRow"><td><b>กก./ไร่</b></td><td>198</td><td>187</td><td>172</td><td>192</td><td>177</td><td>194</td><td>176</td><td>191</td><td>164</td><td>177</td><td>164</td><td>171</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>เพิ่ม ลบ และแก้ค่าใน List</h2>
+<div class="py">plots <span class="kw">=</span> [<span class="st">"P01"</span>, <span class="st">"P02"</span>, <span class="st">"P03"</span>]
+
+plots.<span class="fn">append</span>(<span class="st">"P04"</span>)      <span class="cm"># เพิ่มต่อท้าย → ['P01','P02','P03','P04']</span>
+plots.<span class="fn">remove</span>(<span class="st">"P02"</span>)      <span class="cm"># ลบตามค่า      → ['P01','P03','P04']</span>
+plots[<span class="nu">0</span>] <span class="kw">=</span> <span class="st">"P99"</span>          <span class="cm"># แก้ค่าตามตำแหน่ง → ['P99','P03','P04']</span>
+
+<span class="fn">print</span>(plots)</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>['P99', 'P03', 'P04']</div>
+    <div class="note"><code>remove()</code> ต้องระบุ<b>ค่าที่มีอยู่จริง</b> — ถ้าใส่ค่าที่ไม่มีใน list จะขึ้น <code>ValueError</code></div>
+  </div>
+
+  <div class="card">
+    <h2>🗂️ Dictionary — เก็บข้อมูลแบบมีชื่อกำกับ</h2>
+    <p>List เหมาะกับค่าชนิดเดียวกันหลายค่า แต่ถ้าต้องเก็บข้อมูลของแปลงหนึ่งแปลงที่มีหลายอย่างปนกัน ใช้ Dictionary จะอ่านง่ายกว่ามาก</p>
+<div class="py">plot <span class="kw">=</span> {
+    <span class="st">"รหัส"</span>: <span class="st">"P01"</span>,
+    <span class="st">"โรงเรือน"</span>: <span class="st">"A"</span>,
+    <span class="st">"พื้นที่"</span>: <span class="nu">7.0</span>,
+    <span class="st">"ผลผลิต"</span>: <span class="nu">1384</span>,
+    <span class="st">"ของเสีย"</span>: <span class="nu">88</span>
+}
+
+<span class="fn">print</span>(plot[<span class="st">"โรงเรือน"</span>])
+
+<span class="cm"># เพิ่มคีย์ใหม่จากการคำนวณ</span>
+plot[<span class="st">"ต่อไร่"</span>] <span class="kw">=</span> <span class="fn">round</span>(plot[<span class="st">"ผลผลิต"</span>] <span class="kw">/</span> plot[<span class="st">"พื้นที่"</span>])
+plot[<span class="st">"ของเสีย%"</span>] <span class="kw">=</span> <span class="fn">round</span>(plot[<span class="st">"ของเสีย"</span>] <span class="kw">/</span> plot[<span class="st">"ผลผลิต"</span>] <span class="kw">*</span> <span class="nu">100</span>, <span class="nu">1</span>)
+
+<span class="fn">print</span>(plot)</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>A
+{'รหัส': 'P01', 'โรงเรือน': 'A', 'พื้นที่': 7.0, 'ผลผลิต': 1384, 'ของเสีย': 88, 'ต่อไร่': 198, 'ของเสีย%': 6.4}</div>
+    <div class="callout good">🔑 <b>สังเกตให้ดี:</b> Dictionary หนึ่งตัว = <b>ข้อมูลหนึ่งแถวในตาราง</b> โดยที่ชื่อคีย์คือ<b>หัวคอลัมน์</b> · การเพิ่มคีย์ใหม่จากการคำนวณก็คือการ<b>สร้างคอลัมน์คำนวณ</b> เหมือน Calculated Column ที่ทำใน Power BI คาบที่ 4 — เป็นแนวคิดเดียวกันทุกประการ</div>
+  </div>
+
+  <div class="card">
+    <h2>รวมสองอย่างเข้าด้วยกัน = ตารางทั้งใบ</h2>
+<div class="py">plots <span class="kw">=</span> [
+    {<span class="st">"รหัส"</span>: <span class="st">"P01"</span>, <span class="st">"โรงเรือน"</span>: <span class="st">"A"</span>, <span class="st">"ผลผลิต"</span>: <span class="nu">1384</span>, <span class="st">"ของเสีย"</span>: <span class="nu">88</span>},
+    {<span class="st">"รหัส"</span>: <span class="st">"P02"</span>, <span class="st">"โรงเรือน"</span>: <span class="st">"A"</span>, <span class="st">"ผลผลิต"</span>: <span class="nu">1213</span>, <span class="st">"ของเสีย"</span>: <span class="nu">80</span>},
+    {<span class="st">"รหัส"</span>: <span class="st">"P04"</span>, <span class="st">"โรงเรือน"</span>: <span class="st">"B"</span>, <span class="st">"ผลผลิต"</span>: <span class="nu">1249</span>, <span class="st">"ของเสีย"</span>: <span class="nu">82</span>}
+]
+
+<span class="fn">print</span>(plots[<span class="nu">1</span>][<span class="st">"ผลผลิต"</span>])   <span class="cm"># แถวที่ 2 คอลัมน์ผลผลิต</span></div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>1213</div>
+    <div class="callout info">📌 <b>โครงสร้างนี้สำคัญมาก</b> — List ของ Dictionary คือ<b>ตารางข้อมูลเต็มใบ</b> · ในคาบหน้าเราจะเอาโครงสร้างนี้ใส่เข้า Pandas แล้วมันจะกลายเป็นตารางที่สั่งงานได้เหมือน PivotTable ทันที</div>
+    <p class="note" style="margin-top:12px">มีตัวแปรเก็บหลายค่าอีก 2 ชนิดคือ <b>Tuple</b> (เหมือน List แต่แก้ค่าไม่ได้ ใช้กับข้อมูลที่ไม่ควรเปลี่ยน เช่น พิกัด) และ <b>Set</b> (เก็บค่าไม่ซ้ำ ใช้หาว่ามีกี่ค่าที่ต่างกัน) — วิชานี้ไม่ได้ใช้บ่อย รู้ไว้ว่ามีก็พอ</p>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 3</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>สร้าง List ชื่อ <code>houses</code> เก็บชื่อโรงเรือนทั้งสาม แล้วแสดงค่าตัวสุดท้ายโดยไม่นับเอง (ใช้ index ติดลบ)</li>
+      <li>สร้าง Dictionary ของแปลง P09 (โรงเรือน C · พื้นที่ 6.0 ไร่ · ผลผลิต 987 กก. · ของเสีย 71 กก.) แล้วเพิ่มคีย์ <code>"ต่อไร่"</code> และ <code>"ของเสีย%"</code> เข้าไป</li>
+      <li>เก็บ Dictionary ของ P01 P09 และ P12 ไว้ใน List เดียวกัน แล้วแสดงชื่อโรงเรือนของแถวที่สอง</li>
+    </ol>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: วนซ้ำ &amp; ฟังก์ชัน →</button></div>
+</section>
+
+<!-- ===== PAGE 6 ===== -->
+<section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">ทำซ้ำ</span>
+    <h2>🔁 for loop — ทำสิ่งเดียวกันกับทุกค่า</h2>
+    <p class="lead">นี่คือจุดที่ Python เริ่มคุ้มค่ากว่าการลากสูตรใน Excel — เพราะจะมี 12 แปลงหรือ 12,000 แปลง โค้ดก็ยาวเท่าเดิม</p>
+<div class="py">yields <span class="kw">=</span> [<span class="nu">198</span>, <span class="nu">187</span>, <span class="nu">172</span>, <span class="nu">192</span>]
+
+<span class="kw">for</span> y <span class="kw">in</span> yields:
+    <span class="fn">print</span>(<span class="st">f"แปลงนี้ได้ {y} กก./ไร่"</span>)</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>แปลงนี้ได้ 198 กก./ไร่
+แปลงนี้ได้ 187 กก./ไร่
+แปลงนี้ได้ 172 กก./ไร่
+แปลงนี้ได้ 192 กก./ไร่</div>
+    <p><code>y</code> คือชื่อที่เราตั้งเองสำหรับ "ค่าในรอบนี้" · รอบแรก <code>y</code> เป็น 198 รอบที่สองเป็น 187 ไปเรื่อย ๆ จนครบทุกค่า</p>
+  </div>
+
+  <div class="card">
+    <h2>▶️ ห้องทดลอง: ดูลูปทำงานทีละรอบ</h2>
+    <p>โจทย์: หาผลรวมของผลผลิตต่อไร่ทั้ง 12 แปลง — กดเดินทีละรอบเพื่อดูว่าตัวแปร <code>total</code> เปลี่ยนอย่างไร</p>
+<div class="py">yields <span class="kw">=</span> [<span class="nu">198</span>, <span class="nu">187</span>, <span class="nu">172</span>, <span class="nu">192</span>, <span class="nu">177</span>, <span class="nu">194</span>, <span class="nu">176</span>, <span class="nu">191</span>, <span class="nu">164</span>, <span class="nu">177</span>, <span class="nu">164</span>, <span class="nu">171</span>]
+total <span class="kw">=</span> <span class="nu">0</span>
+
+<span class="kw">for</span> y <span class="kw">in</span> yields:
+    total <span class="kw">=</span> total <span class="kw">+</span> y
+
+<span class="fn">print</span>(<span class="st">f"ผลรวม {total} · ค่าเฉลี่ย {total / len(yields):.2f}"</span>)</div>
+    <div class="row" style="margin-top:12px">
+      <div style="flex:0"><button class="btn sm" onclick="loopStep()">▶ เดินหนึ่งรอบ</button></div>
+      <div style="flex:0"><button class="btn sm ghost" onclick="loopAll()">⏩ รันจนจบ</button></div>
+      <div style="flex:0"><button class="btn sm ghost" onclick="loopReset()">🔄 เริ่มใหม่</button></div>
+    </div>
+    <div class="kv" style="margin-top:14px">
+      <div class="box"><div class="v" id="lpRound">0</div><div class="l">รอบที่</div></div>
+      <div class="box"><div class="v" id="lpY">—</div><div class="l">ค่า y ในรอบนี้</div></div>
+      <div class="box"><div class="v" id="lpTotal">0</div><div class="l">total สะสม</div></div>
+    </div>
+    <div class="out" id="lpOut" style="margin-top:14px"><span class="lbl">ผลลัพธ์</span>กด "เดินหนึ่งรอบ" เพื่อเริ่ม</div>
+  </div>
+
+  <div class="card">
+    <h2>ฟังก์ชันสำเร็จรูป — งานเดียวกันใน 1 บรรทัด</h2>
+    <p>สิ่งที่ลูปข้างบนทำ Python มีคำสั่งสำเร็จรูปให้อยู่แล้ว · คลิกดูทีละตัวได้เลย — <b>ทุกค่าคำนวณจากผลผลิตต่อไร่ 12 แปลงชุดเดียวกับที่ใช้ในคาบ 5</b></p>
+    <div class="fn-list" id="fnList"></div>
+    <div class="py" id="fnCode"></div>
+    <div class="out" id="fnOut"><span class="lbl">ผลลัพธ์</span></div>
+    <div class="note" style="margin-top:10px" id="fnNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>✅ ตรวจคำตอบกับคาบที่ 5</h2>
+    <p>ในคาบ 5 เราคำนวณสถิติของ 12 แปลงนี้ด้วย Excel — ตอนนี้ลองเทียบกัน</p>
+    <table class="xl">
+      <thead><tr><th>ค่าที่คำนวณ</th><th>Excel (คาบ 5)</th><th>Python (คาบนี้)</th><th>ตรงกันไหม</th></tr></thead>
+      <tbody>
+        <tr><td>ค่าเฉลี่ย</td><td>=AVERAGE(...) → 180.25</td><td>sum / len → 180.25</td><td class="hl">✓ ตรงกัน</td></tr>
+        <tr><td>ค่าสูงสุด</td><td>=MAX(...) → 198</td><td>max() → 198</td><td class="hl">✓ ตรงกัน</td></tr>
+        <tr><td>ค่าต่ำสุด</td><td>=MIN(...) → 164</td><td>min() → 164</td><td class="hl">✓ ตรงกัน</td></tr>
+        <tr><td>พิสัย</td><td>=MAX−MIN → 34</td><td>max() − min() → 34</td><td class="hl">✓ ตรงกัน</td></tr>
+        <tr><td>จำนวนข้อมูล</td><td>=COUNT(...) → 12</td><td>len() → 12</td><td class="hl">✓ ตรงกัน</td></tr>
+      </tbody>
+    </table>
+    <div class="callout good">🎯 <b>นี่คือประเด็นสำคัญที่สุดของคาบนี้</b> — เครื่องมือเปลี่ยน แต่คำตอบไม่เปลี่ยน · ความรู้ทางสถิติที่ได้จากคาบ 5 ยังใช้ได้ทั้งหมด สิ่งที่เพิ่มเข้ามาคือวิธีสั่งงานที่ทำซ้ำได้และขยายขนาดได้</div>
+  </div>
+
+  <div class="card">
+    <h2>เขียนฟังก์ชันของตัวเองด้วย def</h2>
+    <p>ถ้ามีการคำนวณที่ต้องใช้ซ้ำหลายที่ ให้เก็บไว้เป็นฟังก์ชัน จะได้ไม่ต้องเขียนซ้ำและแก้ที่เดียวจบ</p>
+<div class="py"><span class="kw">def</span> <span class="fn">yield_per_rai</span>(kg, rai):
+    <span class="kw">return</span> <span class="fn">round</span>(kg <span class="kw">/</span> rai, <span class="nu">1</span>)
+
+<span class="fn">print</span>(<span class="fn">yield_per_rai</span>(<span class="nu">1384</span>, <span class="nu">7.0</span>))
+<span class="fn">print</span>(<span class="fn">yield_per_rai</span>(<span class="nu">987</span>, <span class="nu">6.0</span>))</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>197.7
+164.5</div>
+    <ul>
+      <li><code>def</code> คือคำสั่งเริ่มสร้างฟังก์ชัน · <code>yield_per_rai</code> คือชื่อที่เราตั้ง</li>
+      <li><code>kg</code> และ <code>rai</code> คือ<b>พารามิเตอร์</b> — ค่าที่ฟังก์ชันต้องการรับเข้ามา</li>
+      <li><code>return</code> คือการ<b>ส่งค่ากลับ</b> ให้จุดที่เรียกใช้เอาไปทำต่อได้</li>
+    </ul>
+    <div class="note">คาบหน้าจะเปิดด้วยหัวข้อนี้อีกครั้ง แล้วต่อยอดไปสู่ไลบรารี ซึ่งก็คือฟังก์ชันที่คนอื่นเขียนไว้ให้เราใช้แล้วนั่นเอง</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 4</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>ใช้ <code>for</code> วนหาว่ามี<b>กี่แปลง</b>ที่ผลผลิตต่อไร่ต่ำกว่าค่าเฉลี่ย (180.25)</li>
+      <li>เขียนฟังก์ชัน <code>waste_pct(waste_kg, total_kg)</code> ที่คืนค่าเปอร์เซ็นต์ของเสียเป็นทศนิยม 1 ตำแหน่ง แล้วทดสอบกับแปลง P06 (100 / 1361)</li>
+      <li>ใช้ List ของ Dictionary ทั้ง 6 แปลงด้านล่าง วนลูปแล้ว<b>แสดงเฉพาะแปลงที่ของเสียเกิน 7%</b></li>
+    </ol>
+    <h3>ข้อมูลตั้งต้นสำหรับข้อ 3 (คัดลอกไปใช้ได้เลย)</h3>
+    <button class="btn sm ghost" style="margin-bottom:10px" onclick="copyCode('plotsCode6', this)">📋 คัดลอกโค้ด</button>
+<div class="py" id="plotsCode6">plots <span class="kw">=</span> [
+    {<span class="st">"รหัส"</span>:<span class="st">"P01"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">7.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1384</span>, <span class="st">"ของเสีย"</span>:<span class="nu">88</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P02"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1213</span>, <span class="st">"ของเสีย"</span>:<span class="nu">80</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P03"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1030</span>, <span class="st">"ของเสีย"</span>:<span class="nu">63</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P04"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1249</span>, <span class="st">"ของเสีย"</span>:<span class="nu">82</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P05"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1063</span>, <span class="st">"ของเสีย"</span>:<span class="nu">66</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P06"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">7.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1361</span>, <span class="st">"ของเสีย"</span>:<span class="nu">100</span>}
+]</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: งานส่งท้ายคาบ →</button></div>
+</section>
+
+<!-- ===== PAGE 7 ===== -->
+<section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">งานส่ง</span>
+    <h2>📤 สมุด Colab ของ 12 แปลง</h2>
+    <p class="lead">สร้างไฟล์ Colab หนึ่งไฟล์ที่คำนวณและจัดกลุ่มแปลงทั้ง 12 แปลงของนำชัยฟาร์ม ไตรมาส 2 ปี 2569</p>
+    <div class="callout info">🎯 <b>เป้าหมายของงานชิ้นนี้ไม่ใช่ความยาก แต่คือความพร้อม</b> — เนื้อหาคาบ 8 จะเร็วขึ้นมาก ถ้าคุณใช้ Colab คล่องแล้ว งานนี้จึงเป็นการตรวจว่าทุกคนรันโค้ด แก้ error และแชร์ไฟล์เป็นก่อนเข้าคาบหน้า</div>
+
+    <h3>ข้อมูลตั้งต้น (คัดลอกไปใช้ได้เลย)</h3>
+    <button class="btn sm ghost" style="margin-bottom:10px" onclick="copyCode('plotsCode12', this)">📋 คัดลอกโค้ด</button>
+<div class="py" id="plotsCode12">plots <span class="kw">=</span> [
+    {<span class="st">"รหัส"</span>:<span class="st">"P01"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">7.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1384</span>, <span class="st">"ของเสีย"</span>:<span class="nu">88</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P02"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1213</span>, <span class="st">"ของเสีย"</span>:<span class="nu">80</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P03"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1030</span>, <span class="st">"ของเสีย"</span>:<span class="nu">63</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P04"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1249</span>, <span class="st">"ของเสีย"</span>:<span class="nu">82</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P05"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1063</span>, <span class="st">"ของเสีย"</span>:<span class="nu">66</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P06"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">7.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1361</span>, <span class="st">"ของเสีย"</span>:<span class="nu">100</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P07"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1143</span>, <span class="st">"ของเสีย"</span>:<span class="nu">80</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P08"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"C"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1240</span>, <span class="st">"ของเสีย"</span>:<span class="nu">88</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P09"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"C"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">987</span>,  <span class="st">"ของเสีย"</span>:<span class="nu">71</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P10"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"C"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1064</span>, <span class="st">"ของเสีย"</span>:<span class="nu">76</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P11"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"C"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">982</span>,  <span class="st">"ของเสีย"</span>:<span class="nu">70</span>},
+    {<span class="st">"รหัส"</span>:<span class="st">"P12"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1024</span>, <span class="st">"ของเสีย"</span>:<span class="nu">73</span>}
+]</div>
+
+    <h3>สิ่งที่ต้องมีในไฟล์</h3>
+    <div class="must">
+      <table>
+        <thead><tr><th>ข้อ</th><th>สิ่งที่ต้องทำ</th></tr></thead>
+        <tbody>
+          <tr><td>1 · คำนวณ</td><td>วนลูปเพิ่มคีย์ <code>"ต่อไร่"</code> และ <code>"ของเสีย%"</code> ให้ทุกแปลง (ทศนิยม 1 ตำแหน่ง)</td></tr>
+          <tr><td>2 · จัดกลุ่ม</td><td>เพิ่มคีย์ <code>"กลุ่ม"</code> โดยใช้ if/elif/else ตามเกณฑ์ของเสีย: ไม่เกิน 6.5% = ดีมาก · เกิน 6.5 ถึง 8% = ผ่านเกณฑ์ · เกิน 8% = ต้องแก้ไข</td></tr>
+          <tr><td>3 · สรุปภาพรวม</td><td>แสดง<b>ค่าเฉลี่ย ค่าสูงสุด ค่าต่ำสุด และพิสัย</b>ของผลผลิตต่อไร่ทั้ง 12 แปลง</td></tr>
+          <tr><td>4 · คัดกรอง</td><td>แสดงรายชื่อเฉพาะแปลงที่<b>ผลผลิตต่อไร่ต่ำกว่าค่าเฉลี่ย</b> พร้อมบอกว่ามีกี่แปลง</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>✅ เช็กลิสต์ก่อนส่ง</h3>
+    <ul class="chk">
+      <li>รันทุกเซลล์ตั้งแต่บนลงล่างแล้วไม่มีสีแดง (ถ้ามี error เหลือค้าง แปลว่ายังไม่เสร็จ)</li>
+      <li>ตัวเลขที่แสดงมีทศนิยมตามที่โจทย์กำหนด ไม่ใช่ทศนิยมยาวเต็มหน้าจอ</li>
+      <li>ชื่อไฟล์ตั้งเป็น <code>BDA7_รหัสนิสิต_ชื่อ</code></li>
+      <li>กดแชร์แล้วตั้งเป็น "ทุกคนที่มีลิงก์ · ผู้อ่าน" — <b>ลองเปิดลิงก์ในโหมดไม่ระบุตัวตนเพื่อตรวจว่าเปิดได้จริง</b></li>
+    </ul>
+    <div class="callout">📮 <b>ส่งงาน:</b> ส่งลิงก์ Colab ผ่านช่องทางที่อาจารย์แจ้งในคาบ · กำหนดส่ง: ก่อนเริ่มคาบที่ 8 · <b>ทำคนเดียว</b></div>
+    <div class="callout bad">🚫 <b>ข้อผิดพลาดที่พบบ่อย:</b> ลืมตั้งค่าแชร์ทำให้เปิดไม่ได้ · ลืม <code>round()</code> ทำให้ทศนิยมยาว · ใช้ <code>=</code> แทน <code>==</code> ในเงื่อนไข · เว้นวรรคหน้าบรรทัดไม่เท่ากันในบล็อกเดียวกัน</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn" onclick="go(8)">ถัดไป: แบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 8 : QUIZ ===== -->
+<section class="page" id="p8">
+  <div class="card">
+    <span class="kicker">ทบทวน</span>
+    <h2>📝 แบบทดสอบครั้งที่ 7</h2>
+    <p class="lead">10 ข้อ · เลือกคำตอบแล้วดูเฉลยทันที</p>
+    <div id="quizWrap"></div>
+    <div class="scorebox" id="scorebox">
+      <div>คะแนนของคุณ</div>
+      <div class="big" id="scoreNum"></div>
+      <div id="scoreMsg"></div>
+      <div class="qz-submit-wrap">
+        <button class="btn" id="qz_btn" style="background:#fff;color:#15803d" onclick="submitQuizScore()">📤 ส่งคะแนนเข้า Google Form</button>
+        <button class="btn ghost" id="resetQuiz" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)">🔄 ทำใหม่อีกครั้ง</button>
+      </div>
+      <div class="qz-msg" id="qz_msg"></div>
+      <iframe name="qz_target" id="qz_target" style="display:none" title="hidden"></iframe>
+      <form id="qz_form" action="https://docs.google.com/forms/d/e/1FAIpQLScNK8O5LDaiDXo53N9sAne9Uw_wc8-QpnnB2mJ6RI4OiazekQ/formResponse" method="POST" target="qz_target" style="display:none">
+        <input type="hidden" name="entry.893657035" id="qz_f_student">
+        <input type="hidden" name="entry.1362746898" id="qz_f_score">
+        <input type="hidden" name="fvv" value="1">
+        <input type="hidden" name="pageHistory" value="0">
+      </form>
+    </div>
+  </div>
+  <div class="foot">Business Data Analytics · ครั้งที่ 7 — Python พื้นฐานกับข้อมูลฟาร์ม</div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← กลับหน้าแรก</button><span></span></div>
+</section>
+
+</main>
+
+<script>
+/* ===== ข้อมูล 12 แปลง · ไตรมาส 2 ปี 2569 · BDA_class5_FarmData.xlsx ===== */
+var PLOTS = [
+ {id:'P01', h:'A', rai:7.0, kg:1384, w:88},
+ {id:'P02', h:'A', rai:6.5, kg:1213, w:80},
+ {id:'P03', h:'A', rai:6.0, kg:1030, w:63},
+ {id:'P04', h:'B', rai:6.5, kg:1249, w:82},
+ {id:'P05', h:'B', rai:6.0, kg:1063, w:66},
+ {id:'P06', h:'B', rai:7.0, kg:1361, w:100},
+ {id:'P07', h:'B', rai:6.5, kg:1143, w:80},
+ {id:'P08', h:'C', rai:6.5, kg:1240, w:88},
+ {id:'P09', h:'C', rai:6.0, kg:987,  w:71},
+ {id:'P10', h:'C', rai:6.0, kg:1064, w:76},
+ {id:'P11', h:'C', rai:6.0, kg:982,  w:70},
+ {id:'P12', h:'A', rai:6.0, kg:1024, w:73}
+];
+var YIELDS = [198,187,172,192,177,194,176,191,164,177,164,171];
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function out(el, txt){ document.getElementById(el).innerHTML = '<span class="lbl">ผลลัพธ์</span>'+esc(txt); }
+
+function copyCode(id, btn){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var text = el.innerText;
+  function done(ok){
+    var old = btn.textContent;
+    btn.textContent = ok ? '✅ คัดลอกแล้ว' : '⚠️ คัดลอกไม่สำเร็จ ลองเลือกข้อความเอง';
+    btn.disabled = true;
+    setTimeout(function(){ btn.textContent = old; btn.disabled = false; }, 1500);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ fallbackCopyText(text, done); });
+  } else {
+    fallbackCopyText(text, done);
+  }
+}
+function fallbackCopyText(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  cb(ok);
+}
+
+/* ===== PAGE 4 : condition ===== */
+(function(){
+  var box=document.getElementById('wPresets'); if(!box) return;
+  var presets=[{l:'P01 (6.4%)',v:6.4},{l:'P06 (7.3%)',v:7.3},{l:'โรงเรือน B Q2/2570 (15.7%)',v:15.7}];
+  presets.forEach(function(p){
+    var b=document.createElement('button'); b.className='badge'; b.style.cssText='cursor:pointer;border:1px solid var(--line)';
+    b.textContent=p.l;
+    b.addEventListener('click',function(){ document.getElementById('wSlider').value=p.v; runCond(); });
+    box.appendChild(b);
+  });
+})();
+function runCond(){
+  var w = parseFloat(document.getElementById('wSlider').value);
+  document.getElementById('wLbl').textContent = w.toFixed(1);
+  var line = w<=6.5 ? 1 : (w<=8 ? 2 : 3);
+  var res  = w<=6.5 ? 'ดีมาก' : (w<=8 ? 'ผ่านเกณฑ์' : 'ต้องแก้ไข');
+  function L(n, html){ return (n===line ? '<span class="hi">'+html+'</span>' : html); }
+  document.getElementById('condCode').innerHTML =
+    'waste <span class="kw">=</span> <span class="nu">'+w.toFixed(1)+'</span>\n\n'+
+    '<span class="kw">if</span> waste <span class="kw">&lt;=</span> <span class="nu">6.5</span>:\n'+
+    L(1,'    <span class="fn">print</span>(<span class="st">"ดีมาก"</span>)')+'\n'+
+    '<span class="kw">elif</span> waste <span class="kw">&lt;=</span> <span class="nu">8</span>:\n'+
+    L(2,'    <span class="fn">print</span>(<span class="st">"ผ่านเกณฑ์"</span>)')+'\n'+
+    '<span class="kw">else</span>:\n'+
+    L(3,'    <span class="fn">print</span>(<span class="st">"ต้องแก้ไข"</span>)');
+  out('condOut', res);
+  var msg;
+  if(line===1) msg='ต่ำกว่าเกณฑ์แรก → เข้าเงื่อนไข <code>if</code> ตัวแรกแล้ว<b>หยุดทันที</b> ไม่ไปดู elif หรือ else อีก';
+  else if(line===2) msg='ไม่เข้าเงื่อนไขแรก → ไปตรวจ <code>elif</code> ซึ่งเป็นจริง จึงทำงานบรรทัดนี้ · <b>สังเกตว่าไม่ต้องเขียนว่า "มากกว่า 6.5 และไม่เกิน 8" เพราะการที่มาถึง elif ได้ แปลว่าเงื่อนไขแรกเป็นเท็จอยู่แล้ว</b>';
+  else msg='ไม่เข้าเงื่อนไขใดเลย → ตกมาที่ <code>else</code> · ค่านี้เกินเป้าฟาร์ม 8% แล้ว ถ้าเป็นการรันจริงควรมีการแจ้งเตือนออกไปด้วย';
+  document.getElementById('condNote').innerHTML = msg;
+}
+
+/* ===== PAGE 5 : index ===== */
+function runIdx(){
+  var i = parseInt(document.getElementById('idxSlider').value,10);
+  document.getElementById('idxLbl').textContent = i;
+  document.getElementById('idxCode').innerHTML =
+    'yields <span class="kw">=</span> [<span class="nu">198</span>, <span class="nu">187</span>, <span class="nu">172</span>, <span class="nu">192</span>, <span class="nu">177</span>, <span class="nu">194</span>, <span class="nu">176</span>, <span class="nu">191</span>, <span class="nu">164</span>, <span class="nu">177</span>, <span class="nu">164</span>, <span class="nu">171</span>]\n\n'+
+    '<span class="fn">print</span>(yields[<span class="nu">'+i+'</span>])';
+  var n=YIELDS.length, real = i>=0 ? i : n+i, note;
+  var cells = document.querySelectorAll('#yRow td');
+  cells.forEach(function(td,k){ if(k>0) td.className=''; });
+  if(real>=0 && real<n){
+    out('idxOut', String(YIELDS[real]));
+    if(cells[real+1]) cells[real+1].className='hl';
+    note = i>=0
+      ? 'ตำแหน่ง '+i+' คือค่าลำดับที่ <b>'+(i+1)+'</b> (แปลง '+PLOTS[real].id+') — เพราะนับเริ่มจาก 0'
+      : 'ตัวเลขติดลบคือการนับจาก<b>ท้าย</b>เข้ามา · <code>-1</code> คือค่าสุดท้ายเสมอ ไม่ต้องรู้ว่ามีกี่ค่า (ตรงนี้คือแปลง '+PLOTS[real].id+')';
+  } else {
+    out('idxOut', 'IndexError: list index out of range');
+    note = '❌ เกินขอบเขต — มี 12 ค่า ตำแหน่งที่ใช้ได้คือ <b>0 ถึง 11</b> (หรือ -1 ถึง -12) · นี่คือ error ที่เจอบ่อยเวลาลืมว่าเริ่มนับจาก 0';
+  }
+  document.getElementById('idxNote').innerHTML = note;
+}
+
+/* ===== PAGE 6 : loop stepper ===== */
+var lpI=0, lpTotal=0, lpLog=[];
+function loopRender(msg){
+  document.getElementById('lpRound').textContent = lpI;
+  document.getElementById('lpY').textContent = lpI>0 ? YIELDS[lpI-1] : '—';
+  document.getElementById('lpTotal').textContent = lpTotal.toLocaleString();
+  out('lpOut', msg);
+}
+function loopStep(){
+  if(lpI>=YIELDS.length){ loopRender(lpLog.join('\n')); return; }
+  lpTotal += YIELDS[lpI]; lpI++;
+  lpLog.push('รอบที่ '+lpI+' : y = '+YIELDS[lpI-1]+'  →  total = '+lpTotal);
+  if(lpI===YIELDS.length) lpLog.push('\nผลรวม '+lpTotal+' · ค่าเฉลี่ย '+(lpTotal/YIELDS.length).toFixed(2));
+  loopRender(lpLog.join('\n'));
+}
+function loopAll(){ while(lpI<YIELDS.length) loopStep(); }
+function loopReset(){ lpI=0; lpTotal=0; lpLog=[]; loopRender('กด "เดินหนึ่งรอบ" เพื่อเริ่ม'); }
+
+/* ===== PAGE 6 : builtin functions ===== */
+var FNS=[
+ {n:'sum()',    code:'<span class="fn">sum</span>(yields)', val:function(){var s=0;YIELDS.forEach(function(v){s+=v;});return s;},
+  note:'ผลรวมทั้งหมด — ทำงานเหมือน <code>=SUM()</code> ใน Excel และให้ผลเท่ากับลูปข้างบนทุกประการ'},
+ {n:'len()',    code:'<span class="fn">len</span>(yields)', val:function(){return YIELDS.length;},
+  note:'นับจำนวนค่าใน list — เท่ากับ <code>=COUNT()</code> · ใช้คู่กับ sum() เพื่อหาค่าเฉลี่ย'},
+ {n:'max()',    code:'<span class="fn">max</span>(yields)', val:function(){return Math.max.apply(null,YIELDS);},
+  note:'ค่าสูงสุด = 198 กก./ไร่ คือแปลง P01 ซึ่งเป็นแปลงที่ดีที่สุดของฟาร์มในไตรมาสนี้'},
+ {n:'min()',    code:'<span class="fn">min</span>(yields)', val:function(){return Math.min.apply(null,YIELDS);},
+  note:'ค่าต่ำสุด = 164 กก./ไร่ มีสองแปลงที่ได้ค่านี้คือ P09 และ P11 ทั้งคู่อยู่โรงเรือน C'},
+ {n:'sorted()', code:'<span class="fn">sorted</span>(yields)', val:function(){return '['+YIELDS.slice().sort(function(a,b){return a-b;}).join(', ')+']';},
+  note:'เรียงจากน้อยไปมาก — <b>ไม่ได้แก้ list เดิม</b> แต่คืนค่าเป็น list ใหม่ · ใส่ <code>reverse=True</code> เพื่อเรียงจากมากไปน้อย'},
+ {n:'ค่าเฉลี่ย', code:'<span class="fn">sum</span>(yields) <span class="kw">/</span> <span class="fn">len</span>(yields)', val:function(){var s=0;YIELDS.forEach(function(v){s+=v;});return (s/YIELDS.length).toFixed(2);},
+  note:'Python ไม่มีคำสั่งหาค่าเฉลี่ยในตัว ต้องเขียนเอง — <b>คาบหน้าจะมี <code>mean()</code> จากไลบรารีให้ใช้</b> · ค่านี้ตรงกับ 180.25 ที่คำนวณด้วย AVERAGE ในคาบ 5'},
+ {n:'พิสัย',    code:'<span class="fn">max</span>(yields) <span class="kw">-</span> <span class="fn">min</span>(yields)', val:function(){return Math.max.apply(null,YIELDS)-Math.min.apply(null,YIELDS);},
+  note:'พิสัย = 34 กก./ไร่ · ตรงกับที่หาไว้ในคาบ 5 · พิสัยบอกช่วงกว้างของข้อมูล แต่ดูแค่สองค่าสุดขอบ จึงไวต่อค่าผิดปกติมาก'}
+];
+(function(){
+  var box=document.getElementById('fnList'); if(!box) return;
+  FNS.forEach(function(f,i){
+    var b=document.createElement('button'); b.textContent=f.n;
+    b.addEventListener('click',function(){
+      box.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); showFn(i);
+    });
+    box.appendChild(b);
+  });
+})();
+function showFn(i){
+  var f=FNS[i];
+  document.getElementById('fnCode').innerHTML =
+    'yields <span class="kw">=</span> [<span class="nu">198</span>, <span class="nu">187</span>, <span class="nu">172</span>, <span class="nu">192</span>, <span class="nu">177</span>, <span class="nu">194</span>, <span class="nu">176</span>, <span class="nu">191</span>, <span class="nu">164</span>, <span class="nu">177</span>, <span class="nu">164</span>, <span class="nu">171</span>]\n\n'+
+    '<span class="fn">print</span>('+f.code+')';
+  out('fnOut', String(f.val()));
+  document.getElementById('fnNote').innerHTML = f.note;
+}
+</script>
+
+<script>
+/* ===== QUIZ ===== */
+var QUIZ=[
+ {q:'ข้อใดอธิบายความต่างระหว่าง Power Query กับ Python ได้ถูกต้องที่สุด สำหรับงานวิเคราะห์ข้อมูลฟาร์ม?',
+  a:['Python ทำงานได้เร็วกว่าในทุกกรณี จึงควรเลิกใช้ Power Query ตั้งแต่คาบนี้เป็นต้นไป','Power Query เหมาะกับงานทำความสะอาดที่ทำซ้ำประจำ ส่วน Python ทำได้เพิ่มคือการสร้างแบบจำลองทำนาย','Power Query ใช้ได้เฉพาะไฟล์ Excel ส่วน Python ใช้ได้เฉพาะไฟล์ CSV เท่านั้น','ทั้งสองอย่างทำงานได้เหมือนกันทุกประการ ต่างกันแค่หน้าตาของโปรแกรมที่ใช้'],
+  c:1, e:'Power Query ยังเป็นเครื่องมือที่ดีมากสำหรับงาน ETL ประจำเดือน และคนที่ไม่เขียนโค้ดก็ใช้ต่อได้ · สิ่งที่ Python เพิ่มเข้ามาและเครื่องมืออื่นทำไม่ได้คือการสร้างแบบจำลองเพื่อพยากรณ์'},
+ {q:'ใน Colab นิสิตเขียนโค้ดสร้างตัวแปรไว้ที่เซลล์ที่ 2 แล้วข้ามไปรันเซลล์ที่ 5 ที่เรียกใช้ตัวแปรนั้น ผลจะเป็นอย่างไร?',
+  a:['ทำงานได้ปกติ เพราะ Colab จะรันเซลล์ก่อนหน้าให้อัตโนมัติทั้งหมด','ขึ้น NameError เพราะยังไม่ได้รันเซลล์ที่สร้างตัวแปรนั้น','ขึ้น TypeError เพราะ Colab ไม่รู้ว่าตัวแปรเป็นข้อมูลชนิดใด','ทำงานได้แต่ผลลัพธ์จะเป็นค่าว่าง เพราะตัวแปรยังไม่มีค่าที่กำหนดไว้'],
+  c:1, e:'Colab จำเฉพาะเซลล์ที่รันไปแล้วเท่านั้น ไม่ได้รันย้อนหลังให้ · เมื่อเจอ NameError ให้ตรวจสองอย่าง คือสะกดชื่อถูกไหม และรันเซลล์ที่สร้างตัวแปรนั้นแล้วหรือยัง'},
+ {q:'โค้ด print(f"ของเสีย {waste:.1f}%") โดยที่ waste มีค่า 6.36 จะแสดงผลอย่างไร?',
+  a:['ของเสีย 6.36%','ของเสีย 6.4%','ของเสีย {waste:.1f}%','ของเสีย 6%'],
+  c:1, e:'f-string จะแทนค่าตัวแปรที่อยู่ในวงเล็บปีกกา และ :.1f คือการแสดงทศนิยม 1 ตำแหน่งโดยปัดค่าให้ · การกำหนดทศนิยมเองทำให้รายงานอ่านง่ายและดูเป็นมืออาชีพกว่าการแสดงค่าดิบ'},
+ {q:'นิสิตเขียน total = input("ปริมาณ: ") แล้วนำ total ไปหารด้วยพื้นที่ทันที จะเกิดอะไรขึ้น?',
+  a:['ได้ผลลัพธ์ถูกต้องตามปกติ เพราะ Python แปลงชนิดข้อมูลให้เองอัตโนมัติ','ขึ้น TypeError เพราะค่าที่ได้จาก input เป็นข้อความ ต้องแปลงเป็นตัวเลขก่อน','ขึ้น NameError เพราะยังไม่ได้ประกาศชนิดของตัวแปร total ไว้ล่วงหน้า','ได้ผลลัพธ์เป็นข้อความที่ต่อกันไปเรื่อย ๆ ตามจำนวนครั้งที่หาร'],
+  c:1, e:'input() คืนค่าเป็นข้อความเสมอ แม้ผู้ใช้จะพิมพ์ตัวเลขก็ตาม · ต้องครอบด้วย int() หรือ float() ก่อนนำไปคำนวณทุกครั้ง'},
+ {q:'ถ้า yields = [198, 187, 172, 192] แล้วสั่ง print(yields[2]) จะได้ค่าใด?',
+  a:['198 เพราะเป็นค่าตัวแรกของ list ที่ถูกสร้างขึ้นมา','187 เพราะเป็นค่าลำดับที่สองนับจากซ้ายมือ','172 เพราะการนับตำแหน่งใน Python เริ่มจาก 0','192 เพราะเป็นค่าลำดับสุดท้ายที่อยู่ใน list'],
+  c:2, e:'Python นับตำแหน่งเริ่มจาก 0 ดังนั้นตำแหน่งที่ 2 คือค่าลำดับที่ 3 · เรื่องนี้เป็นสาเหตุของความผิดพลาดที่พบบ่อยที่สุดในผู้เริ่มต้น จำไว้ว่าค่าสุดท้ายเรียกด้วย -1 ได้เสมอ'},
+ {q:'จากโค้ด plot = {"รหัส":"P01", "ผลผลิต":1384} ถ้าต้องการเพิ่มคีย์ใหม่ชื่อ "ต่อไร่" ต้องเขียนอย่างไร?',
+  a:['plot.append("ต่อไร่", 198) เพื่อเพิ่มคีย์และค่าเข้าไปพร้อมกัน','plot["ต่อไร่"] = 198 เป็นการกำหนดค่าให้คีย์ใหม่โดยตรง','plot.add("ต่อไร่" : 198) ตามรูปแบบของ Dictionary','plot = plot + {"ต่อไร่": 198} เพื่อรวมสองชุดเข้าด้วยกัน'],
+  c:1, e:'Dictionary เพิ่มคีย์ใหม่ด้วยการกำหนดค่าให้คีย์ที่ยังไม่มีได้เลย ส่วน append() เป็นคำสั่งของ List ไม่ใช่ Dictionary · การเพิ่มคีย์จากการคำนวณคือแนวคิดเดียวกับ Calculated Column ในคาบ 4'},
+ {q:'โครงสร้าง List ของ Dictionary เช่น [{"รหัส":"P01",...}, {"รหัส":"P02",...}] เทียบได้กับอะไรในสิ่งที่เคยเรียนมา?',
+  a:['สูตร VLOOKUP ที่ดึงค่าจากตารางอื่นมาแสดงในตารางปัจจุบัน','ตารางข้อมูลหนึ่งใบ โดยแต่ละ Dictionary คือหนึ่งแถว และคีย์คือหัวคอลัมน์','กราฟแท่งที่แสดงค่าของแต่ละแปลงเรียงต่อกันตามลำดับ','ตัวกรอง Filter ที่เลือกแสดงเฉพาะแถวที่ตรงเงื่อนไข'],
+  c:1, e:'นี่คือโครงสร้างที่สำคัญที่สุดของคาบนี้ เพราะคาบหน้าจะเอาโครงสร้างเดียวกันนี้ใส่เข้า Pandas แล้วมันจะกลายเป็นตารางที่สั่งงานได้เหมือน PivotTable'},
+ {q:'ในโค้ด for y in yields: total = total + y  ตัวแปร y คืออะไร?',
+  a:['ชื่อของ list ที่กำลังถูกวนซ้ำอยู่ในขณะนั้น','ค่าที่ถูกหยิบออกมาจาก list ในแต่ละรอบของการวน','จำนวนรอบทั้งหมดที่ลูปจะต้องทำงานจนจบ','ตำแหน่งของข้อมูลใน list ซึ่งเริ่มนับจากเลข 0'],
+  c:1, e:'y คือชื่อที่เราตั้งเองสำหรับ "ค่าในรอบนี้" · รอบแรก y เป็นค่าแรกของ list รอบที่สองเป็นค่าที่สอง ไปเรื่อย ๆ จนครบ · ถ้าต้องการตำแหน่งด้วยจะใช้ enumerate() ซึ่งจะเจอในคาบถัดไป'},
+ {q:'ผลผลิตต่อไร่ 12 แปลงคือ [198,187,172,192,177,194,176,191,164,177,164,171] คำสั่งใดให้ค่าพิสัยของข้อมูลชุดนี้?',
+  a:['max(yields) - min(yields) ซึ่งได้ค่าเท่ากับ 34','sum(yields) / len(yields) ซึ่งได้ค่าเท่ากับ 180.25','sorted(yields)[0] ซึ่งได้ค่าเท่ากับ 164','len(yields) ซึ่งได้ค่าเท่ากับ 12'],
+  c:0, e:'พิสัยคือผลต่างระหว่างค่ามากที่สุดกับน้อยที่สุด = 198 − 164 = 34 · ตรงกับที่คำนวณด้วย Excel ในคาบ 5 · ข้อ b คือค่าเฉลี่ย ข้อ c คือค่าต่ำสุด ข้อ d คือจำนวนข้อมูล'},
+ {q:'เหตุใดจึงควรใช้ตัวแปรแทนการพิมพ์ตัวเลขลงในสูตรโดยตรง เช่น เขียน kg / rai แทน 1384 / 7.0?',
+  a:['เพราะการพิมพ์ตัวเลขตรง ๆ ลงในโค้ดจะทำให้ Python ขึ้นข้อความแจ้งเตือน','เพราะโค้ดชุดเดิมนำไปใช้กับข้อมูลชุดอื่นได้ทันทีโดยแก้ที่จุดเดียว','เพราะตัวแปรจะทำให้โปรแกรมประมวลผลได้เร็วกว่าการใช้ตัวเลขคงที่','เพราะ Python ไม่อนุญาตให้ใช้เครื่องหมายหารกับตัวเลขที่พิมพ์เข้าไปเอง'],
+  c:1, e:'นี่คือหลักการเดียวกับการอ้างอิงเซลล์ใน Excel แทนการพิมพ์ตัวเลขลงในสูตร · เมื่อข้อมูลเปลี่ยน แก้ที่จุดเดียวแล้วผลลัพธ์ทุกจุดที่เกี่ยวข้องเปลี่ยนตาม ลดโอกาสผิดพลาดได้มาก'}
+];
+</script>
+
+<script>
+/* ===== navigation ===== */
+var PAGES = document.querySelectorAll('section.page');
+var TABS  = document.querySelectorAll('#tabs button');
+function go(i){
+  if(i<0) i=0; if(i>=PAGES.length) i=PAGES.length-1;
+  PAGES.forEach(function(p,k){ p.classList.toggle('active', k===i); });
+  TABS.forEach(function(b,k){ b.classList.toggle('active', k===i); });
+  document.getElementById('pbar').style.width = ((i+1)/PAGES.length*100)+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(typeof onPage==='function') onPage(i);
+}
+function onPage(i){
+  if(i===4) runCond();
+  if(i===5) runIdx();
+  if(i===6){ if(lpI===0) loopReset(); if(!document.querySelector('#fnList button.on')){ var b=document.querySelector('#fnList button'); if(b) b.click(); } }
+}
+TABS.forEach(function(b){ b.addEventListener('click', function(){ go(+b.dataset.p); }); });
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  var cur = 0; PAGES.forEach(function(p,k){ if(p.classList.contains('active')) cur=k; });
+  if(e.key==='ArrowRight') go(cur+1);
+  if(e.key==='ArrowLeft')  go(cur-1);
+});
+go(0);
+
+/* ===== quiz engine ===== */
+(function(){
+  var wrap = document.getElementById('quizWrap');
+  if(!wrap || typeof QUIZ==='undefined') return;
+  var answered = 0, score = 0;
+  QUIZ.forEach(function(q, qi){
+    var d = document.createElement('div');
+    d.className = 'quiz-q';
+    var h = '<div class="qhead">'+(qi+1)+'. '+q.q+'</div>';
+    q.a.forEach(function(opt, oi){
+      h += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</button>';
+    });
+    h += '<div class="explain" id="ex'+qi+'"><b>เฉลย:</b> '+q.e+'</div>';
+    d.innerHTML = h;
+    wrap.appendChild(d);
+  });
+  wrap.addEventListener('click', function(ev){
+    var b = ev.target.closest('.opt');
+    if(!b || b.classList.contains('disabled')) return;
+    var qi = +b.dataset.q, oi = +b.dataset.o;
+    var box = b.parentNode;
+    if(box.dataset.done) return;
+    box.dataset.done = '1';
+    box.querySelectorAll('.opt').forEach(function(o,k){
+      o.classList.add('disabled');
+      if(k===QUIZ[qi].c) o.classList.add('correct');
+    });
+    if(oi!==QUIZ[qi].c) b.classList.add('wrong'); else score++;
+    document.getElementById('ex'+qi).classList.add('show');
+    answered++;
+    var sb = document.getElementById('scorebox');
+    if(answered===QUIZ.length && sb){
+      window.__quizScore = score; window.__quizTotal = QUIZ.length;
+      sb.classList.add('show');
+      document.getElementById('scoreNum').textContent = score+' / '+QUIZ.length;
+      var pct = Math.round(score/QUIZ.length*100);
+      document.getElementById('scoreMsg').textContent =
+        pct>=80 ? 'เยี่ยมมาก! พร้อมไปคาบต่อไปแล้ว 🎉' :
+        pct>=60 ? 'ผ่านเกณฑ์ แต่ควรทบทวนข้อที่ตอบผิดอีกครั้ง' :
+                  'ลองกลับไปทบทวนเนื้อหาแต่ละหน้าอีกรอบนะ';
+      sb.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+  var rb = document.getElementById('resetQuiz');
+  if(rb) rb.addEventListener('click', function(){ location.reload(); });
+})();
+</script>
+<script>
+/* ---------- Page 0: Check-in (Google Form) ---------- */
+var ROSTER=["67090218 นางสาวเบญจรัตน์ กาศา","67090219 นางสาวมาริษา ชินสุข","67090220 นางสาวริลลดา อัตรา","67090221 นางสาววิจิตรา แนวคำพา","67090379 นางสาวจิรนันท์ ทองดอนน้อย","67090380 นางสาวชรินพัชร พรมกุล","67090382 นายธัญวิชญ์ แอบศรีหาด","67090383 นางสาวนิศากร จะคำรัมย์","67090384 นายบริรักษ์ ปัตตานัง","67090385 นางสาวปาลิดา อินทรคุ้มวงค์","67090386 นางสาวรุจิรดา ยอดทอง","67090387 นายวุฒิชัย ปัญจกะบุตร","67090388 นางสาวศุพิชญ์ทิญา เครือแก้ว","67090389 นางสาวสาธิดา ฤกษมงคล","67090390 นางสาวสิฐิตา บุญโยประการ","67090391 นางสาวอนัญพร ทวีพจน์","67090392 นายอนุพล นามสาม","67090393 นายก้องภพ เทินสระเกษ","67090394 นางสาวขวัญข้าว พุ่มทอง","67090395 นางสาวจิรัศยา พันธุ์ครุฑ","67090396 นายณฐนนท์ กองสุข","67090397 นายณภัทร ศิริโชติรุ่งขจร","67090398 นายณัฏฐวุฒิ พงศ์ภัคพันธุ์","67090401 นายธีรเดช โซว","67090403 นายนันทกร ธรรมวงศ์","67090404 นางสาวใบเฟิร์น บุญทูล","67090405 นางสาวปานไพลิน ชานาเมือง","67090407 นางสาวภนิดา สุทธิธรรมานันต์","67090408 นายรวิช ทองมี","67090409 นางสาวสิวพร หิรัญโท","67090410 นางสาวสุธาสินี อู่นอก","67090412 นางสาวสุภาพร แก่นการ","67090413 นางสาวหทัยภัทร รัตนรุ่งเรือง","67090414 นายอภิสิทธิ์ ตรงต่อกิจ","67090434 นายกฤตภัค ห้วยลำดวน","67090436 นายศิวนาถ ราศรีจันทร์","67090437 นางสาวกรณิศ กลั่นอักโข","67090441 นางสาวนันทิกา สะอาดประโคน","67090443 นางสาวปวีณอร เพ็งวิสาภาพพงษ์","67090445 นายรัฐภูมิ สว่างภพ"];
+(function(){
+  var sel=document.getElementById('ci_student'); if(!sel) return;
+  ROSTER.forEach(function(name){var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);});
+  try{ var st=localStorage.getItem('bda2_student'); if(st){ sel.value=st; } }catch(e){}
+  try{ var em=localStorage.getItem('bda2_email'); if(em){ var el=document.getElementById('ci_email'); if(el) el.value=em; } }catch(e){}
+  try{ var prev=localStorage.getItem('bda7_checkin'); if(prev){ var m=document.getElementById('ci_msg'); if(m){ m.className='ci-msg ok'; m.textContent='ℹ️ เคยเช็คชื่อคาบนี้จากเครื่องนี้: '+prev; } } }catch(e){}
+})();
+function formReady(id){ var f=document.getElementById(id); return f && f.action.indexOf('FORM_ID_')<0; }
+function submitCheckin(){
+  var email=(document.getElementById('ci_email').value||'').trim();
+  var student=document.getElementById('ci_student').value;
+  var msg=document.getElementById('ci_msg');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณากรอกอีเมลให้ถูกต้อง'; return; }
+  if(!student){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณาเลือกชื่อ–รหัสนิสิตของคุณ'; return; }
+  if(!formReady('ci_form')){ msg.className='ci-msg err'; msg.textContent='⚠️ ระบบเช็คชื่อของคาบนี้ยังไม่เปิด — อาจารย์จะเปิดให้ในคาบ'; return; }
+  document.getElementById('ci_f_email').value=email;
+  document.getElementById('ci_f_student').value=student;
+  document.getElementById('ci_form').submit();
+  msg.className='ci-msg ok'; msg.textContent='✅ ส่งเช็คชื่อแล้ว: '+student;
+  try{ localStorage.setItem('bda2_student', student); localStorage.setItem('bda2_email', email); localStorage.setItem('bda7_checkin', student+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
+function submitQuizScore(){
+  var student=(document.getElementById('ci_student')||{}).value||'';
+  var msg=document.getElementById('qz_msg');
+  var sc=window.__quizScore, tot=window.__quizTotal||10;
+  if(sc===undefined){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาทำแบบทดสอบให้ครบทุกข้อก่อนส่งคะแนน'; return; }
+  if(!student){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาไปที่หน้าแรก แล้วเลือกชื่อของคุณในส่วน "เช็คชื่อเข้าเรียน" ก่อนส่งคะแนน'; return; }
+  if(!formReady('qz_form')){ msg.className='qz-msg err'; msg.textContent='⚠️ ระบบส่งคะแนนของคาบนี้ยังไม่เปิด — อาจารย์จะเปิดให้ในคาบ'; return; }
+  document.getElementById('qz_f_student').value=student;
+  document.getElementById('qz_f_score').value=sc;
+  document.getElementById('qz_form').submit();
+  var btn=document.getElementById('qz_btn'); if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='default'; }
+  msg.className='qz-msg ok'; msg.textContent='✅ ส่งคะแนนแล้ว: '+student+' — '+sc+'/'+tot+' คะแนน';
+  try{ localStorage.setItem('bda7_quiz', student+' : '+sc+'/'+tot+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
+</script>
+</body>
+</html>
