@@ -794,7 +794,7 @@ plt.<span class="fn">show</span>()</div>
         <tbody>
           <tr><td>1 · สำรวจข้อมูล</td><td>อ่านชีต <code>FarmData</code> ด้วย <code>read_excel</code> · แสดง <code>.shape</code> <code>.info()</code> และ <code>.head()</code></td></tr>
           <tr><td>2 · เตรียมคอลัมน์วันที่</td><td>สร้างคอลัมน์ <code>'ปี'</code> (พ.ศ. — อย่าลืม <code>+ 543</code>) และ <code>'เดือน'</code> จากคอลัมน์ <code>วันที่</code> ด้วย <code>.dt</code> · แสดง 3 แถวแรกเพื่อยืนยันว่าถูกต้อง</td></tr>
-          <tr><td>3 · สถิติพื้นฐาน</td><td>แสดง <code>describe()</code> ของคอลัมน์ปริมาณ แล้วเทียบกับค่าที่หาไว้ในคาบ 5 อย่างน้อย 3 ค่า</td></tr>
+          <tr><td>3 · สถิติพื้นฐาน</td><td>แสดง <code>describe()</code> ของคอลัมน์ปริมาณ</td></tr>
           <tr><td>4 · สรุปแบบจัดกลุ่ม</td><td>ใช้ <code>groupby</code> หรือ <code>pivot_table</code> สร้างตารางเทียบผลผลิตไตรมาส 2 ปี 2569 กับ 2570 <b>รายโรงเรือน</b> พร้อมคอลัมน์เปอร์เซ็นต์การเปลี่ยนแปลง — ต้องได้ −2.5% · −44.1% · −4.4%</td></tr>
           <tr><td>5 · เจาะลึกหนึ่งชั้น</td><td>เจาะโรงเรือนที่มีปัญหาลงไปดู<b>รายเดือน</b> แล้วระบุว่าเดือนใดแย่ที่สุด</td></tr>
           <tr><td>6 · กราฟ 2 รูป</td><td>กราฟแท่งเทียบรายโรงเรือน และกราฟอีกหนึ่งรูปที่เลือกเอง · <b>ตั้งชื่อกราฟเป็นข้อสรุป</b> และภาษาไทยต้องแสดงผลได้</td></tr>
@@ -813,7 +813,8 @@ plt.<span class="fn">show</span>()</div>
       <li>มีไฟล์ <code>.xlsx</code> ของข้อ 7 แนบมาด้วย</li>
       <li>ตั้งค่าแชร์เป็น "ทุกคนที่มีลิงก์ · ผู้อ่าน" และทดลองเปิดลิงก์ในโหมดไม่ระบุตัวตนแล้ว</li>
     </ul>
-    <div class="callout">📮 <b>ส่งงาน:</b> ส่งลิงก์ Colab ผ่านช่องทางที่อาจารย์แจ้งในคาบ · กำหนดส่ง: ก่อนเริ่มคาบที่ 9 · <b>ทำคนเดียว</b></div>
+    <div class="callout">📮 <b>ส่งงาน:</b> กดปุ่มด้านล่างเพื่อส่งลิงก์ Colab · กำหนดส่ง: ภายในวันอาทิตย์ที่ 27 · <b>ทำคนเดียว</b></div>
+    <a class="btn dl-link" style="margin-top:12px" href="https://docs.google.com/forms/d/e/1FAIpQLSdDzJ1Hwb3BYXX9RDvCqH_JD_VF1jbCWrLTzS3pZyTt16brUA/viewform?usp=publish-editor" target="_blank" rel="noopener">📤 ส่งงานที่นี่ ↗</a>
     <div class="callout bad">🚫 <b>ข้อผิดพลาดที่พบบ่อย:</b> ลืมสร้างคอลัมน์ <code>ปี</code>/<code>เดือน</code> ก่อน (ขึ้น <code>KeyError</code>) · ลืมบวก 543 ทำให้กรองปี 2570 แล้วได้ตารางว่าง · ลืมกรองปีหรือกรองเดือนทำให้ตัวเลขไม่ตรง · ใช้ <code>and</code> แทน <code>&amp;</code> ในเงื่อนไขแบบวงเล็บเหลี่ยม · ลืมรันเซลล์ฟอนต์ไทยทำให้กราฟอ่านไม่ออก · ส่งลิงก์ที่ยังไม่ได้เปิดสิทธิ์ให้คนอื่นดู</div>
   </div>
 
@@ -1124,7 +1125,8 @@ var CHARTS=[
         scales:{x:{title:{display:true,text:'อุณหภูมิสูงสุดช่วงบ่ายเฉลี่ย (°C)'}},y:{beginAtZero:true,title:{display:true,text:'ของเสีย (%)'}}}}};
   }},
  {n:'ฮิสโทแกรม',
-  code:'plot_q2[<span class="st">\'ต่อไร่\'</span>].<span class="fn">hist</span>(bins=<span class="nu">6</span>, color=<span class="st">\'#16a34a\'</span>)\n'+
+  code:'<span class="cm"># plot_q2 คือตารางรายแปลงที่สร้างไว้แล้วตอนต้นคาบ (มีคอลัมน์ \'ต่อไร่\')</span>\n'+
+       'plot_q2[<span class="st">\'ต่อไร่\'</span>].<span class="fn">hist</span>(bins=<span class="nu">6</span>, color=<span class="st">\'#16a34a\'</span>)\n'+
        'plt.<span class="fn">title</span>(<span class="st">\'ผลผลิตต่อไร่แยกเป็นสองกลุ่มชัดเจน\'</span>)\n'+
        'plt.<span class="fn">xlabel</span>(<span class="st">\'กก./ไร่\'</span>)\n'+
        'plt.<span class="fn">show</span>()',
