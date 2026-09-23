@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Data Analytics — ครั้งที่ 8 (Pandas & Matplotlib · สื่อ Interactive)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --line:#e2e8f0; --brand:#16a34a; --brand2:#15803d; --brand-soft:#dcfce7;
+    --blue:#2563eb; --amber:#d97706; --violet:#7c3aed; --red:#dc2626;
+    --shadow:0 10px 30px rgba(2,6,23,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI","Sarabun","Noto Sans Thai",Tahoma,sans-serif; color:var(--ink); background:#f1f5f9; line-height:1.7}
+  a{color:var(--brand2)}
+  header.top{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px); background:rgba(15,23,42,.92); color:#fff; border-bottom:1px solid rgba(255,255,255,.08)}
+  .top-inner{max-width:1080px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand-mini{font-weight:800; letter-spacing:.5px; font-size:15px}
+  .brand-mini span{color:#4ade80}
+  nav.tabs{display:flex; gap:6px; flex-wrap:wrap; margin-left:auto}
+  nav.tabs button{background:transparent; color:#cbd5e1; border:1px solid transparent; padding:7px 11px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; transition:.15s; font-family:inherit}
+  nav.tabs button:hover{color:#fff; background:rgba(255,255,255,.08)}
+  nav.tabs button.active{background:var(--brand); color:#fff}
+  .progressbar{height:4px; background:rgba(255,255,255,.1)}
+  .progressbar > div{height:100%; width:0; background:linear-gradient(90deg,#4ade80,#16a34a); transition:width .4s}
+  main{max-width:1080px; margin:0 auto; padding:28px 20px 80px}
+  section.page{display:none; animation:fade .4s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:var(--shadow); margin-bottom:22px}
+  h1{font-size:30px; margin:.2em 0 .1em; line-height:1.25}
+  h2{font-size:23px; margin:.1em 0 .4em; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  h3{font-size:18px; margin:1.1em 0 .3em}
+  .kicker{color:var(--brand2); font-weight:800; letter-spacing:1px; font-size:12.5px; text-transform:uppercase}
+  .muted{color:var(--muted)}
+  .lead{font-size:17px; color:#334155}
+  .pill{display:inline-block; background:var(--brand-soft); color:var(--brand2); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px}
+  .hero{background:linear-gradient(135deg,#0f172a,#14532d); color:#fff; border:none}
+  .hero .pill{background:rgba(255,255,255,.15); color:#bbf7d0}
+  .hero h1{font-size:34px}
+  .hero .muted{color:#cbd5e1}
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .tile{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .tile .n{font-size:12px; font-weight:800; color:#fff; background:var(--brand); width:26px; height:26px; border-radius:8px; display:grid; place-items:center; margin-bottom:8px}
+  .btn{background:var(--brand); color:#fff; border:none; padding:11px 18px; border-radius:12px; font-weight:700; cursor:pointer; font-family:inherit; font-size:15px; transition:.15s}
+  .btn:hover{background:var(--brand2)}
+  .btn.ghost{background:#fff; color:var(--brand2); border:1.5px solid var(--brand)}
+  .btn.sm{padding:8px 14px; font-size:13.5px}
+  .nav-next{display:flex; justify-content:space-between; gap:10px; margin-top:4px}
+  .nav-next .btn{box-shadow:var(--shadow)}
+  select, input[type=text], input[type=email], input[type=number]{
+    font-family:inherit; font-size:15px; padding:9px 12px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink)}
+  select:focus, input:focus{outline:none; border-color:var(--brand)}
+  .row{display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end}
+  .row > div{flex:1; min-width:150px}
+  input[type=range]{width:100%; accent-color:var(--brand)}
+  table.xl{border-collapse:collapse; width:100%; font-size:13.5px; margin-top:10px}
+  table.xl th, table.xl td{border:1px solid #cbd5e1; padding:7px 9px; text-align:center}
+  table.xl th{background:#1e293b; color:#fff; font-weight:700}
+  table.xl tr:nth-child(even) td{background:#f8fafc}
+  table.xl td.hl{background:#dcfce7 !important; font-weight:700}
+  table.xl td.warn{background:#fef2f2 !important; color:#b91c1c; font-weight:700}
+  table.cmp{border-collapse:collapse; width:100%; font-size:14px; margin-top:12px}
+  table.cmp th, table.cmp td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top}
+  table.cmp th{background:#1e293b; color:#fff; font-weight:700}
+  table.cmp td:first-child{font-weight:700; background:#f8fafc}
+  table.cmp td.old{color:#b91c1c}
+  table.cmp td.new{background:#f0fdf4; color:#166534; font-weight:600}
+  table.term{border-collapse:collapse; width:100%; font-size:14.5px; margin-top:12px}
+  table.term th,table.term td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top}
+  table.term th{background:#1e293b; color:#fff}
+  table.term td:first-child{white-space:nowrap; font-weight:700; background:#f8fafc; width:1%; font-family:"Consolas",monospace}
+  .device-box{border:1px solid var(--line); border-radius:14px; padding:16px; background:#fbfdfb}
+  .device-box h3{margin:0 0 8px; font-size:15.5px}
+  .badge{font-size:12px; font-weight:700; padding:5px 11px; border-radius:8px; background:#f1f5f9; color:#475569; font-family:"Consolas",monospace}
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  .note{font-size:13px; color:var(--muted)}
+  .kv{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+  .kv .box{flex:1; min-width:120px; text-align:center; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb}
+  .kv .box .v{font-size:22px; font-weight:800; color:var(--brand2)}
+  .kv .box .l{font-size:12px; color:var(--muted)}
+  /* code blocks */
+  .py{background:#0f172a; color:#e2e8f0; border-radius:12px; padding:14px 16px; font-family:"Consolas","Cascadia Mono",monospace; font-size:14px; margin-top:12px; overflow-x:auto; white-space:pre; line-height:1.65}
+  .py .kw{color:#c084fc}   .py .st{color:#86efac}   .py .nu{color:#fbbf24}
+  .py .cm{color:#64748b; font-style:italic}  .py .fn{color:#38bdf8}
+  .py .hi{background:rgba(74,222,128,.16); display:block; margin:0 -16px; padding:0 16px}
+  .out{background:#f8fafc; border:1px solid var(--line); border-left:4px solid var(--brand); border-radius:0 12px 12px 0; padding:12px 16px; font-family:"Consolas",monospace; font-size:14px; white-space:pre-wrap; margin-top:0; color:#0f172a}
+  .out .lbl{display:block; font-family:inherit; font-size:11px; font-weight:800; letter-spacing:.6px; color:var(--muted); margin-bottom:6px; text-transform:uppercase}
+  .fn-list{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0}
+  .fn-list button{border:1.5px solid var(--line); background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-family:"Consolas",monospace; font-size:13px; font-weight:700; color:#334155; transition:.15s}
+  .fn-list button:hover{border-color:var(--brand); color:var(--brand2)}
+  .fn-list button.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+  .quiz-q{border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:#fff}
+  .quiz-q .qhead{font-weight:700; margin-bottom:12px}
+  .opt{display:block; width:100%; text-align:left; border:1.5px solid var(--line); background:#fff; padding:12px 14px; border-radius:11px; margin:7px 0; cursor:pointer; font-family:inherit; font-size:15px; transition:.12s}
+  .opt:hover{border-color:var(--brand); background:#f0fdf4}
+  .opt.correct{border-color:var(--brand); background:var(--brand-soft); font-weight:600}
+  .opt.wrong{border-color:var(--red); background:#fef2f2}
+  .opt.disabled{cursor:default; opacity:.85}
+  .explain{margin-top:10px; padding:12px 14px; border-radius:11px; background:#f0f9ff; border-left:4px solid var(--blue); font-size:14.5px; display:none}
+  .explain.show{display:block}
+  .scorebox{text-align:center; padding:26px; border-radius:16px; background:linear-gradient(135deg,#14532d,#166534); color:#fff; display:none}
+  .scorebox.show{display:block}
+  .scorebox .big{font-size:46px; font-weight:800}
+  .foot{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+  .example-box{margin-top:14px; background:#f8fafc; border:1px dashed var(--line); border-radius:12px; padding:14px}
+  .example-box .lbl{font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+  .steps{counter-reset:s; padding-left:0; list-style:none}
+  .steps li{position:relative; padding:10px 0 10px 42px; border-bottom:1px dashed var(--line)}
+  .steps li:before{counter-increment:s; content:counter(s); position:absolute; left:0; top:10px; width:28px; height:28px; border-radius:9px; background:var(--brand-soft); color:var(--brand2); font-weight:800; display:grid; place-items:center; font-size:13px}
+  code{background:#f1f5f9; padding:2px 6px; border-radius:6px; font-family:"Consolas",monospace; font-size:.92em; color:#0f172a}
+  .cols2{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+  .callout{border-left:4px solid var(--amber); background:#fffbeb; padding:12px 16px; border-radius:0 12px 12px 0; margin-top:14px; font-size:14.5px}
+  .callout.good{border-color:var(--brand); background:#f0fdf4}
+  .callout.bad{border-color:var(--red); background:#fef2f2}
+  .callout.info{border-color:var(--blue); background:#eff6ff}
+  .checkin{background:linear-gradient(135deg,#ecfdf5,#eff6ff); border:2px solid var(--brand)}
+  .ci-row{display:flex; flex-wrap:wrap; gap:14px; margin-top:14px}
+  .ci-field{flex:1 1 260px; display:flex; flex-direction:column; gap:6px}
+  .ci-field label{font-weight:700; font-size:13.5px; color:#334155}
+  .ci-field input, .ci-field select{padding:11px 12px; border:1.5px solid var(--line); border-radius:10px; font-family:inherit; font-size:15px; background:#fff; width:100%}
+  .ci-submit{margin-top:14px}
+  .ci-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .ci-msg.ok{color:var(--brand2)}
+  .ci-msg.err{color:var(--red)}
+  .qz-submit-wrap{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:16px}
+  .qz-msg{margin-top:12px; font-weight:700; font-size:14.5px; min-height:20px}
+  .qz-msg.ok{color:#bbf7d0}
+  .qz-msg.err{color:#fecaca}
+  .chk{list-style:none; padding-left:0; margin:12px 0 0}
+  .chk li{padding:9px 0 9px 30px; position:relative; border-bottom:1px dashed var(--line); font-size:14.5px}
+  .chk li:before{content:"☐"; position:absolute; left:0; top:8px; font-size:17px; color:var(--brand2)}
+  .must{border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:14px}
+  .must table{border-collapse:collapse; width:100%; font-size:14px}
+  .must th, .must td{border-bottom:1px solid var(--line); padding:11px 13px; text-align:left; vertical-align:top}
+  .must th{background:#1e293b; color:#fff; font-weight:700}
+  .must td:first-child{width:30%; font-weight:700}
+  .levels{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+  .levels .lv{flex:1; min-width:150px; border:1px solid var(--line); border-radius:12px; padding:12px; background:#fbfdfb; text-align:center}
+  .levels .lv.now{background:var(--brand-soft); border-color:var(--brand)}
+  .levels .lv .t{font-weight:800; font-size:14.5px}
+  .levels .lv .q{font-size:12.5px; color:var(--muted)}
+  .levels .lv .tool{font-size:12px; margin-top:6px; color:#334155}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-mini">BUSINESS <span>DATA ANALYTICS</span> · ครั้งที่ 8</div>
+    <nav class="tabs" id="tabs">
+      <button data-p="0" class="active">ภาพรวม</button>
+      <button data-p="1">ไลบรารี &amp; DataFrame</button>
+      <button data-p="2">สำรวจข้อมูล</button>
+      <button data-p="3">กรอง · คอลัมน์ · เรียง</button>
+      <button data-p="4">groupby &amp; pivot</button>
+      <button data-p="5">Excel &harr; Python</button>
+      <button data-p="6">พล็อตกราฟ</button>
+      <button data-p="7">สรุป &amp; งานส่ง</button>
+      <button data-p="8">แบบทดสอบ</button>
+    </nav>
+  </div>
+  <div class="progressbar"><div id="pbar"></div></div>
+</header>
+
+<main>
+
+<!-- ===== PAGE 0 ===== -->
+<section class="page active" id="p0">
+  <div class="card hero">
+    <span class="pill">Pandas · NumPy · Matplotlib</span>
+    <h1>ครั้งที่ 8 — ทำทุกอย่างที่เคยทำใน Excel และ Power BI ด้วยโค้ด</h1>
+    <p class="lead muted">คาบที่แล้วเราเก็บข้อมูล 12 แปลงไว้ใน List ของ Dictionary — ซึ่งก็คือ<b>ตารางหนึ่งใบ</b><br>
+    <b style="color:#bbf7d0">คาบนี้เราจะเอาตารางนั้นเข้า Pandas แล้วสั่งงานมันได้เหมือน PivotTable · Power Query · และ DAX ที่เรียนมาแล้วทั้งหมด</b></p>
+    <div class="row" style="margin-top:18px">
+      <div style="flex:0"><button class="btn" onclick="go(1)">เริ่มบทเรียน →</button></div>
+      <div style="flex:0"><button class="btn ghost" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" onclick="go(7)">ดูตารางแปลงคำสั่ง</button></div>
+    </div>
+  </div>
+
+  <div class="card checkin">
+    <span class="kicker">ก่อนเริ่มเรียน</span>
+    <h2>✅ เช็คชื่อเข้าเรียน</h2>
+    <p class="muted" style="margin-top:0">กรอกอีเมล และเลือกชื่อ–รหัสนิสิตของคุณ แล้วกดส่ง — ข้อมูลจะถูกส่งเข้า Google Form ของอาจารย์ทันที (ไม่ต้องออกจากหน้านี้)</p>
+    <div class="ci-row">
+      <div class="ci-field">
+        <label>อีเมล (Email) *</label>
+        <input type="email" id="ci_email" placeholder="you@go.buu.ac.th" autocomplete="email">
+      </div>
+      <div class="ci-field">
+        <label>เลือกข้อมูลนิสิต (ชื่อ–รหัส) *</label>
+        <select id="ci_student"><option value="">— เลือกชื่อของคุณ —</option></select>
+      </div>
+    </div>
+    <button class="btn ci-submit" id="ci_btn" onclick="submitCheckin()">📩 ส่งเช็คชื่อ</button>
+    <div class="ci-msg" id="ci_msg"></div>
+    <iframe name="ci_target" id="ci_target" style="display:none" title="hidden"></iframe>
+    <!-- อาจารย์: เปลี่ยน 1FAIpQLSfAa9WZ4WXnzu4CuWMJBpUygkzbzqb4nKk8qqW9uq4koYJb6g เป็นรหัสฟอร์มเช็คชื่อของคาบ 8 (แปลง /viewform?... เป็น /formResponse) -->
+    <form id="ci_form" action="https://docs.google.com/forms/d/e/1FAIpQLSfAa9WZ4WXnzu4CuWMJBpUygkzbzqb4nKk8qqW9uq4koYJb6g/formResponse" method="POST" target="ci_target" style="display:none">
+      <input type="hidden" name="emailAddress" id="ci_f_email">
+      <input type="hidden" name="entry.893657035" id="ci_f_student">
+      <input type="hidden" name="fvv" value="1">
+      <input type="hidden" name="pageHistory" value="0">
+    </form>
+  </div>
+
+  <div class="card">
+    <span class="kicker">เป้าหมาย</span>
+    <h2>จบคาบนี้แล้วต้องทำอะไรได้</h2>
+    <div class="grid g2">
+      <div class="tile"><div class="n">1</div><b>อ่านไฟล์เข้ามาสำรวจ</b><div class="note">read_excel · head · info · describe แล้วอ่านผลเป็น</div></div>
+      <div class="tile"><div class="n">2</div><b>คัดกรองและจัดเรียง</b><div class="note">กรองหลายเงื่อนไข เรียงลำดับ และหาอันดับต้น ๆ</div></div>
+      <div class="tile"><div class="n">3</div><b>สร้างคอลัมน์คำนวณ</b><div class="note">แยกปี–เดือนจากวันที่ และจัดกลุ่มด้วยเงื่อนไข เหมือน Calculated Column ในคาบ 4</div></div>
+      <div class="tile"><div class="n">4</div><b>สรุปแบบจัดกลุ่ม</b><div class="note">groupby และ pivot_table = PivotTable ที่เขียนเป็นโค้ด</div></div>
+      <div class="tile"><div class="n">5</div><b>ทำงานร่วมกับ Excel</b><div class="note">รับตารางที่เตรียมไว้ด้วย Power Query แล้วบันทึกผลกลับเป็นไฟล์ Excel</div></div>
+      <div class="tile"><div class="n">6</div><b>พล็อตกราฟจากตาราง</b><div class="note">แท่ง เส้น กระจาย ฮิสโทแกรม และกล่อง พร้อมฟอนต์ไทยที่แสดงผลถูกต้อง</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>ข้อตกลงของคาบนี้: ข้อมูลชุดเดิม เครื่องมือใหม่</h2>
+    <div class="callout good">🍃 เราจะใช้ไฟล์ <code>BDA_class8_FarmData.xlsx</code> ซึ่งเป็นข้อมูลชุดเดียวกับที่ทำแดชบอร์ดในคาบ 4 และหาสาเหตุในคาบ 5 · <b>ทุกตัวเลขที่ Python คำนวณออกมาในคาบนี้ ต้องตรงกับที่เราเคยได้จาก Excel และ Power BI</b> ถ้าไม่ตรงแปลว่าเขียนผิด — นี่คือวิธีตรวจคำตอบตัวเองที่ดีที่สุดตอนเพิ่งหัดเขียนโค้ด</div>
+    <h3>โครงสร้างไฟล์ — รวมตารางมาให้แล้วจาก Power Query</h3>
+    <table class="term">
+      <thead><tr><th style="width:24%">ชีต</th><th style="width:14%">ขนาด</th><th>เก็บอะไร</th></tr></thead>
+      <tbody>
+        <tr><td>FarmData</td><td>2,520 × 16</td><td>บันทึกการเก็บเกี่ยวรายรอบ <b>ที่ต่อข้อมูลแปลงและข้อมูลพืชเข้ามาให้แล้ว</b>: วันที่ · รหัสแปลง · โรงเรือน · พื้นที่ (ไร่) · ชนิดพืช · ปริมาณกก. · ของเสีย (กก.) · ต้นทุน · ยอดขาย</td></tr>
+        <tr><td>SummaryMonthly</td><td>54 × 8</td><td>สรุปรายเดือน × โรงเรือน: ปริมาณ ของเสีย% และอุณหภูมิสูงสุดเฉลี่ยจากเซนเซอร์ — ใช้ตอนทำแผนภาพกระจาย</td></tr>
+      </tbody>
+    </table>
+    <div class="callout info">💡 <b>ทำไมไม่ต้องรวมตารางเอง</b> — ไฟล์เดิมเป็น Star Schema 7 ชีต (FactHarvest · DimPlot · DimCrop · …) ซึ่งเรา<b>รวมไปแล้วด้วย Merge ใน Power Query ตั้งแต่คาบ 3</b> · งานรวมตารางทำใน Excel เห็นภาพและตรวจง่ายกว่า จึงทำที่นั่นครั้งเดียวแล้วส่งตารางแบน ๆ ใบเดียวมาให้ Python ทำงานต่อ — <b>นี่คือวิธีทำงานจริงที่ใช้ทั้งสองเครื่องมือร่วมกัน</b> (ดูหน้า Excel ↔ Python)</div>
+  </div>
+
+  <div class="card">
+    <h2>เตรียมก่อนเริ่ม</h2>
+    <ol class="steps">
+      <li>เปิด <a href="https://colab.research.google.com/" target="_blank" rel="noopener">Colab</a> แล้วสร้างสมุดใหม่ ตั้งชื่อว่า <code>BDA8_ชื่อคุณ</code></li>
+      <li>ดาวน์โหลด <code>BDA_class8_FarmData.xlsx</code> จากช่องทางที่อาจารย์แจ้ง แล้วอัปโหลดเข้า Colab (ไอคอนโฟลเดอร์ทางซ้าย)</li>
+      <li>รันเซลล์เตรียมความพร้อมด้านล่างนี้ก่อน 1 ครั้ง — <b>สำคัญมาก</b> ถ้าไม่รัน กราฟภาษาไทยจะขึ้นเป็นสี่เหลี่ยมว่างทั้งหมด</li>
+    </ol>
+    <a class="btn dl-link" href="https://drive.google.com/drive/folders/12gV3McmZDsVaHb2xgFfyhU0yX2bgfa-C?usp=sharing" target="_blank" rel="noopener">📂 เปิด Google Drive โหลดไฟล์ ↗</a>
+    <button class="btn sm ghost" style="margin-top:12px;margin-bottom:10px" onclick="copyCode('setupCode0', this)">📋 คัดลอกโค้ด</button>
+<div class="py" id="setupCode0"><span class="cm"># รันเซลล์นี้ครั้งเดียวตอนเปิดสมุด — ติดตั้งฟอนต์ไทยให้ Matplotlib</span>
+<span class="kw">!</span>apt-get -qq install fonts-thai-tlwg
+<span class="kw">import</span> matplotlib, matplotlib.pyplot <span class="kw">as</span> plt
+matplotlib.font_manager.fontManager.<span class="fn">addfont</span>(<span class="st">'/usr/share/fonts/truetype/tlwg/Loma.ttf'</span>)
+matplotlib.rc(<span class="st">'font'</span>, family=<span class="st">'Loma'</span>)
+
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="fn">print</span>(<span class="st">"พร้อมแล้ว · pandas เวอร์ชัน"</span>, pd.__version__)</div>
+  </div>
+  <div class="nav-next"><span></span><button class="btn" onclick="go(1)">ถัดไป: ไลบรารี &amp; DataFrame →</button></div>
+</section>
+
+<!-- ===== PAGE 1 ===== -->
+<section class="page" id="p1">
+  <div class="card">
+    <span class="kicker">ทวนคาบที่แล้ว</span>
+    <h2>🧩 จากฟังก์ชันของเรา สู่ฟังก์ชันของคนอื่น</h2>
+    <p class="lead">Warm-up: ลองเขียนฟังก์ชันหาค่าเฉลี่ยเอง</p>
+<div class="py"><span class="cm"># ข้อมูลผลผลิต 12 แปลง (กก.) — ลองเขียนฟังก์ชัน average(data) ของคุณเอง แล้วเรียก average(yields) ดู</span>
+yields <span class="kw">=</span> [<span class="nu">198</span>, <span class="nu">187</span>, <span class="nu">172</span>, <span class="nu">192</span>, <span class="nu">177</span>, <span class="nu">194</span>, <span class="nu">176</span>, <span class="nu">191</span>, <span class="nu">164</span>, <span class="nu">177</span>, <span class="nu">164</span>, <span class="nu">171</span>]</div>
+    <div class="callout">🎯 <b>เป้าหมาย:</b> ฟังก์ชันของคุณควรคำนวณค่าเฉลี่ยได้ <b>180.25</b></div>
+    <p style="margin-top:14px"><b>ไลบรารี (Library)</b> คือชุดฟังก์ชันที่มีคนเขียนไว้ให้แล้ว เราแค่เรียกใช้ · งานที่เขียนเอง 6 บรรทัด เหลือบรรทัดเดียว และยังได้ค่าสถิติอื่นแถมมาด้วย</p>
+<div class="py"><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="fn">print</span>(np.<span class="fn">mean</span>(yields))   <span class="cm"># ค่าเฉลี่ย</span>
+<span class="fn">print</span>(np.<span class="fn">std</span>(yields))    <span class="cm"># ส่วนเบี่ยงเบนมาตรฐาน</span>
+<span class="fn">print</span>(np.<span class="fn">median</span>(yields)) <span class="cm"># มัธยฐาน</span></div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>180.25
+11.99
+177.0</div>
+    <div class="callout good">✅ <b>ตรวจกับคาบ 5:</b> ค่าเฉลี่ย 180.25 มัธยฐาน 177 และส่วนเบี่ยงเบนมาตรฐานประมาณ 12 — <b>ตรงกับที่คำนวณด้วย Excel ในคาบ 5 ทุกค่า</b></div>
+    <table class="term">
+      <thead><tr><th style="width:26%">คำสั่ง</th><th>ความหมาย</th></tr></thead>
+      <tbody>
+        <tr><td>import numpy</td><td style="font-family:inherit">เรียกไลบรารีชื่อ numpy เข้ามาใช้ในสมุดเล่มนี้</td></tr>
+        <tr><td>as np</td><td style="font-family:inherit">ตั้งชื่อเล่นให้สั้นลง เวลาเรียกใช้จะพิมพ์แค่ <code>np.</code> · เป็นธรรมเนียมที่ทุกคนใช้เหมือนกันหมด</td></tr>
+        <tr><td>np.mean(...)</td><td style="font-family:inherit">เรียกฟังก์ชัน <code>mean</code> ที่อยู่ในไลบรารีนั้น</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-top:12px">ไลบรารีที่จะใช้ในวิชานี้: <b>NumPy</b> (คำนวณตัวเลข) · <b>Pandas</b> (จัดการตาราง) · <b>Matplotlib</b> (วาดกราฟ) · <b>scikit-learn</b> (สร้างแบบจำลอง — คาบ 9 เป็นต้นไป)</div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Pandas และ DataFrame</h2>
+    <p class="lead">Pandas คือไลบรารีสำหรับจัดการข้อมูลแบบตาราง · โครงสร้างหลักของมันเรียกว่า <b>DataFrame</b> ซึ่งก็คือตารางที่มีหัวคอลัมน์ เหมือนชีตหนึ่งชีตใน Excel</p>
+    <p>ยังจำ List ของ Dictionary จากคาบที่แล้วได้ไหม — เอามาใส่ Pandas ได้ตรง ๆ เลย</p>
+<div class="py"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+plots <span class="kw">=</span> [
+    {<span class="st">"รหัสแปลง"</span>:<span class="st">"P01"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"A"</span>, <span class="st">"ไร่"</span>:<span class="nu">7.0</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1356</span>},
+    {<span class="st">"รหัสแปลง"</span>:<span class="st">"P04"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"B"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">696</span>},
+    {<span class="st">"รหัสแปลง"</span>:<span class="st">"P08"</span>, <span class="st">"โรงเรือน"</span>:<span class="st">"C"</span>, <span class="st">"ไร่"</span>:<span class="nu">6.5</span>, <span class="st">"ผลผลิต"</span>:<span class="nu">1195</span>}
+]
+
+df <span class="kw">=</span> pd.<span class="fn">DataFrame</span>(plots)
+df</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>  รหัสแปลง โรงเรือน  ไร่  ผลผลิต
+0      P01        A  7.0    1356
+1      P04        B  6.5     696
+2      P08        C  6.5    1195</div>
+    <div class="callout info">💡 <b>สังเกตเลข 0 1 2 ทางซ้าย</b> — Pandas ใส่ให้อัตโนมัติ เรียกว่า <b>index</b> คือหมายเลขแถว · เหมือนเลขแถวใน Excel แต่เริ่มจาก 0 ตามธรรมเนียมของ Python</div>
+    <div class="note" style="margin-top:12px">ถ้าเซลล์สุดท้ายเขียนแค่ชื่อตัวแปร <code>df</code> โดยไม่มี <code>print()</code> Colab จะแสดงตารางแบบสวยงามให้ · ถ้าอยากแสดงกลางเซลล์ให้ใช้ <code>display(df)</code></div>
+  </div>
+
+  <div class="card">
+    <h2>อ่านข้อมูลจากไฟล์จริง</h2>
+    <p>ในงานจริงเราไม่พิมพ์ข้อมูลเองแบบข้างบน แต่อ่านจากไฟล์ — ไฟล์ของเรามี 2 ชีต จึงระบุชื่อชีตที่ต้องการ</p>
+<div class="py">harvest        <span class="kw">=</span> pd.<span class="fn">read_excel</span>(<span class="st">'/content/BDA_class8_FarmData.xlsx'</span>, sheet_name=<span class="st">'FarmData'</span>)
+monthly_summary <span class="kw">=</span> pd.<span class="fn">read_excel</span>(<span class="st">'/content/BDA_class8_FarmData.xlsx'</span>, sheet_name=<span class="st">'SummaryMonthly'</span>)
+
+<span class="fn">print</span>(harvest.shape)    <span class="cm"># (จำนวนแถว, จำนวนคอลัมน์)</span>
+<span class="fn">print</span>(monthly_summary.shape)</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>(2520, 16)
+(54, 8)</div>
+    <table class="cmp">
+      <thead><tr><th style="width:22%">ไฟล์ชนิดอื่น</th><th>คำสั่ง</th></tr></thead>
+      <tbody>
+        <tr><td>CSV</td><td><code>pd.read_csv('ไฟล์.csv')</code></td></tr>
+        <tr><td>Excel ชีตแรก</td><td><code>pd.read_excel('ไฟล์.xlsx')</code> — ไม่ระบุ sheet_name จะได้ชีตแรก</td></tr>
+        <tr><td>Excel ทุกชีตพร้อมกัน</td><td><code>pd.read_excel('ไฟล์.xlsx', sheet_name=None)</code> — ได้ Dictionary ที่คีย์คือชื่อชีต</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">⚠️ <b>FileNotFoundError คือ error ที่จะเจอบ่อยที่สุดในคาบนี้</b> — แปลว่าหาไฟล์ไม่เจอ · ตรวจสองอย่าง: อัปโหลดไฟล์แล้วหรือยัง และสะกดชื่อไฟล์ตรงกันหรือไม่ (รวมทั้งตัวพิมพ์เล็กพิมพ์ใหญ่) · วิธีที่ปลอดภัยที่สุดคือคลิกขวาที่ไฟล์ในแถบซ้ายแล้วเลือก "คัดลอกเส้นทาง" มาวาง</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← ย้อนกลับ</button><button class="btn" onclick="go(2)">ถัดไป: สำรวจข้อมูล →</button></div>
+</section>
+
+<!-- ===== PAGE 2 ===== -->
+<section class="page" id="p2">
+  <div class="card">
+    <span class="kicker">ขั้นแรกเสมอ</span>
+    <h2>👀 เปิดไฟล์มาแล้วต้องดูอะไรก่อน</h2>
+    <p class="lead">ในคาบ 3 เราเปิด Power Query แล้วเลื่อนดูข้อมูลก่อนเริ่มทำอะไร · Pandas มีคำสั่งสำรวจ 4 ตัวที่ทำหน้าที่เดียวกัน และควรรันทุกครั้งที่เปิดไฟล์ใหม่</p>
+    <div class="fn-list" id="expList"></div>
+    <div class="py" id="expCode"></div>
+    <div class="out" id="expOut"></div>
+    <div class="note" style="margin-top:10px" id="expNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>อ่านผล describe() ให้เป็น</h2>
+    <p>คำสั่งเดียวได้สถิติครบชุดที่คาบ 5 ต้องกดหลายสูตร — และนี่คือค่าของคอลัมน์ <b>ปริมาณกก.</b> จากทั้งไฟล์ 2,520 แถว</p>
+    <table class="xl">
+      <thead><tr><th>ค่าที่ได้</th><th>ตัวเลข</th><th>สูตรใน Excel (คาบ 1–5)</th><th>บอกอะไร</th></tr></thead>
+      <tbody>
+        <tr><td>count</td><td class="hl">2,520</td><td>=COUNT()</td><td>มีข้อมูลกี่แถว — ถ้าน้อยกว่าที่คาดแปลว่ามีค่าว่าง</td></tr>
+        <tr><td>mean</td><td class="hl">63.3</td><td>=AVERAGE()</td><td>เก็บเกี่ยวเฉลี่ยรอบละ 63 กก.</td></tr>
+        <tr><td>std</td><td class="hl">16.9</td><td>=STDEV()</td><td>ความผันผวน — ยิ่งสูงยิ่งวางแผนยาก</td></tr>
+        <tr><td>min</td><td>14</td><td>=MIN()</td><td>รอบที่แย่ที่สุด</td></tr>
+        <tr><td>25%</td><td>52</td><td>=QUARTILE(...,1)</td><td>ควอไทล์ที่ 1 — ใช้หา Outlier ด้วยกฎ 1.5 × IQR</td></tr>
+        <tr><td>50%</td><td class="hl">62</td><td>=MEDIAN()</td><td>มัธยฐาน — ใกล้เคียงค่าเฉลี่ย แปลว่าข้อมูลไม่เบ้มาก</td></tr>
+        <tr><td>75%</td><td>74</td><td>=QUARTILE(...,3)</td><td>ควอไทล์ที่ 3</td></tr>
+        <tr><td>max</td><td>123</td><td>=MAX()</td><td>รอบที่ดีที่สุด</td></tr>
+      </tbody>
+    </table>
+    <div class="callout good">🎯 <b>IQR หาได้ทันทีจากตารางนี้:</b> 74 − 52 = 22 · ขอบล่างของ Outlier = 52 − 1.5 × 22 = <b>19</b> · ค่า min ที่ 14 จึงต่ำกว่าขอบล่าง แปลว่ามีรอบเก็บเกี่ยวที่เข้าข่ายผิดปกติอยู่ในไฟล์ — <b>เป็นวิธีคิดเดียวกับกฎ 1.5 × IQR ในคาบ 5 ทุกประการ ต่างแค่ได้ตัวเลขมาเร็วกว่า</b></div>
+  </div>
+
+  <div class="card">
+    <h2>เลือกดูเฉพาะบางส่วน</h2>
+<div class="py"><span class="cm"># หนึ่งคอลัมน์</span>
+harvest[<span class="st">'ปริมาณกก.'</span>]
+
+<span class="cm"># หลายคอลัมน์ — ใส่ list ซ้อนเข้าไปอีกชั้น</span>
+harvest[[<span class="st">'วันที่'</span>, <span class="st">'รหัสแปลง'</span>, <span class="st">'ปริมาณกก.'</span>]]
+
+<span class="cm"># หนึ่งแถวตามหมายเลข index</span>
+harvest.loc[<span class="nu">0</span>]
+
+<span class="cm"># 5 แถวแรกของ 3 คอลัมน์นี้</span>
+harvest[[<span class="st">'วันที่'</span>, <span class="st">'รหัสแปลง'</span>, <span class="st">'ปริมาณกก.'</span>]].<span class="fn">head</span>()</div>
+    <div class="callout">⚠️ <b>วงเล็บเหลี่ยมสองชั้น</b> <code>[[...]]</code> ตอนเลือกหลายคอลัมน์ — คนมักลืมแล้วเขียนชั้นเดียว จะขึ้น <code>KeyError</code> ทันที · จำง่าย ๆ ว่าชั้นในคือ List ของชื่อคอลัมน์ ชั้นนอกคือการเลือก</div>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(1)">← ย้อนกลับ</button><button class="btn" onclick="go(3)">ถัดไป: กรอง · คอลัมน์ · เรียง →</button></div>
+</section>
+
+<!-- ===== PAGE 3 ===== -->
+<section class="page" id="p3">
+  <div class="card">
+    <span class="kicker">ต้องทำก่อนเป็นอันดับแรก</span>
+    <h2>🗓️ แยก <code>ปี</code> และ <code>เดือน</code> ออกจากคอลัมน์วันที่</h2>
+    <p class="lead">ไฟล์มีแค่คอลัมน์ <code>วันที่</code> — <b>ยังไม่มีคอลัมน์ ปี หรือ เดือน ให้กรอง</b> ต้องสร้างขึ้นมาเองก่อน เหมือนที่คาบ 2 ใช้ <code>=YEAR()</code> กับ <code>=MONTH()</code> และคาบ 4 สร้างตารางปฏิทินให้ Power BI</p>
+<div class="py"><span class="cm"># .dt คือประตูเข้าไปหยิบส่วนต่าง ๆ ของวันที่ออกมา</span>
+harvest[<span class="st">'ปี'</span>]   <span class="kw">=</span> harvest[<span class="st">'วันที่'</span>].dt.year <span class="kw">+</span> <span class="nu">543</span>   <span class="cm"># ไฟล์เก็บเป็น ค.ศ. บวก 543 ให้เป็น พ.ศ.</span>
+harvest[<span class="st">'เดือน'</span>] <span class="kw">=</span> harvest[<span class="st">'วันที่'</span>].dt.month
+
+harvest[[<span class="st">'วันที่'</span>, <span class="st">'ปี'</span>, <span class="st">'เดือน'</span>]].<span class="fn">head</span>(<span class="nu">3</span>)</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>       วันที่    ปี  เดือน
+0 2025-01-03  2568      1
+1 2025-01-07  2568      1
+2 2025-01-11  2568      1</div>
+    <table class="cmp">
+      <thead><tr><th style="width:30%">อยากได้อะไรจากวันที่</th><th>เขียนอย่างไร</th></tr></thead>
+      <tbody>
+        <tr><td>ปี (ค.ศ.)</td><td class="new"><code>df['วันที่'].dt.year</code></td></tr>
+        <tr><td>เดือน (1–12)</td><td class="new"><code>df['วันที่'].dt.month</code></td></tr>
+        <tr><td>วันที่ในเดือน</td><td><code>df['วันที่'].dt.day</code></td></tr>
+        <tr><td>ไตรมาส (1–4)</td><td><code>df['วันที่'].dt.quarter</code></td></tr>
+        <tr><td>วันในสัปดาห์ (จันทร์ = 0)</td><td><code>df['วันที่'].dt.dayofweek</code></td></tr>
+      </tbody>
+    </table>
+    <div class="callout bad">❌ <b>ถ้าลืมรันเซลล์นี้</b> แล้วไปเรียก <code>harvest['ปี']</code> จะขึ้น <code>KeyError: 'ปี'</code> ทันที — เป็นข้อผิดพลาดที่เจอบ่อยที่สุดของหน้าถัดไป เพราะ<b>คอลัมน์ที่ไม่ได้สร้าง ก็ไม่มีอยู่จริง</b></div>
+    <div class="callout info">💡 <code>.dt</code> ใช้ได้เฉพาะเมื่อคอลัมน์นั้นเป็นชนิดวันที่จริง ๆ · ถ้า <code>info()</code> บอกว่า <code>วันที่</code> เป็น <code>object</code> ให้แปลงก่อนด้วย <code>harvest['วันที่'] = pd.to_datetime(harvest['วันที่'])</code> — ตรงกับขั้น Change Type ใน Power Query คาบ 3</div>
+    <div class="callout good">🇹🇭 <b>เรื่อง พ.ศ. กับ ค.ศ.</b> — ข้อมูลดิบเก็บเป็น ค.ศ. เสมอ (2025, 2026, 2027) แต่รายงานที่ส่งอาจารย์และผู้บริหารใช้ พ.ศ. (2568, 2569, 2570) · <b>ทั้งคาบนี้เราจะพูดถึงปีเป็น พ.ศ. หลังบวก 543 แล้ว</b> ถ้ากรอง <code>ปี == 2570</code> แล้วได้ตารางว่าง ให้กลับมาดูว่าลืมบวก 543 หรือเปล่า</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">จัดการข้อมูล</span>
+    <h2>🔎 คัดกรองข้อมูล = Filter ใน Excel · Filter Context ใน Power BI</h2>
+    <p class="lead">ตารางด้านล่างคือตัวอย่างข้อมูลดิบบางแถวจาก <code>harvest</code> (ตัวแปรที่มีอยู่แล้วตอนนี้ ยังไม่ต้องสรุปอะไรก่อน) · ลองประกอบเงื่อนไขดูว่าเหลือกี่แถว</p>
+    <div class="row">
+      <div style="max-width:180px">
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">คอลัมน์</label>
+        <select id="fCol" style="width:100%">
+          <option value="w">ของเสีย (กก.)</option>
+          <option value="kg">ปริมาณกก.</option>
+          <option value="h">โรงเรือน</option>
+        </select>
+      </div>
+      <div style="max-width:130px">
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">เงื่อนไข</label>
+        <select id="fOp" style="width:100%"></select>
+      </div>
+      <div style="max-width:160px">
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">ค่า</label>
+        <select id="fVal" style="width:100%"></select>
+      </div>
+    </div>
+    <div class="cols2" style="margin-top:14px">
+      <div>
+        <h3 style="margin:0 0 8px;font-size:14px">แบบวงเล็บเหลี่ยม</h3>
+        <div class="py" id="fCodeBracket"></div>
+      </div>
+      <div>
+        <h3 style="margin:0 0 8px;font-size:14px">แบบ query()</h3>
+        <div class="py" id="fCodeQuery"></div>
+      </div>
+    </div>
+    <div class="out" id="fOut"></div>
+    <div id="fTable" style="margin-top:12px"></div>
+    <div class="note" style="margin-top:10px" id="fNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>เขียนเงื่อนไขได้ 2 แบบ — เลือกแบบที่อ่านง่ายกว่า</h2>
+    <table class="cmp">
+      <thead><tr><th style="width:24%">โจทย์</th><th>แบบวงเล็บเหลี่ยม</th><th>แบบ query()</th></tr></thead>
+      <tbody>
+        <tr><td>ของเสียเกิน 8%</td><td><code>df[df['ของเสีย%'] &gt; 8]</code></td><td class="new"><code>df.query('ของเสีย% &gt; 8')</code></td></tr>
+        <tr><td>สองเงื่อนไขพร้อมกัน</td><td><code>df[(df['ของเสีย%'] &gt; 8) &amp; (df['โรงเรือน'] == 'B')]</code></td><td class="new"><code>df.query("ของเสีย% &gt; 8 and โรงเรือน == 'B'")</code></td></tr>
+        <tr><td>อยู่ในรายการที่กำหนด</td><td><code>df[df['โรงเรือน'].isin(['A','B'])]</code></td><td class="new"><code>df.query("โรงเรือน in ['A','B']")</code></td></tr>
+        <tr><td>อยู่ในช่วง</td><td><code>df[df['ผลผลิต'].between(100, 200)]</code></td><td class="new"><code>df.query('100 &lt;= ผลผลิต &lt;= 200')</code></td></tr>
+      </tbody>
+    </table>
+    <div class="callout info">💡 <code>query()</code> เขียนเงื่อนไขเป็นประโยคเดียว ใช้คำว่า <code>and</code> <code>or</code> ได้ตรง ๆ — <b>รูปแบบนี้ใกล้เคียงกับคำสั่ง WHERE ในภาษา SQL มาก</b> ซึ่งเป็นภาษาที่ใช้ดึงข้อมูลจากฐานข้อมูลในงานจริง ถ้าคุ้นกับ <code>query()</code> ก็จะอ่าน SQL ออกโดยอัตโนมัติ</div>
+    <div class="callout bad">❌ <b>จุดพลาดที่พบบ่อย:</b> ใช้ <code>and</code> กับแบบวงเล็บเหลี่ยม (ต้องใช้ <code>&amp;</code>) และลืมใส่วงเล็บครอบแต่ละเงื่อนไข · <code>df[df['a']&gt;1 &amp; df['b']&lt;2]</code> จะพัง ต้องเป็น <code>df[(df['a']&gt;1) &amp; (df['b']&lt;2)]</code></div>
+  </div>
+
+  <div class="card">
+    <h2>➕ สร้างคอลัมน์ใหม่ = Calculated Column ในคาบ 4</h2>
+    <p>ก่อนอื่นสร้างตารางสรุป <b>รายแปลง ไตรมาส 2 ปี 2570</b> ที่ใช้เป็นตัวอย่างในหน้านี้ — 12 แถว แถวละหนึ่งแปลง</p>
+<div class="py"><span class="cm"># กรองเฉพาะไตรมาส 2 ปี 2570 แล้วรวมยอดรายแปลง</span>
+q2_70 <span class="kw">=</span> harvest[(harvest[<span class="st">'ปี'</span>] <span class="kw">==</span> <span class="nu">2570</span>) <span class="kw">&amp;</span> (harvest[<span class="st">'เดือน'</span>].<span class="fn">between</span>(<span class="nu">4</span>, <span class="nu">6</span>))]
+
+plot_q2 <span class="kw">=</span> q2_70.<span class="fn">groupby</span>([<span class="st">'รหัสแปลง'</span>, <span class="st">'โรงเรือน'</span>]).<span class="fn">agg</span>(
+    ผลผลิต=(<span class="st">'ปริมาณกก.'</span>, <span class="st">'sum'</span>),
+    ของเสีย=(<span class="st">'ของเสีย (กก.)'</span>, <span class="st">'sum'</span>),
+    ไร่=(<span class="st">'พื้นที่ (ไร่)'</span>, <span class="st">'max'</span>)
+).<span class="fn">reset_index</span>()</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>  รหัสแปลง โรงเรือน  ผลผลิต  ของเสีย  ไร่
+0      P01        A    1356       88  7.0
+1      P02        A    1185       80  6.5
+2      P03        A    1006       63  6.0
+3      P04        B     696       99  6.5</div>
+    <p style="margin-top:14px">แล้วจึงเติมคอลัมน์คำนวณเข้าไป</p>
+<div class="py"><span class="cm"># คำนวณจากคอลัมน์อื่น — คำนวณให้ทุกแถวพร้อมกัน ไม่ต้องวนลูป</span>
+plot_q2[<span class="st">'ต่อไร่'</span>] <span class="kw">=</span> (plot_q2[<span class="st">'ผลผลิต'</span>] <span class="kw">/</span> plot_q2[<span class="st">'ไร่'</span>]).<span class="fn">round</span>(<span class="nu">1</span>)
+plot_q2[<span class="st">'ของเสีย%'</span>] <span class="kw">=</span> (plot_q2[<span class="st">'ของเสีย'</span>] <span class="kw">/</span> plot_q2[<span class="st">'ผลผลิต'</span>] <span class="kw">*</span> <span class="nu">100</span>).<span class="fn">round</span>(<span class="nu">1</span>)
+
+<span class="cm"># จัดกลุ่มด้วยเงื่อนไข — เหมือน IF ใน Excel แต่ทำทั้งคอลัมน์ในบรรทัดเดียว</span>
+plot_q2[<span class="st">'สถานะ'</span>] <span class="kw">=</span> np.<span class="fn">where</span>(plot_q2[<span class="st">'ของเสีย%'</span>] <span class="kw">&gt;</span> <span class="nu">8</span>, <span class="st">'เกินเป้า'</span>, <span class="st">'ผ่านเกณฑ์'</span>)
+
+<span class="cm"># แปลงรหัสเป็นชื่อเต็ม — เหมือน VLOOKUP กับตารางเล็ก ๆ</span>
+ชื่อโรงเรือน <span class="kw">=</span> {<span class="st">'A'</span>:<span class="st">'โรงเรือนเหนือ'</span>, <span class="st">'B'</span>:<span class="st">'โรงเรือนกลาง'</span>, <span class="st">'C'</span>:<span class="st">'โรงเรือนใต้'</span>}
+plot_q2[<span class="st">'ชื่อเต็ม'</span>] <span class="kw">=</span> plot_q2[<span class="st">'โรงเรือน'</span>].<span class="fn">map</span>(ชื่อโรงเรือน)</div>
+    <div class="callout good">✅ <b>จุดสำคัญ:</b> ไม่ต้องเขียน <code>for</code> วนทีละแถวเลย — Pandas คำนวณทั้งคอลัมน์พร้อมกัน · <b>นี่คือเหตุผลที่ Pandas เร็วกว่าการเขียนลูปเองมาก</b> และเป็นวิธีคิดเดียวกับการลากสูตรลงทั้งคอลัมน์ใน Excel</div>
+    <div class="callout">⚠️ <b>ชื่อคอลัมน์ที่มีวงเล็บหรือช่องว่าง</b> เช่น <code>'ของเสีย (กก.)'</code> ใช้กับ <code>query()</code> ตรง ๆ ไม่ได้ ต้องครอบด้วยเครื่องหมาย ` เช่น <code>df.query("`ของเสีย (กก.)` &gt; 10")</code> · เวลาสร้างคอลัมน์ใหม่เองจึงควรตั้งชื่อสั้นและไม่มีช่องว่าง</div>
+  </div>
+
+  <div class="card">
+    <h2>🧹 จัดการค่าว่าง และ 🔃 การเรียงลำดับ</h2>
+    <div class="cols2">
+      <div>
+        <h3>ค่าว่าง (Missing Values)</h3>
+<div class="py"><span class="cm"># ตรวจก่อนเสมอ ว่ามีกี่ช่องที่ว่าง</span>
+df.<span class="fn">isna</span>().<span class="fn">sum</span>()
+
+<span class="cm"># ลบทั้งแถวที่มีค่าว่าง</span>
+df.<span class="fn">dropna</span>()
+
+<span class="cm"># เติมด้วยค่าเฉลี่ยของคอลัมน์นั้น</span>
+df[<span class="st">'ปริมาณกก.'</span>] <span class="kw">=</span> df[<span class="st">'ปริมาณกก.'</span>].<span class="fn">fillna</span>(df[<span class="st">'ปริมาณกก.'</span>].<span class="fn">mean</span>())</div>
+        <div class="note">คือคำสั่ง Remove Rows และ Replace Values ใน Power Query คาบ 3 · <b>ไฟล์ของเราไม่มีค่าว่างเลย</b> แต่ข้อมูลจริงมีเสมอ จึงต้องตรวจทุกครั้ง</div>
+      </div>
+      <div>
+        <h3>เรียงลำดับ</h3>
+<div class="py"><span class="cm"># เรียงจากน้อยไปมาก</span>
+df.<span class="fn">sort_values</span>(<span class="st">'ของเสีย%'</span>)
+
+<span class="cm"># จากมากไปน้อย</span>
+df.<span class="fn">sort_values</span>(<span class="st">'ของเสีย%'</span>, ascending=<span class="kw">False</span>)
+
+<span class="cm"># เรียงสองชั้น: โรงเรือนก่อน แล้วผลผลิตมากไปน้อย</span>
+df.<span class="fn">sort_values</span>([<span class="st">'โรงเรือน'</span>, <span class="st">'ต่อไร่'</span>], ascending=[<span class="kw">True</span>, <span class="kw">False</span>])
+
+<span class="cm"># เอาแค่ 5 อันดับแรก</span>
+df.<span class="fn">nlargest</span>(<span class="nu">5</span>, <span class="st">'ของเสีย%'</span>)</div>
+        <div class="note">คือ Sort และ Top N ใน PivotTable คาบ 2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 1</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>สร้างคอลัมน์ <code>'ปี'</code> (พ.ศ.) และ <code>'เดือน'</code> ใน <code>harvest</code> แล้วนับว่าปี 2570 มีรอบเก็บเกี่ยวกี่รอบ</li>
+      <li>จาก <code>harvest</code> กรองเฉพาะรอบเก็บเกี่ยวที่ปริมาณ<b>ต่ำกว่า 19 กก.</b> — มีกี่แถว และอยู่แปลงไหนบ้าง</li>
+      <li>สร้างคอลัมน์ <code>'ของเสีย%'</code> ในตาราง <code>harvest</code> แล้วหาว่ารอบไหนของเสียสูงสุด 5 อันดับแรก</li>
+      <li>ใช้ <code>query()</code> เขียนเงื่อนไข "ของเสียเกิน 15% และปริมาณมากกว่า 50 กก." แล้วนับจำนวนแถวที่ได้</li>
+    </ol>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(2)">← ย้อนกลับ</button><button class="btn" onclick="go(4)">ถัดไป: groupby &amp; pivot →</button></div>
+</section>
+
+<!-- ===== PAGE 4 ===== -->
+<section class="page" id="p4">
+  <div class="card">
+    <span class="kicker">หัวใจของคาบนี้</span>
+    <h2>📊 groupby — PivotTable ที่เขียนเป็นโค้ด</h2>
+    <p class="lead">นี่คือคำสั่งที่ใช้บ่อยที่สุดในการวิเคราะห์ข้อมูล และเป็นสิ่งที่คุณทำเป็นอยู่แล้วตั้งแต่คาบ 2 — เพียงแต่ตอนนั้นทำด้วยการลากช่อง</p>
+    <table class="cmp">
+      <thead><tr><th style="width:24%">สิ่งที่ทำใน PivotTable</th><th>เขียนใน Pandas ตรงไหน</th></tr></thead>
+      <tbody>
+        <tr><td>ลากฟิลด์ลงช่อง <b>แถว</b></td><td class="new"><code>.groupby('โรงเรือน')</code></td></tr>
+        <tr><td>ลากฟิลด์ลงช่อง <b>ค่า</b></td><td class="new"><code>['ปริมาณกก.']</code></td></tr>
+        <tr><td>เลือกว่าจะ<b>รวม</b>หรือ<b>เฉลี่ย</b></td><td class="new"><code>.sum()</code> หรือ <code>.mean()</code></td></tr>
+        <tr><td>ลากฟิลด์ลงช่อง <b>คอลัมน์</b></td><td class="new">ใช้ <code>pivot_table(columns=...)</code> แทน</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>🧪 ห้องทดลอง: ประกอบคำสั่ง groupby</h2>
+    <p>ข้อมูล: การเก็บเกี่ยว<b>ไตรมาส 2 ปี 2570</b> (252 รอบเก็บเกี่ยว) — เลือกดูว่าจัดกลุ่มด้วยอะไรแล้วได้อะไร</p>
+    <div class="row">
+      <div style="max-width:190px">
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">จัดกลุ่มตาม (แถว)</label>
+        <select id="gKey" style="width:100%">
+          <option value="h">โรงเรือน</option>
+          <option value="m">เดือน</option>
+          <option value="c">ชนิดพืช</option>
+        </select>
+      </div>
+      <div style="max-width:190px">
+        <label style="font-weight:700;font-size:13.5px;display:block;margin-bottom:5px">คำนวณ (ค่า)</label>
+        <select id="gAgg" style="width:100%">
+          <option value="sum">sum — ผลรวมปริมาณ</option>
+          <option value="mean">mean — เฉลี่ยต่อรอบ</option>
+          <option value="count">count — จำนวนรอบ</option>
+          <option value="waste">ของเสีย% (คำนวณเอง)</option>
+        </select>
+      </div>
+    </div>
+    <div class="py" id="gCode" style="margin-top:14px"></div>
+    <div class="out" id="gOut"></div>
+    <div class="note" style="margin-top:10px" id="gNote"></div>
+  </div>
+
+  <div class="card">
+    <h2>🔍 ทำ Drill-down ของคาบ 5 ซ้ำ — ด้วยโค้ด 3 บรรทัด</h2>
+    <p>ในคาบ 5 เราไล่หาสาเหตุด้วยการคลิกเจาะลงไปทีละชั้นใน Power BI · ตอนนี้ทำทั้งกระบวนการได้ในโค้ดสั้น ๆ</p>
+<div class="py"><span class="cm"># ชั้นที่ 1 — ภาพรวมทั้งฟาร์ม เทียบไตรมาส 2 ของสองปี</span>
+<span class="cm"># (ต้องสร้างคอลัมน์ ปี และ เดือน ไว้ก่อนแล้วจากหน้าที่แล้ว)</span>
+q2 <span class="kw">=</span> harvest[(harvest[<span class="st">'ปี'</span>].<span class="fn">isin</span>([<span class="nu">2569</span>, <span class="nu">2570</span>])) <span class="kw">&amp;</span> (harvest[<span class="st">'เดือน'</span>].<span class="fn">between</span>(<span class="nu">4</span>, <span class="nu">6</span>))]
+<span class="fn">print</span>(q2.<span class="fn">groupby</span>(<span class="st">'ปี'</span>)[<span class="st">'ปริมาณกก.'</span>].<span class="fn">sum</span>())</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>ปี
+2569    13740
+2570    11310
+→ เปลี่ยนแปลง -17.7%</div>
+<div class="py" style="margin-top:16px"><span class="cm"># ชั้นที่ 2 — แยกตามโรงเรือน</span>
+<span class="fn">print</span>(q2.<span class="fn">pivot_table</span>(index=<span class="st">'โรงเรือน'</span>, columns=<span class="st">'ปี'</span>, values=<span class="st">'ปริมาณกก.'</span>, aggfunc=<span class="st">'sum'</span>))</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>ปี         2569   2570    เปลี่ยนแปลง
+โรงเรือน
+A          4651   4533       -2.5%
+B          4816   2694      -44.1%
+C          4273   4083       -4.4%</div>
+    <div class="callout bad">🎯 <b>เจอเหมือนเดิม</b> — ค่าเฉลี่ยรวมบอกว่าลด 17.7% แต่ความจริงคือ<b>โรงเรือน B ลดถึง 44.1%</b> ส่วน A กับ C แทบไม่เปลี่ยน · ตัวเลขตรงกับที่ได้จาก Power BI ในคาบ 5 ทุกตัว <b>ต่างกันแค่คาบนั้นใช้เวลาคลิกหลายนาที คาบนี้ใช้โค้ดสองบรรทัด และรันซ้ำเดือนหน้าได้ทันที</b></div>
+<div class="py" style="margin-top:16px"><span class="cm"># ชั้นที่ 3 — เจาะโรงเรือน B ลงไปดูรายเดือน</span>
+b <span class="kw">=</span> q2[(q2[<span class="st">'โรงเรือน'</span>] <span class="kw">==</span> <span class="st">'B'</span>) <span class="kw">&amp;</span> (q2[<span class="st">'ปี'</span>] <span class="kw">==</span> <span class="nu">2570</span>)]
+<span class="fn">print</span>(b.<span class="fn">groupby</span>(<span class="st">'เดือน'</span>)[[<span class="st">'ปริมาณกก.'</span>, <span class="st">'ของเสีย (กก.)'</span>]].<span class="fn">sum</span>())</div>
+    <div class="out"><span class="lbl">ผลลัพธ์</span>เดือน   ปริมาณกก.  ของเสีย (กก.)
+4            835           113
+5            729           124
+6           1130           185</div>
+    <div class="note">เมษายนกับพฤษภาคมคือช่วงที่ผลผลิตต่ำที่สุด สอดคล้องกับบันทึกซ่อมบำรุงที่ระบุว่าพัดลมระบายอากาศเสียเมื่อ 8 เมษายน · มิถุนายนเริ่มฟื้นเพราะอากาศเย็นลง แต่ของเสียยังสูงอยู่</div>
+  </div>
+
+  <div class="card">
+    <h2>คำสั่งกลุ่ม groupby ที่ควรรู้</h2>
+<div class="py"><span class="cm"># q2_70 = ไตรมาส 2 ปี 2570 ที่สร้างไว้ในหน้าก่อน</span>
+<span class="cm"># จัดกลุ่มสองชั้น</span>
+q2_70.<span class="fn">groupby</span>([<span class="st">'โรงเรือน'</span>, <span class="st">'เดือน'</span>])[<span class="st">'ปริมาณกก.'</span>].<span class="fn">sum</span>()
+
+<span class="cm"># คำนวณหลายอย่างพร้อมกัน</span>
+q2_70.<span class="fn">groupby</span>(<span class="st">'โรงเรือน'</span>).<span class="fn">agg</span>(
+    ผลผลิตรวม=(<span class="st">'ปริมาณกก.'</span>, <span class="st">'sum'</span>),
+    เฉลี่ยต่อรอบ=(<span class="st">'ปริมาณกก.'</span>, <span class="st">'mean'</span>),
+    จำนวนรอบ=(<span class="st">'ปริมาณกก.'</span>, <span class="st">'count'</span>),
+    ของเสียรวม=(<span class="st">'ของเสีย (กก.)'</span>, <span class="st">'sum'</span>)
+)
+
+<span class="cm"># ให้ผลกลับมาเป็นตารางปกติ ไม่ใช่ index ซ้อนกัน</span>
+q2_70.<span class="fn">groupby</span>(<span class="st">'โรงเรือน'</span>)[<span class="st">'ปริมาณกก.'</span>].<span class="fn">sum</span>().<span class="fn">reset_index</span>()</div>
+    <div class="callout info">💡 <code>.agg()</code> ที่ตั้งชื่อคอลัมน์ผลลัพธ์เองได้ คือสิ่งที่ใกล้เคียงกับการเขียน <b>Measure ใน DAX</b> มากที่สุด — ต่างกันตรงที่ DAX คำนวณใหม่ทุกครั้งที่ผู้ใช้กดตัวกรอง ส่วน Pandas คำนวณครั้งเดียวได้ตารางออกมาเลย</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 2</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>หาผลผลิตรวม<b>รายชนิดพืช</b>ของทั้งไฟล์ แล้วเรียงจากมากไปน้อย</li>
+      <li>ใช้ <code>pivot_table</code> สร้างตาราง <b>โรงเรือน × เดือน</b> ของไตรมาส 2 ปี 2570 โดยให้ค่าเป็นผลรวมปริมาณ</li>
+      <li>ใช้ <code>.agg()</code> หาผลผลิตรวม ของเสียรวม และจำนวนรอบ ของแต่ละโรงเรือน <b>ในไตรมาส 2 ปี 2570</b> แล้วสร้างคอลัมน์ <code>'ของเสีย%'</code> ต่อท้าย — ตรวจว่าโรงเรือน B ได้ 15.7% หรือไม่</li>
+    </ol>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(3)">← ย้อนกลับ</button><button class="btn" onclick="go(5)">ถัดไป: Excel ↔ Python →</button></div>
+</section>
+
+<!-- ===== PAGE 5 ===== -->
+<section class="page" id="p5">
+  <div class="card">
+    <span class="kicker">ทำงานร่วมกัน</span>
+    <h2>🔁 งานไหนทำใน Excel · งานไหนส่งต่อให้ Python</h2>
+    <p class="lead">คาบนี้ไม่ได้มาแทน Excel — <b>เป้าหมายคือใช้สองอย่างต่อกันเป็นสายงานเดียว</b> · เลือกเครื่องมือตามลักษณะงาน ไม่ใช่ตามความเคยชิน</p>
+    <table class="cmp">
+      <thead><tr><th style="width:30%">งาน</th><th style="width:20%">ทำที่ไหน</th><th>เพราะอะไร</th></tr></thead>
+      <tbody>
+        <tr><td><b>รวมตารางหลายชีต / ต่อไฟล์หลายเดือน</b></td><td>Excel · Power Query<br><span class="note">Merge · Append (คาบ 3)</span></td><td>คลิกเลือกคีย์แล้วเห็นผลทันที ตรวจว่าจับคู่ครบหรือไม่ได้ด้วยตา · ทำครั้งเดียวจบแล้วส่งตารางให้ Python ใช้ต่อ</td></tr>
+        <tr><td>ทำความสะอาด เปลี่ยนชนิดข้อมูล แยกคอลัมน์</td><td>Excel · Power Query</td><td>มี Applied Steps ให้ย้อนดูทีละขั้น และรันซ้ำกับไฟล์เดือนใหม่ได้</td></tr>
+        <tr><td>สำรวจ · กรอง · สร้างคอลัมน์ · สรุปรายกลุ่ม</td><td>ได้ทั้งสองอย่าง</td><td>ไม่กี่พันแถวและดูครั้งเดียว PivotTable เร็วกว่า · ถ้าต้องทำซ้ำทุกเดือน Python คุ้มกว่า</td></tr>
+        <tr><td class="new"><b>รายงานชุดเดิมที่ต้องทำซ้ำทุกเดือน</b></td><td class="new">Python</td><td>เปลี่ยนไฟล์ต้นทางแล้วกด Run All — ได้ผลใหม่ทั้งชุดโดยไม่ต้องคลิกซ้ำและไม่พลาดขั้นตอน</td></tr>
+        <tr><td class="new">ข้อมูลเกินหนึ่งล้านแถว</td><td class="new">Python</td><td>เกินขีดจำกัดของชีต Excel ไปแล้ว</td></tr>
+        <tr><td class="new"><b>พยากรณ์ · Machine Learning</b></td><td class="new">Python</td><td>Excel และ Power BI ทำไม่ได้ — คือเหตุผลหลักที่ต้องเรียนคาบ 9–11</td></tr>
+        <tr><td>ส่งผลลัพธ์ให้เพื่อนร่วมงานที่ใช้ Excel</td><td>กลับมาที่ Excel</td><td><code>to_excel()</code> แล้วเขาเปิดทำงานต่อได้ตามปกติ</td></tr>
+      </tbody>
+    </table>
+    <div class="callout good">🍃 <b>ไฟล์ที่เราใช้ทั้งคาบคือผลของแถวบนสุดในตารางนี้</b> — <code>BDA_class8_FarmData.xlsx</code> คือ FactHarvest ที่ Merge กับ DimPlot และ DimCrop ไว้แล้วใน Power Query · คุณจึงเรียก <code>โรงเรือน</code> และ <code>ชนิดพืช</code> ได้เลยโดยไม่ต้องรวมตารางเองใน Python</div>
+    <div class="callout info">💡 <b>สำหรับคนที่อยากรู้ต่อ</b> — Python รวมตารางเองได้เหมือนกันด้วย <code>pd.merge()</code> (= Merge) และ <code>pd.concat()</code> (= Append) · ไม่ได้สอนในคาบนี้เพราะทำใน Power Query เห็นภาพและตรวจง่ายกว่ามาก · จะได้ใช้จริงก็ต่อเมื่อไฟล์ใหญ่เกินกว่าที่ Excel จะเปิดไหว</div>
+  </div>
+
+  <div class="card">
+    <h2>💾 บันทึกผลลัพธ์กลับเป็นไฟล์ Excel</h2>
+    <p>ขั้นสุดท้ายของสายงาน — เอาตารางสรุปที่ Python คำนวณได้ ส่งกลับไปให้คนที่ทำงานด้วย Excel</p>
+<div class="py">summary <span class="kw">=</span> q2_70.<span class="fn">groupby</span>(<span class="st">'โรงเรือน'</span>)[<span class="st">'ปริมาณกก.'</span>].<span class="fn">sum</span>().<span class="fn">reset_index</span>()
+
+summary.<span class="fn">to_excel</span>(<span class="st">'สรุปรายโรงเรือน.xlsx'</span>, index=<span class="kw">False</span>)
+summary.<span class="fn">to_csv</span>(<span class="st">'สรุปรายโรงเรือน.csv'</span>, index=<span class="kw">False</span>, encoding=<span class="st">'utf-8-sig'</span>)</div>
+    <ul>
+      <li><code>index=False</code> เพื่อไม่ให้เลขแถว 0 1 2 ติดไปในไฟล์ด้วย</li>
+      <li><code>encoding='utf-8-sig'</code> <b>จำเป็นสำหรับไฟล์ CSV ที่มีภาษาไทย</b> ไม่งั้นเปิดใน Excel แล้วจะเป็นตัวอักษรประหลาด</li>
+      <li>ไฟล์จะไปอยู่ในแถบโฟลเดอร์ทางซ้ายของ Colab — คลิกขวาเพื่อดาวน์โหลด</li>
+    </ul>
+    <div class="callout info">📄 <b>เขียนหลายตารางลงไฟล์เดียวหลายชีต</b> ก็ทำได้ — รูปแบบเดียวกับไฟล์ที่เราเปิดตอนต้นคาบ
+<div class="py" style="margin-top:8px"><span class="kw">with</span> pd.<span class="fn">ExcelWriter</span>(<span class="st">'รายงานเดือนนี้.xlsx'</span>) <span class="kw">as</span> w:
+    summary.<span class="fn">to_excel</span>(w, sheet_name=<span class="st">'รายโรงเรือน'</span>, index=<span class="kw">False</span>)
+    plot_q2.<span class="fn">to_excel</span>(w, sheet_name=<span class="st">'รายแปลง'</span>, index=<span class="kw">False</span>)</div></div>
+    <div class="callout good">🔄 <b>สายงานที่ใช้จริงหลังจบวิชานี้:</b> Power Query เตรียมข้อมูล → Python สรุปและวิเคราะห์ → <code>to_excel()</code> ส่งออก → Excel หรือ Power BI ทำหน้าตารายงานให้ผู้บริหารดู · <b>แต่ละเครื่องมือทำสิ่งที่ตัวเองทำได้ดีที่สุด</b></div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 3</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>สร้างตารางสรุป <b>ผลผลิตรวมและของเสีย% รายเดือนของแต่ละโรงเรือน</b> ในปี 2570 ด้วย <code>.agg()</code></li>
+      <li>บันทึกเป็นไฟล์ <code>สรุปรายโรงเรือน.xlsx</code> แล้วดาวน์โหลดออกมา</li>
+    </ol>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(4)">← ย้อนกลับ</button><button class="btn" onclick="go(6)">ถัดไป: พล็อตกราฟ →</button></div>
+</section>
+
+<!-- ===== PAGE 6 ===== -->
+<section class="page" id="p6">
+  <div class="card">
+    <span class="kicker">แสดงผล</span>
+    <h2>📈 พล็อตกราฟจาก DataFrame</h2>
+    <p class="lead">เรื่องว่ากราฟชนิดไหนใช้ตอนไหนเรียนไปแล้วครบในคาบ 4 และ 5 — <b>คาบนี้จึงเรียนแค่วิธีพิมพ์คำสั่ง</b> ส่วนหลักการเลือกกราฟใช้ของเดิมได้ทั้งหมด</p>
+    <div class="callout bad">🔤 <b>ต้องรันเซลล์ติดตั้งฟอนต์ไทยจากหน้าแรกก่อนเสมอ</b> — ถ้าไม่รัน หัวกราฟและชื่อแกนภาษาไทยจะกลายเป็นสี่เหลี่ยมว่างทั้งหมด นี่ไม่ใช่ error แต่เป็นเพราะ Colab ไม่มีฟอนต์ไทยติดตั้งมาให้</div>
+    <div class="fn-list" id="chList"></div>
+    <div class="py" id="chCode"></div>
+    <div class="chartwrap" style="position:relative;height:320px;margin-top:14px"><canvas id="chCanvas"></canvas></div>
+    <div class="note" style="margin-top:12px" id="chNote"></div>
+    <div class="note" style="margin-top:6px;font-style:italic">ภาพด้านบนคือภาพจำลองหน้าตาผลลัพธ์ · เมื่อรันใน Colab จริงจะได้กราฟรูปแบบเดียวกันจากคำสั่ง Matplotlib</div>
+  </div>
+
+  <div class="card">
+    <h2>สองวิธีเขียน — ใช้อันไหนก็ได้</h2>
+    <div class="cols2">
+      <div>
+        <h3>วิธีที่ 1 — สั่งจาก DataFrame</h3>
+<div class="py">summary.<span class="fn">plot</span>(kind=<span class="st">'bar'</span>)
+plt.<span class="fn">title</span>(<span class="st">'ผลผลิตรายโรงเรือน'</span>)
+plt.<span class="fn">show</span>()</div>
+        <div class="note">สั้นกว่า เหมาะกับกราฟเร็ว ๆ ระหว่างวิเคราะห์</div>
+      </div>
+      <div>
+        <h3>วิธีที่ 2 — สั่ง Matplotlib ตรง ๆ</h3>
+<div class="py">plt.<span class="fn">figure</span>(figsize=(<span class="nu">9</span>, <span class="nu">5</span>))
+plt.<span class="fn">bar</span>(summary.index, summary[<span class="st">'ปริมาณกก.'</span>])
+plt.<span class="fn">title</span>(<span class="st">'ผลผลิตรายโรงเรือน'</span>)
+plt.<span class="fn">ylabel</span>(<span class="st">'กิโลกรัม'</span>)
+plt.<span class="fn">show</span>()</div>
+        <div class="note">ยาวกว่าแต่ควบคุมทุกอย่างได้ เหมาะกับกราฟที่จะใส่ในรายงาน</div>
+      </div>
+    </div>
+    <div class="callout info">📌 <b>อย่าลืม <code>plt.show()</code></b> ปิดท้าย และอย่าลืมสิ่งที่คาบ 5 ย้ำไว้ — <b>ตั้งชื่อกราฟให้เป็นข้อสรุป ไม่ใช่ชื่อข้อมูล</b> · เขียนว่า "โรงเรือน B ผลผลิตต่ำกว่าอีกสองโรงเรือนราว 40%" ดีกว่าเขียนว่า "ผลผลิตรายโรงเรือน"</div>
+  </div>
+
+  <div class="card">
+    <span class="kicker">แบบฝึกหัดที่ 4</span>
+    <h2>✍️ ลองเอง</h2>
+    <ol class="steps">
+      <li>ทำกราฟแท่งผลผลิตรวม<b>รายชนิดพืช</b> พร้อมตั้งชื่อกราฟเป็นข้อสรุป</li>
+      <li>ทำกราฟเส้นผลผลิตรวม<b>รายเดือนของปี 2570</b> แล้วดูว่าเดือนไหนต่ำที่สุด</li>
+      <li>ทำ boxplot ของ <code>'ปริมาณกก.'</code> <b>แยกตามโรงเรือน</b> (ไตรมาส 2 ปี 2570) แล้วบอกว่าโรงเรือนใดมีการกระจายกว้างที่สุด และค่าต่ำสุดของโรงเรือนนั้นเข้าข่าย Outlier ตามกฎ 1.5 × IQR หรือไม่</li>
+    </ol>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(5)">← ย้อนกลับ</button><button class="btn" onclick="go(7)">ถัดไป: สรุป &amp; งานส่ง →</button></div>
+</section>
+
+<!-- ===== PAGE 7 ===== -->
+<section class="page" id="p7">
+  <div class="card">
+    <span class="kicker">สรุปทั้งคาบ</span>
+    <h2>🗺️ สิ่งที่คุณทำเป็นอยู่แล้ว → เขียนอย่างไรใน Python</h2>
+    <p class="lead">เก็บหน้านี้ไว้เปิดคู่กันทุกครั้งที่เขียนโค้ด — <b>เกือบทุกแถวคือสิ่งที่คุณทำเป็นมาตั้งแต่คาบ 1 แล้ว วันนี้แค่เปลี่ยนวิธีพิมพ์</b> · แถวสุดท้ายเท่านั้นที่เครื่องมือเดิมทำไม่ได้</p>
+    <table class="term">
+      <thead><tr><th style="width:24%">สิ่งที่ต้องการทำ</th><th style="width:26%">เคยทำด้วย</th><th>เขียนใน Python</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:inherit">เปิดไฟล์</td><td style="font-family:inherit">เปิด Excel · Get Data</td><td><code>pd.read_excel(...)</code></td></tr>
+        <tr><td style="font-family:inherit">ดูข้อมูลคร่าว ๆ</td><td style="font-family:inherit">เลื่อนดูในชีต</td><td><code>df.head()</code> · <code>df.info()</code></td></tr>
+        <tr><td style="font-family:inherit"><b>แยกปี–เดือนจากวันที่</b></td><td style="font-family:inherit">=YEAR() · =MONTH() · ตารางปฏิทิน</td><td><code>df['วันที่'].dt.year + 543</code> · <code>.dt.month</code></td></tr>
+        <tr><td style="font-family:inherit">สถิติทุกคอลัมน์</td><td style="font-family:inherit">AVERAGE · MEDIAN · STDEV · QUARTILE</td><td><code>df.describe()</code></td></tr>
+        <tr><td style="font-family:inherit">กรองแถว</td><td style="font-family:inherit">Filter · Boolean ใน Power Query</td><td><code>df[df['ผลผลิต'] &gt; 100]</code></td></tr>
+        <tr><td style="font-family:inherit">กรองหลายเงื่อนไข</td><td style="font-family:inherit">Advanced Filter · SUMIFS หลายเกณฑ์</td><td><code>df.query("โรงเรือน=='B' and เดือน==4")</code></td></tr>
+        <tr><td style="font-family:inherit">สร้างคอลัมน์คำนวณ</td><td style="font-family:inherit">สูตรในเซลล์ · Calculated Column</td><td><code>df['ต่อไร่'] = df['ผลผลิต'] / df['ไร่']</code></td></tr>
+        <tr><td style="font-family:inherit">จัดประเภทตามเงื่อนไข</td><td style="font-family:inherit">IF · Conditional Column</td><td><code>np.where(df['ของเสีย%']&gt;8,'เกิน','ผ่าน')</code></td></tr>
+        <tr><td style="font-family:inherit">แปลงรหัสเป็นชื่อ</td><td style="font-family:inherit">VLOOKUP กับตารางเล็ก</td><td><code>df['รหัส'].map(ตารางแปลง)</code></td></tr>
+        <tr><td style="font-family:inherit"><b>สรุปยอดตามกลุ่ม</b></td><td style="font-family:inherit">PivotTable · SUMIFS · Measure</td><td><code>df.groupby('โรงเรือน')['ผลผลิต'].sum()</code></td></tr>
+        <tr><td style="font-family:inherit"><b>ตารางสรุปสองมิติ</b></td><td style="font-family:inherit">PivotTable แถว + คอลัมน์</td><td><code>df.pivot_table(index=..., columns=..., values=..., aggfunc='sum')</code></td></tr>
+        <tr><td style="font-family:inherit">คำนวณหลายค่าพร้อมกัน</td><td style="font-family:inherit">Measure หลายตัวใน Power BI</td><td><code>df.groupby(...).agg(...)</code></td></tr>
+        <tr><td style="font-family:inherit">ดึงข้อมูลข้ามตาราง</td><td style="font-family:inherit">VLOOKUP · XLOOKUP · <b>Merge (คาบ 3)</b></td><td>ทำใน Power Query แล้ว · Python ก็ทำได้ด้วย <code>pd.merge(...)</code> — <span class="note">อ่านเสริม</span></td></tr>
+        <tr><td style="font-family:inherit">ต่อไฟล์หลายเดือน</td><td style="font-family:inherit"><b>Append ใน Power Query (คาบ 3)</b></td><td>ทำใน Power Query แล้ว · Python ก็ทำได้ด้วย <code>pd.concat([a, b])</code> — <span class="note">อ่านเสริม</span></td></tr>
+        <tr><td style="font-family:inherit">ลบแถวซ้ำ</td><td style="font-family:inherit">Remove Duplicates</td><td><code>df.drop_duplicates()</code></td></tr>
+        <tr><td style="font-family:inherit">เติมค่าว่าง</td><td style="font-family:inherit">Replace Values · Fill Down</td><td><code>df['x'].fillna(df['x'].mean())</code></td></tr>
+        <tr><td style="font-family:inherit">แยกคอลัมน์</td><td style="font-family:inherit">Text to Columns · Split Column</td><td><code>df['รหัส'].str.split('-', expand=True)</code></td></tr>
+        <tr><td style="font-family:inherit">เรียงและดูอันดับต้น</td><td style="font-family:inherit">Sort · Top N</td><td><code>df.nlargest(5, 'ผลผลิต')</code></td></tr>
+        <tr><td style="font-family:inherit">หาความสัมพันธ์</td><td style="font-family:inherit">CORREL · แผนภาพกระจาย</td><td><code>df[['อุณหภูมิ','ของเสีย%']].corr()</code></td></tr>
+        <tr><td style="font-family:inherit">หาค่าผิดปกติ</td><td style="font-family:inherit">กฎ 1.5 × IQR</td><td><code>df.boxplot(column='ปริมาณกก.', by='โรงเรือน')</code></td></tr>
+        <tr><td style="font-family:inherit">บันทึกผลลัพธ์</td><td style="font-family:inherit">Save As · Close &amp; Load</td><td><code>df.to_excel('ผล.xlsx', index=False)</code></td></tr>
+        <tr><td style="font-family:inherit"><b>พยากรณ์ค่าในอนาคต</b></td><td style="font-family:inherit"><span style="color:var(--red);font-weight:700">เครื่องมือเดิมทำไม่ได้</span></td><td><b>คาบ 9–11 · นี่คือเหตุผลที่ต้องเรียน Python</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <span class="kicker">งานส่ง</span>
+    <h2>📤 ทำซ้ำผลวิเคราะห์คาบ 5 ด้วย Python</h2>
+    <p class="lead">โจทย์: ใช้ <code>BDA_class8_FarmData.xlsx</code> (ชีต <code>FarmData</code> รวมตารางมาให้พร้อมใช้งานแล้วจาก Power Query) เขียน Python ทำซ้ำผลวิเคราะห์ที่เคยทำด้วย Excel และ Power BI แล้ว<b>พิสูจน์ว่าได้ตัวเลขเดียวกัน</b></p>
+    <div class="callout info">🎯 <b>ทำไมต้องทำซ้ำของเดิม</b> — เพราะคุณรู้คำตอบที่ถูกอยู่แล้ว จึงตรวจตัวเองได้ว่าเขียนโค้ดถูกหรือผิด · ถ้าไปทำโจทย์ใหม่ทันทีตั้งแต่วันแรก จะไม่มีอะไรมายืนยันว่าตัวเลขที่ได้เชื่อถือได้</div>
+
+    <h3>สิ่งที่ต้องมีในไฟล์</h3>
+    <div class="must">
+      <table>
+        <thead><tr><th>ข้อ</th><th>สิ่งที่ต้องทำ</th></tr></thead>
+        <tbody>
+          <tr><td>1 · สำรวจข้อมูล</td><td>อ่านชีต <code>FarmData</code> ด้วย <code>read_excel</code> · แสดง <code>.shape</code> <code>.info()</code> และ <code>.head()</code></td></tr>
+          <tr><td>2 · เตรียมคอลัมน์วันที่</td><td>สร้างคอลัมน์ <code>'ปี'</code> (พ.ศ. — อย่าลืม <code>+ 543</code>) และ <code>'เดือน'</code> จากคอลัมน์ <code>วันที่</code> ด้วย <code>.dt</code> · แสดง 3 แถวแรกเพื่อยืนยันว่าถูกต้อง</td></tr>
+          <tr><td>3 · สถิติพื้นฐาน</td><td>แสดง <code>describe()</code> ของคอลัมน์ปริมาณ แล้วเทียบกับค่าที่หาไว้ในคาบ 5 อย่างน้อย 3 ค่า</td></tr>
+          <tr><td>4 · สรุปแบบจัดกลุ่ม</td><td>ใช้ <code>groupby</code> หรือ <code>pivot_table</code> สร้างตารางเทียบผลผลิตไตรมาส 2 ปี 2569 กับ 2570 <b>รายโรงเรือน</b> พร้อมคอลัมน์เปอร์เซ็นต์การเปลี่ยนแปลง — ต้องได้ −2.5% · −44.1% · −4.4%</td></tr>
+          <tr><td>5 · เจาะลึกหนึ่งชั้น</td><td>เจาะโรงเรือนที่มีปัญหาลงไปดู<b>รายเดือน</b> แล้วระบุว่าเดือนใดแย่ที่สุด</td></tr>
+          <tr><td>6 · กราฟ 2 รูป</td><td>กราฟแท่งเทียบรายโรงเรือน และกราฟอีกหนึ่งรูปที่เลือกเอง · <b>ตั้งชื่อกราฟเป็นข้อสรุป</b> และภาษาไทยต้องแสดงผลได้</td></tr>
+          <tr><td>7 · ส่งกลับเข้า Excel</td><td>บันทึกตารางสรุปของข้อ 4 เป็นไฟล์ <code>.xlsx</code> ด้วย <code>to_excel(..., index=False)</code> แล้วเปิดตรวจใน Excel ว่าเปิดได้และภาษาไทยไม่เพี้ยน · <b>แนบไฟล์นี้มาพร้อมลิงก์ Colab</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>✅ เช็กลิสต์ก่อนส่ง</h3>
+    <ul class="chk">
+      <li>รันใหม่ตั้งแต่เซลล์แรกถึงเซลล์สุดท้าย (Runtime → Restart and run all) แล้วไม่มี error</li>
+      <li>ตัวเลขข้อ 4 ตรงกับที่ระบุไว้ในโจทย์ทั้งสามค่า — ถ้ากรองแล้วได้ตารางว่าง ให้ตรวจว่าลืมบวก 543 หรือเปล่า</li>
+      <li>กราฟภาษาไทยอ่านออก ไม่ใช่สี่เหลี่ยมว่าง</li>
+      <li>ชื่อกราฟทั้งสองรูปเป็นข้อสรุป ไม่ใช่ชื่อข้อมูลเฉย ๆ</li>
+      <li>มีเซลล์ข้อความคั่นเป็นหัวข้อ 1 ถึง 7 ให้อ่านตามได้</li>
+      <li>มีไฟล์ <code>.xlsx</code> ของข้อ 7 แนบมาด้วย</li>
+      <li>ตั้งค่าแชร์เป็น "ทุกคนที่มีลิงก์ · ผู้อ่าน" และทดลองเปิดลิงก์ในโหมดไม่ระบุตัวตนแล้ว</li>
+    </ul>
+    <div class="callout">📮 <b>ส่งงาน:</b> ส่งลิงก์ Colab ผ่านช่องทางที่อาจารย์แจ้งในคาบ · กำหนดส่ง: ก่อนเริ่มคาบที่ 9 · <b>ทำคนเดียว</b></div>
+    <div class="callout bad">🚫 <b>ข้อผิดพลาดที่พบบ่อย:</b> ลืมสร้างคอลัมน์ <code>ปี</code>/<code>เดือน</code> ก่อน (ขึ้น <code>KeyError</code>) · ลืมบวก 543 ทำให้กรองปี 2570 แล้วได้ตารางว่าง · ลืมกรองปีหรือกรองเดือนทำให้ตัวเลขไม่ตรง · ใช้ <code>and</code> แทน <code>&amp;</code> ในเงื่อนไขแบบวงเล็บเหลี่ยม · ลืมรันเซลล์ฟอนต์ไทยทำให้กราฟอ่านไม่ออก · ส่งลิงก์ที่ยังไม่ได้เปิดสิทธิ์ให้คนอื่นดู</div>
+  </div>
+
+  <div class="card">
+    <h2>คาบหน้าจะไปไหนต่อ</h2>
+    <p>ตอนนี้คุณเตรียมข้อมูลด้วย Python ได้แล้ว ซึ่งเป็นเงื่อนไขที่ต้องมีก่อนเข้าสู่ Machine Learning · <b>คาบที่ 9 เราจะเริ่มตอบคำถามที่ Excel และ Power BI ตอบไม่ได้ นั่นคือ "เดือนหน้าผลผลิตจะเป็นเท่าไร"</b> โดยใช้ตารางที่เตรียมเป็นในคาบนี้เป็นข้อมูลป้อนเข้าโมเดล</p>
+  </div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(6)">← ย้อนกลับ</button><button class="btn" onclick="go(8)">ถัดไป: แบบทดสอบ →</button></div>
+</section>
+
+<!-- ===== PAGE 8 : QUIZ ===== -->
+<section class="page" id="p8">
+  <div class="card">
+    <span class="kicker">ทบทวน</span>
+    <h2>📝 แบบทดสอบครั้งที่ 8</h2>
+    <p class="lead">10 ข้อ · เลือกคำตอบแล้วดูเฉลยทันที</p>
+    <div id="quizWrap"></div>
+    <div class="scorebox" id="scorebox">
+      <div>คะแนนของคุณ</div>
+      <div class="big" id="scoreNum"></div>
+      <div id="scoreMsg"></div>
+      <div class="qz-submit-wrap">
+        <button class="btn" id="qz_btn" style="background:#fff;color:#15803d" onclick="submitQuizScore()">📤 ส่งคะแนนเข้า Google Form</button>
+        <button class="btn ghost" id="resetQuiz" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)">🔄 ทำใหม่อีกครั้ง</button>
+      </div>
+      <div class="qz-msg" id="qz_msg"></div>
+      <iframe name="qz_target" id="qz_target" style="display:none" title="hidden"></iframe>
+      <!-- อาจารย์: เปลี่ยน 1FAIpQLSdL2iQ7rUbBdJ9quIEOzR225wdsNBritjjkTUFEUR-zZrw2fQ เป็นรหัสฟอร์มรับคะแนนควิซของคาบ 8 -->
+      <form id="qz_form" action="https://docs.google.com/forms/d/e/1FAIpQLSdL2iQ7rUbBdJ9quIEOzR225wdsNBritjjkTUFEUR-zZrw2fQ/formResponse" method="POST" target="qz_target" style="display:none">
+        <input type="hidden" name="entry.893657035" id="qz_f_student">
+        <input type="hidden" name="entry.1362746898" id="qz_f_score">
+        <input type="hidden" name="fvv" value="1">
+        <input type="hidden" name="pageHistory" value="0">
+      </form>
+    </div>
+  </div>
+  <div class="foot">Business Data Analytics · ครั้งที่ 8 — Pandas · NumPy · Matplotlib</div>
+  <div class="nav-next"><button class="btn ghost" onclick="go(0)">← กลับหน้าแรก</button><span></span></div>
+</section>
+
+</main>
+
+<script>
+/* ===== ข้อมูลจาก BDA_class8_FarmData.xlsx (ไตรมาส 2 ปี 2570) ===== */
+var PLOTQ2 = [
+ {id:'P01',h:'A',rai:7.0,crop:'กรีนโอ๊ค',kg:1356,w:88,perrai:193.7,wp:6.5},
+ {id:'P02',h:'A',rai:6.5,crop:'กรีนโอ๊ค',kg:1185,w:80,perrai:182.3,wp:6.8},
+ {id:'P03',h:'A',rai:6.0,crop:'กรีนโอ๊ค',kg:1006,w:63,perrai:167.7,wp:6.3},
+ {id:'P04',h:'B',rai:6.5,crop:'กรีนโอ๊ค',kg:696, w:99, perrai:107.1,wp:14.2},
+ {id:'P05',h:'B',rai:6.0,crop:'กรีนโอ๊ค',kg:590, w:83, perrai:98.3, wp:14.1},
+ {id:'P06',h:'B',rai:7.0,crop:'คอส',    kg:763, w:132,perrai:109.0,wp:17.3},
+ {id:'P07',h:'B',rai:6.5,crop:'คอส',    kg:645, w:108,perrai:99.2, wp:16.7},
+ {id:'P08',h:'C',rai:6.5,crop:'คอส',    kg:1195,w:87, perrai:183.8,wp:7.3},
+ {id:'P09',h:'C',rai:6.0,crop:'คอส',    kg:944, w:71, perrai:157.3,wp:7.5},
+ {id:'P10',h:'C',rai:6.0,crop:'เคล',    kg:1010,w:74, perrai:168.3,wp:7.3},
+ {id:'P11',h:'C',rai:6.0,crop:'เคล',    kg:934, w:69, perrai:155.7,wp:7.4},
+ {id:'P12',h:'A',rai:6.0,crop:'เคล',    kg:986, w:73, perrai:164.3,wp:7.4}
+];
+/* ตัวอย่างแถวดิบจาก harvest (ก่อนจะสรุปเป็น plot_q2) — ใช้สาธิตการคัดกรองข้อมูล */
+var HARVEST_SAMPLE = [
+ {id:'P01',h:'A',kg:87,w:6},
+ {id:'P02',h:'A',kg:76,w:5},
+ {id:'P03',h:'A',kg:65,w:4},
+ {id:'P04',h:'B',kg:45,w:8},
+ {id:'P05',h:'B',kg:38,w:7},
+ {id:'P06',h:'B',kg:49,w:10},
+ {id:'P07',h:'B',kg:41,w:9},
+ {id:'P08',h:'C',kg:77,w:6},
+ {id:'P09',h:'C',kg:61,w:5},
+ {id:'P10',h:'C',kg:65,w:5},
+ {id:'P11',h:'C',kg:60,w:4},
+ {id:'P12',h:'A',kg:64,w:5}
+];
+/* โรงเรือน × เดือน × ชนิดพืช · Q2/2570 */
+var GRP = [
+ {h:'A',m:4,c:'กรีนโอ๊ค',kg:1231,w:93,n:21},{h:'A',m:4,c:'เคล',kg:338,w:24,n:7},
+ {h:'A',m:5,c:'กรีนโอ๊ค',kg:1100,w:71,n:21},{h:'A',m:5,c:'เคล',kg:307,w:19,n:7},
+ {h:'A',m:6,c:'กรีนโอ๊ค',kg:1216,w:67,n:21},{h:'A',m:6,c:'เคล',kg:341,w:30,n:7},
+ {h:'B',m:4,c:'กรีนโอ๊ค',kg:396,w:53,n:14}, {h:'B',m:4,c:'คอส',kg:439,w:60,n:14},
+ {h:'B',m:5,c:'กรีนโอ๊ค',kg:348,w:62,n:14}, {h:'B',m:5,c:'คอส',kg:381,w:62,n:14},
+ {h:'B',m:6,c:'กรีนโอ๊ค',kg:542,w:67,n:14}, {h:'B',m:6,c:'คอส',kg:588,w:118,n:14},
+ {h:'C',m:4,c:'คอส',kg:753,w:53,n:14},      {h:'C',m:4,c:'เคล',kg:675,w:50,n:14},
+ {h:'C',m:5,c:'คอส',kg:665,w:43,n:14},      {h:'C',m:5,c:'เคล',kg:612,w:37,n:14},
+ {h:'C',m:6,c:'คอส',kg:721,w:62,n:14},      {h:'C',m:6,c:'เคล',kg:657,w:56,n:14}
+];
+/* อุณหภูมิสูงสุดช่วงบ่ายเฉลี่ยรายเดือน กับ % ของเสีย · ปี 2570 · 18 จุด */
+var SCAT = [
+ {h:'A',m:1,t:30.1,w:6.8},{h:'A',m:2,t:31.5,w:5.6},{h:'A',m:3,t:33.2,w:8.4},
+ {h:'A',m:4,t:33.9,w:7.5},{h:'A',m:5,t:33.0,w:6.4},{h:'A',m:6,t:32.1,w:6.2},
+ {h:'B',m:1,t:30.8,w:6.6},{h:'B',m:2,t:32.0,w:5.6},{h:'B',m:3,t:33.4,w:8.0},
+ {h:'B',m:4,t:35.1,w:13.5},{h:'B',m:5,t:34.4,w:17.0},{h:'B',m:6,t:33.5,w:16.4},
+ {h:'C',m:1,t:30.0,w:6.2},{h:'C',m:2,t:31.4,w:5.4},{h:'C',m:3,t:32.8,w:7.9},
+ {h:'C',m:4,t:33.8,w:7.2},{h:'C',m:5,t:32.7,w:6.3},{h:'C',m:6,t:32.0,w:8.6}
+];
+
+function copyCode(id, btn){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var text = el.innerText;
+  function done(ok){
+    var old = btn.textContent;
+    btn.textContent = ok ? '✅ คัดลอกแล้ว' : '⚠️ คัดลอกไม่สำเร็จ ลองเลือกข้อความเอง';
+    btn.disabled = true;
+    setTimeout(function(){ btn.textContent = old; btn.disabled = false; }, 1500);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ fallbackCopyText(text, done); });
+  } else {
+    fallbackCopyText(text, done);
+  }
+}
+function fallbackCopyText(text, cb){
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+  document.body.removeChild(ta);
+  cb(ok);
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function out(el, txt){ document.getElementById(el).innerHTML = '<span class="lbl">ผลลัพธ์</span>'+esc(txt); }
+function pad(s,n){ s=String(s); while(s.length<n) s=' '+s; return s; }
+function padr(s,n){ s=String(s); while(s.length<n) s=s+' '; return s; }
+
+/* ===== PAGE 2 : explore ===== */
+var EXP=[
+ {n:'head()', code:"harvest.<span class=\"fn\">head</span>()",
+  out:"       วันที่ รหัสแปลง  ปริมาณกก.  ของเสีย (กก.) โรงเรือน  พื้นที่ (ไร่)   ชนิดพืช\n0  2025-01-03      P01         87              7        A           7.0  กรีนโอ๊ค\n1  2025-01-07      P01        103              8        A           7.0  กรีนโอ๊ค\n2  2025-01-11      P01         72              6        A           7.0  กรีนโอ๊ค\n3  2025-01-15      P01         87              7        A           7.0  กรีนโอ๊ค\n4  2025-01-19      P01        103              8        A           7.0  กรีนโอ๊ค\n\n[แสดงบางคอลัมน์เท่านั้น · ไฟล์จริงมี 16 คอลัมน์]",
+  note:'แสดง 5 แถวแรก · <b>สังเกตว่าคอลัมน์ วันที่ เป็น ค.ศ. (2025) และมี โรงเรือน กับ ชนิดพืช ติดมาแล้วจาก Power Query</b> · ใช้ตรวจว่าอ่านไฟล์มาถูกชีตหรือไม่ และหัวคอลัมน์ถูกอ่านเป็นหัวคอลัมน์จริง ไม่ได้กลายเป็นข้อมูลแถวแรก · <code>tail()</code> ทำแบบเดียวกันแต่เอา 5 แถวสุดท้าย'},
+ {n:'shape', code:"<span class=\"fn\">print</span>(harvest.shape)",
+  out:"(2520, 16)",
+  note:'บอกขนาดตารางเป็น (จำนวนแถว, จำนวนคอลัมน์) · <b>ควรดูทุกครั้งหลังอ่านไฟล์และหลังกรองข้อมูล</b> เพราะถ้าตัวเลขผิดจากที่คาด แปลว่ามีอะไรผิดตั้งแต่ต้น'},
+ {n:'info()', code:"harvest.<span class=\"fn\">info</span>()",
+  out:"RangeIndex: 2520 entries, 0 to 2519\nData columns (total 16 columns):\n #   Column          Non-Null Count  Dtype\n---  ------          --------------  -----\n 0   วันที่           2520 non-null   datetime64\n 1   รหัสแปลง         2520 non-null   object\n 2   รหัสพืช          2520 non-null   object\n 3   ปริมาณกก.        2520 non-null   int64\n 4   ของเสีย (กก.)    2520 non-null   int64\n 5   ต้นทุน (บาท)     2520 non-null   int64\n 6   ยอดขาย (บาท)     2520 non-null   int64\n 7   โรงเรือน         2520 non-null   object\n 8   พื้นที่ (ไร่)      2520 non-null   float64\n 9   ระบบให้น้ำ       2520 non-null   object\n...\n13  กลุ่มสินค้า      2520 non-null   object\n15  ราคาต่อกก. (บาท) 2520 non-null   int64",
+  note:'ดู 2 อย่าง: <b>Non-Null Count</b> ถ้าน้อยกว่าจำนวนแถวแปลว่ามีค่าว่าง · <b>Dtype</b> คือชนิดข้อมูล — <b>คอลัมน์ วันที่ ต้องเป็น datetime64 เท่านั้นจึงจะใช้ <code>.dt</code> ได้</b> — ถ้าคอลัมน์ตัวเลขขึ้นเป็น <code>object</code> แปลว่ามันถูกอ่านเป็นข้อความ จะคำนวณไม่ได้ ต้องแปลงก่อน (เป็นปัญหาที่เจอบ่อยมากกับไฟล์จริง)'},
+ {n:'describe()', code:"harvest[<span class=\"st\">'ปริมาณกก.'</span>].<span class=\"fn\">describe</span>()",
+  out:"count    2520.0\nmean       63.3\nstd        16.9\nmin        14.0\n25%        52.0\n50%        62.0\n75%        74.0\nmax       123.0",
+  note:'สถิติครบชุดในคำสั่งเดียว — เท่ากับกด COUNT AVERAGE STDEV MIN QUARTILE MEDIAN MAX ใน Excel รวดเดียว · <b>อ่านรายละเอียดของแต่ละค่าได้ในตารางถัดไป</b>'}
+];
+(function(){
+  var box=document.getElementById('expList'); if(!box) return;
+  EXP.forEach(function(f,i){
+    var b=document.createElement('button'); b.textContent=f.n;
+    b.addEventListener('click',function(){
+      box.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on');
+      document.getElementById('expCode').innerHTML=f.code;
+      out('expOut', f.out);
+      document.getElementById('expNote').innerHTML=f.note;
+    });
+    box.appendChild(b);
+  });
+})();
+
+/* ===== PAGE 3 : filter lab ===== */
+var FOPTS={
+  w:{label:'ของเสีย (กก.)', num:true, vals:[5,6,7,8]},
+  kg:{label:'ปริมาณกก.', num:true, vals:[40,50,60,70]},
+  h:{label:'โรงเรือน', num:false, vals:['A','B','C']}
+};
+function fillF(){
+  var col=document.getElementById('fCol').value, o=FOPTS[col];
+  var op=document.getElementById('fOp'), va=document.getElementById('fVal');
+  op.innerHTML=''; va.innerHTML='';
+  (o.num?['&gt;','&gt;=','&lt;','&lt;=']:['==','!=']).forEach(function(s){
+    var e=document.createElement('option'); e.value=s.replace('&gt;','>').replace('&lt;','<'); e.innerHTML=s; op.appendChild(e);
+  });
+  o.vals.forEach(function(v){ var e=document.createElement('option'); e.value=v; e.textContent=v; va.appendChild(e); });
+  runFilter();
+}
+function runFilter(){
+  var col=document.getElementById('fCol').value, o=FOPTS[col];
+  var op=document.getElementById('fOp').value, raw=document.getElementById('fVal').value;
+  var v=o.num?parseFloat(raw):raw;
+  var rows=HARVEST_SAMPLE.filter(function(r){
+    var x=r[col];
+    if(op==='>') return x>v; if(op==='>=') return x>=v;
+    if(op==='<') return x<v; if(op==='<=') return x<=v;
+    if(op==='==') return x===v; return x!==v;
+  });
+  var opHtml = esc(op);
+  var valHtml = o.num ? ('<span class="nu">'+v+'</span>') : ("<span class=\"st\">'"+v+"'</span>");
+  var bracketCode = 'result <span class="kw">=</span> harvest[harvest[<span class="st">\''+o.label+'\'</span>] <span class="kw">'+opHtml+'</span> '+valHtml+']';
+  var queryStr = o.num ? ("'`"+o.label+"` "+op+' '+v+"'") : ('"`'+o.label+'` '+op+" '"+v+"'\"");
+  var queryCode = 'result <span class="kw">=</span> harvest.<span class="fn">query</span>(<span class="st">'+esc(queryStr)+'</span>)';
+  document.getElementById('fCodeBracket').innerHTML =
+    '<span class="cm"># harvest = ตารางดิบหลังเพิ่มคอลัมน์ ปี และ เดือน</span>\n'+
+    bracketCode+'\n'+
+    '<span class="fn">print</span>(<span class="fn">len</span>(result))';
+  document.getElementById('fCodeQuery').innerHTML =
+    '<span class="cm"># harvest = ตารางดิบหลังเพิ่มคอลัมน์ ปี และ เดือน</span>\n'+
+    queryCode+'\n'+
+    '<span class="fn">print</span>(<span class="fn">len</span>(result))';
+  out('fOut', String(rows.length));
+  var html='<table class="xl"><thead><tr><th>รหัสแปลง</th><th>โรงเรือน</th><th>ปริมาณกก.</th><th>ของเสีย (กก.)</th></tr></thead><tbody>';
+  if(rows.length===0) html+='<tr><td colspan="4">ไม่มีแถวใดตรงเงื่อนไข — ตารางว่าง</td></tr>';
+  rows.forEach(function(r){
+    html+='<tr><td>'+r.id+'</td><td>'+r.h+'</td><td>'+r.kg+'</td><td class="'+(r.w>=7?'warn':'')+'">'+r.w+'</td></tr>';
+  });
+  document.getElementById('fTable').innerHTML=html+'</tbody></table>';
+  var nb=rows.filter(function(r){return r.h==='B';}).length;
+  var note='ได้ '+rows.length+' แถวจากทั้งหมด 12 แถว';
+  if(rows.length>0 && nb===rows.length && rows.length>1) note+=' — <b>ทุกแถวที่ได้อยู่โรงเรือน B ทั้งหมด</b> ซึ่งเป็นข้อสังเกตเดียวกับที่คาบ 5 ชี้ว่าปัญหากระจุกอยู่ที่เดียว ไม่ได้กระจายทั้งฟาร์ม';
+  else if(rows.length===0) note+=' — เงื่อนไขแคบเกินไป · การได้ตารางว่างไม่ใช่ error แต่เป็นคำตอบว่าไม่มีข้อมูลที่ตรงเงื่อนไข';
+  document.getElementById('fNote').innerHTML=note;
+}
+(function(){
+  var c=document.getElementById('fCol'); if(!c) return;
+  c.addEventListener('change',fillF);
+  document.getElementById('fOp').addEventListener('change',runFilter);
+  document.getElementById('fVal').addEventListener('change',runFilter);
+})();
+
+/* ===== PAGE 4 : groupby lab ===== */
+function runGroup(){
+  var key=document.getElementById('gKey').value, agg=document.getElementById('gAgg').value;
+  var kname={h:'โรงเรือน',m:'เดือน',c:'ชนิดพืช'}[key];
+  var acc={};
+  GRP.forEach(function(r){
+    var k=r[key]; if(!acc[k]) acc[k]={kg:0,w:0,n:0};
+    acc[k].kg+=r.kg; acc[k].w+=r.w; acc[k].n+=r.n;
+  });
+  var keys=Object.keys(acc).sort();
+  var code, lines=[];
+  if(agg==='sum'){
+    code='q2_70.<span class="fn">groupby</span>(<span class="st">\''+kname+'\'</span>)[<span class="st">\'ปริมาณกก.\'</span>].<span class="fn">sum</span>()';
+    keys.forEach(function(k){ lines.push(padr(k,10)+pad(acc[k].kg.toLocaleString(),8)); });
+  } else if(agg==='mean'){
+    code='q2_70.<span class="fn">groupby</span>(<span class="st">\''+kname+'\'</span>)[<span class="st">\'ปริมาณกก.\'</span>].<span class="fn">mean</span>().<span class="fn">round</span>(<span class="nu">1</span>)';
+    keys.forEach(function(k){ lines.push(padr(k,10)+pad((acc[k].kg/acc[k].n).toFixed(1),8)); });
+  } else if(agg==='count'){
+    code='q2_70.<span class="fn">groupby</span>(<span class="st">\''+kname+'\'</span>)[<span class="st">\'ปริมาณกก.\'</span>].<span class="fn">count</span>()';
+    keys.forEach(function(k){ lines.push(padr(k,10)+pad(acc[k].n,8)); });
+  } else {
+    code='g <span class="kw">=</span> q2_70.<span class="fn">groupby</span>(<span class="st">\''+kname+'\'</span>)[[<span class="st">\'ปริมาณกก.\'</span>, <span class="st">\'ของเสีย (กก.)\'</span>]].<span class="fn">sum</span>()\n'+
+         'g[<span class="st">\'ของเสีย%\'</span>] <span class="kw">=</span> (g[<span class="st">\'ของเสีย (กก.)\'</span>] <span class="kw">/</span> g[<span class="st">\'ปริมาณกก.\'</span>] <span class="kw">*</span> <span class="nu">100</span>).<span class="fn">round</span>(<span class="nu">1</span>)\n'+
+         '<span class="fn">print</span>(g[<span class="st">\'ของเสีย%\'</span>])';
+    keys.forEach(function(k){ lines.push(padr(k,10)+pad((acc[k].w/acc[k].kg*100).toFixed(1),8)); });
+  }
+  document.getElementById('gCode').innerHTML=
+    '<span class="cm"># q2_70 = การเก็บเกี่ยวไตรมาส 2 ปี 2570 (252 แถว)</span>\n'+code;
+  out('gOut', padr(kname,10)+'\n'+lines.join('\n'));
+  var note='';
+  if(key==='h' && agg==='sum') note='โรงเรือน B ได้แค่ 2,694 กก. ขณะที่ A และ C ได้กว่า 4,000 กก. — <b>ผลลัพธ์ตรงกับที่เห็นในแดชบอร์ด Power BI คาบ 4 และการเจาะข้อมูลในคาบ 5</b>';
+  else if(key==='h' && agg==='waste') note='โรงเรือน B ของเสีย 15.7% เทียบกับ A ที่ 6.7% และ C ที่ 7.4% — <b>เกินเป้าฟาร์มที่ 8% อยู่เกือบเท่าตัว</b> · สังเกตว่าการหาเปอร์เซ็นต์ต้องรวมตัวตั้งกับตัวหารก่อนแล้วค่อยหาร ไม่ใช่เอาเปอร์เซ็นต์รายแถวมาเฉลี่ยกัน';
+  else if(key==='m' && agg==='sum') note='เดือนพฤษภาคมต่ำที่สุด · แต่ตัวเลขรายเดือนรวมทั้งฟาร์มยังกลบปัญหาไว้อยู่ — <b>ต้องจัดกลุ่มด้วยโรงเรือนถึงจะเห็นว่าใครเป็นต้นเหตุ นี่คือเหตุผลที่ต้องทำ Drill-down หลายชั้น</b>';
+  else if(key==='c') note='แยกตามชนิดพืชแล้วยังไม่เห็นความผิดปกติชัด เพราะพืชแต่ละชนิดปลูกอยู่หลายโรงเรือนปนกัน — <b>เลือกมิติผิด ก็หาสาเหตุไม่เจอ</b>';
+  else if(agg==='count') note='<code>count()</code> นับจำนวนรอบเก็บเกี่ยว ไม่ได้บอกปริมาณ — ใช้ตรวจว่าแต่ละกลุ่มมีข้อมูลพอจะเปรียบเทียบกันหรือไม่';
+  else if(agg==='mean') note='ค่าเฉลี่ยต่อรอบต่างจากผลรวม เพราะแต่ละกลุ่มมีจำนวนรอบไม่เท่ากัน — <b>ต้องเลือกให้ตรงกับคำถาม</b> ว่าอยากรู้ผลผลิตรวม หรืออยากรู้ประสิทธิภาพต่อรอบ';
+  document.getElementById('gNote').innerHTML=note;
+}
+(function(){
+  var k=document.getElementById('gKey'); if(!k) return;
+  k.addEventListener('change',runGroup);
+  document.getElementById('gAgg').addEventListener('change',runGroup);
+})();
+
+/* ===== PAGE 6 : charts ===== */
+var chart=null;
+var CHARTS=[
+ {n:'กราฟแท่ง',
+  code:'summary <span class="kw">=</span> q2_70.<span class="fn">groupby</span>(<span class="st">\'โรงเรือน\'</span>)[<span class="st">\'ปริมาณกก.\'</span>].<span class="fn">sum</span>()\n\n'+
+       'summary.<span class="fn">plot</span>(kind=<span class="st">\'bar\'</span>, color=<span class="st">\'#16a34a\'</span>)\n'+
+       'plt.<span class="fn">title</span>(<span class="st">\'โรงเรือน B ผลผลิตต่ำกว่าอีกสองโรงเรือนราว 40%\'</span>)\n'+
+       'plt.<span class="fn">ylabel</span>(<span class="st">\'กิโลกรัม\'</span>)\n'+
+       'plt.<span class="fn">show</span>()',
+  note:'ใช้เปรียบเทียบระหว่างหมวดหมู่ — <b>แกนตั้งต้องเริ่มจากศูนย์เสมอ</b> ไม่งั้นความต่างจะดูเกินจริง (หลักการเดียวกับที่เตือนไว้ในคาบ 4)',
+  build:function(){
+    var acc={}; GRP.forEach(function(r){acc[r.h]=(acc[r.h]||0)+r.kg;});
+    var ks=Object.keys(acc).sort();
+    return {type:'bar', data:{labels:ks.map(function(k){return 'โรงเรือน '+k;}),
+      datasets:[{label:'ปริมาณ (กก.)', data:ks.map(function(k){return acc[k];}),
+        backgroundColor:ks.map(function(k){return k==='B'?'#dc2626':'#16a34a';})}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'โรงเรือน B ผลผลิตต่ำกว่าอีกสองโรงเรือนราว 40%'},legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'กิโลกรัม'}}}}};
+  }},
+ {n:'กราฟเส้น',
+  code:'monthly <span class="kw">=</span> q2_70.<span class="fn">pivot_table</span>(index=<span class="st">\'เดือน\'</span>, columns=<span class="st">\'โรงเรือน\'</span>,\n'+
+       '                        values=<span class="st">\'ปริมาณกก.\'</span>, aggfunc=<span class="st">\'sum\'</span>)\n\n'+
+       'monthly.<span class="fn">plot</span>(marker=<span class="st">\'o\'</span>)\n'+
+       'plt.<span class="fn">title</span>(<span class="st">\'โรงเรือน B ดิ่งตั้งแต่ เม.ย. แล้วเริ่มฟื้นใน มิ.ย.\'</span>)\n'+
+       'plt.<span class="fn">show</span>()',
+  note:'ใช้กับข้อมูลที่เรียงตามเวลา — เห็นได้ทันทีว่า B แยกตัวออกจากอีกสองเส้นอย่างชัดเจน ขณะที่ A และ C เดินไปด้วยกันตามปกติ',
+  build:function(){
+    var hs=['A','B','C'], ms=[4,5,6], col={A:'#16a34a',B:'#dc2626',C:'#2563eb'};
+    return {type:'line', data:{labels:['เม.ย.','พ.ค.','มิ.ย.'],
+      datasets:hs.map(function(h){ return {label:'โรงเรือน '+h, borderColor:col[h], backgroundColor:col[h], tension:.25,
+        data:ms.map(function(m){ var s=0; GRP.forEach(function(r){ if(r.h===h&&r.m===m) s+=r.kg; }); return s; })}; })},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'โรงเรือน B ดิ่งตั้งแต่ เม.ย. แล้วเริ่มฟื้นใน มิ.ย.'}},scales:{y:{beginAtZero:true,title:{display:true,text:'กิโลกรัม'}}}}};
+  }},
+ {n:'แผนภาพกระจาย',
+  code:'<span class="cm"># ชีต SummaryMonthly รวมข้อมูลเซนเซอร์กับการเก็บเกี่ยวเป็นรายเดือนไว้ให้แล้ว</span>\n'+
+       'monthly_summary[<span class="st">\'ปี\'</span>] <span class="kw">=</span> monthly_summary[<span class="st">\'ปี\'</span>] <span class="kw">+</span> <span class="nu">543</span>\n'+
+       'monthly_70 <span class="kw">=</span> monthly_summary[(monthly_summary[<span class="st">\'ปี\'</span>] <span class="kw">==</span> <span class="nu">2570</span>) <span class="kw">&amp;</span> (monthly_summary[<span class="st">\'เดือน\'</span>] <span class="kw">&lt;=</span> <span class="nu">6</span>)]\n\n'+
+       'plt.<span class="fn">scatter</span>(monthly_70[<span class="st">\'อุณหภูมิสูงสุด (°C)\'</span>], monthly_70[<span class="st">\'ของเสีย%\'</span>])\n'+
+       'plt.<span class="fn">xlabel</span>(<span class="st">\'อุณหภูมิสูงสุดช่วงบ่ายเฉลี่ย (°C)\'</span>)\n'+
+       'plt.<span class="fn">ylabel</span>(<span class="st">\'ของเสีย (%)\'</span>)\n'+
+       'plt.<span class="fn">show</span>()\n\n'+
+       '<span class="fn">print</span>(monthly_70[[<span class="st">\'อุณหภูมิสูงสุด (°C)\'</span>, <span class="st">\'ของเสีย%\'</span>]].<span class="fn">corr</span>())',
+  note:'คู่กับ <code>corr()</code> เสมอ — ข้อมูลชุดนี้ให้ <b>r = 0.62</b> คือความสัมพันธ์เชิงบวกระดับปานกลางค่อนไปทางสูง · <b>อย่าลืมสิ่งที่คาบ 5 ย้ำไว้: correlation ไม่ได้แปลว่าเป็นสาเหตุ</b> ที่เชื่อได้ในกรณีนี้เพราะมีกลไกทางชีวภาพรองรับ และไทม์ไลน์ตรงกับวันที่พัดลมเสีย',
+  build:function(){
+    var col={A:'#16a34a',B:'#dc2626',C:'#2563eb'};
+    return {type:'scatter', data:{datasets:['A','B','C'].map(function(h){
+        return {label:'โรงเรือน '+h, backgroundColor:col[h], pointRadius:6,
+          data:SCAT.filter(function(r){return r.h===h;}).map(function(r){return {x:r.t,y:r.w};})}; })},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'อุณหภูมิยิ่งสูง ของเสียยิ่งเพิ่ม (r = 0.62)'}},
+        scales:{x:{title:{display:true,text:'อุณหภูมิสูงสุดช่วงบ่ายเฉลี่ย (°C)'}},y:{beginAtZero:true,title:{display:true,text:'ของเสีย (%)'}}}}};
+  }},
+ {n:'ฮิสโทแกรม',
+  code:'plot_q2[<span class="st">\'ต่อไร่\'</span>].<span class="fn">hist</span>(bins=<span class="nu">6</span>, color=<span class="st">\'#16a34a\'</span>)\n'+
+       'plt.<span class="fn">title</span>(<span class="st">\'ผลผลิตต่อไร่แยกเป็นสองกลุ่มชัดเจน\'</span>)\n'+
+       'plt.<span class="fn">xlabel</span>(<span class="st">\'กก./ไร่\'</span>)\n'+
+       'plt.<span class="fn">show</span>()',
+  note:'ดูรูปร่างการกระจาย — <b>กราฟนี้มีสองยอดแยกกัน</b> กลุ่มซ้ายราว 100 กก./ไร่ คือ 4 แปลงของโรงเรือน B ส่วนกลุ่มขวาคือแปลงปกติ · การแจกแจงแบบสองยอดมักเป็นสัญญาณว่ามีสองกลุ่มปนกันอยู่ ซึ่งตรงกับหลักการอ่านการแจกแจงในคาบ 5',
+  build:function(){
+    var bins=[[90,110],[110,130],[130,150],[150,170],[170,190],[190,210]];
+    var cnt=bins.map(function(b){ return PLOTQ2.filter(function(r){return r.perrai>=b[0]&&r.perrai<b[1];}).length; });
+    return {type:'bar', data:{labels:bins.map(function(b){return b[0]+'–'+b[1];}),
+      datasets:[{label:'จำนวนแปลง',data:cnt,backgroundColor:'#16a34a'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{title:{display:true,text:'ผลผลิตต่อไร่แยกเป็นสองกลุ่มชัดเจน'},legend:{display:false}},
+        scales:{x:{title:{display:true,text:'กก./ไร่'}},y:{beginAtZero:true,ticks:{stepSize:1},title:{display:true,text:'จำนวนแปลง'}}}}};
+  }},
+ {n:'กราฟกล่อง (boxplot)',
+  code:'q2_70.<span class="fn">boxplot</span>(column=<span class="st">\'ปริมาณกก.\'</span>, by=<span class="st">\'โรงเรือน\'</span>)\n'+
+       'plt.<span class="fn">title</span>(<span class="st">\'โรงเรือน B กระจายกว้างที่สุด และมีรอบที่ต่ำผิดปกติ\'</span>)\n'+
+       'plt.<span class="fn">suptitle</span>(<span class="st">\'\'</span>)   <span class="cm"># ลบหัวข้ออัตโนมัติที่ pandas ใส่มาให้</span>\n'+
+       'plt.<span class="fn">xlabel</span>(<span class="st">\'โรงเรือน\'</span>)\n'+
+       'plt.<span class="fn">ylabel</span>(<span class="st">\'กิโลกรัมต่อรอบ\'</span>)\n'+
+       'plt.<span class="fn">show</span>()',
+  note:'<b>กล่องคือช่วงควอไทล์ที่ 1 ถึง 3 (IQR) เส้นกลางคือมัธยฐาน ส่วนหนวดคือค่าต่ำสุด–สูงสุด</b> — ตรงกับค่าที่ <code>describe()</code> ให้มาทุกตัว เพียงแต่วาดออกมาเทียบกันได้ทีเดียวทุกกลุ่ม · A: 43.8–59.2 (มัธยฐาน 52) · B: 22.0–39.2 (29.5) · C: 41.8–53.2 (48) · <b>B ทั้งต่ำกว่าและกระจายกว้างกว่า</b> ซึ่งแปลว่าไม่ได้แย่ลงทุกรอบเท่า ๆ กัน แต่มีบางรอบที่พังหนัก — เป็นภาพเดียวกับกฎ 1.5 × IQR ที่ใช้หา Outlier ในคาบ 5',
+  build:function(){
+    var S={A:{min:34,q1:43.8,med:52,q3:59.2,max:84},B:{min:14,q1:22,med:29.5,q3:39.2,max:70},C:{min:33,q1:41.8,med:48,q3:53.2,max:73}};
+    var ks=['A','B','C'], col={A:'#16a34a',B:'#dc2626',C:'#2563eb'};
+    var ds=[{label:'กล่อง Q1–Q3 (IQR)', data:ks.map(function(k){return [S[k].q1,S[k].q3];}),
+             backgroundColor:ks.map(function(k){return col[k]+'99';}),
+             borderColor:ks.map(function(k){return col[k];}), borderWidth:2,
+             categoryPercentage:0.6, barPercentage:0.9, order:3}];
+    ds.push({type:'scatter', label:'ค่าต่ำสุด–สูงสุด (หนวด)', data:ks.map(function(k){return S[k].min;}),
+             backgroundColor:'#64748b', borderColor:'#64748b', pointStyle:'line', radius:14, borderWidth:2, order:2});
+    ds.push({type:'scatter', label:'_max', data:ks.map(function(k){return S[k].max;}),
+             backgroundColor:'#64748b', borderColor:'#64748b', pointStyle:'line', radius:14, borderWidth:2, order:2});
+    ds.push({type:'scatter', label:'เส้นมัธยฐาน', data:ks.map(function(k){return S[k].med;}),
+             backgroundColor:'#111827', borderColor:'#111827', pointStyle:'line', radius:26, borderWidth:3, order:1});
+    return {type:'bar',
+      data:{labels:ks.map(function(k){return 'โรงเรือน '+k;}), datasets:ds},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{title:{display:true,text:'โรงเรือน B กระจายกว้างที่สุด และมีรอบที่ต่ำผิดปกติ'},
+          legend:{display:true,position:'bottom',labels:{filter:function(it){return it.text.charAt(0)!=='_';}}},
+          tooltip:{filter:function(it){return it.dataset.label.charAt(0)!=='_';}}},
+        scales:{x:{type:'category',offset:true},y:{beginAtZero:true,title:{display:true,text:'กิโลกรัมต่อรอบ'}}}}};
+  }}
+];
+(function(){
+  var box=document.getElementById('chList'); if(!box) return;
+  CHARTS.forEach(function(c,i){
+    var b=document.createElement('button'); b.textContent=c.n;
+    b.addEventListener('click',function(){
+      box.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); showChart(i);
+    });
+    box.appendChild(b);
+  });
+})();
+function showChart(i){
+  var c=CHARTS[i];
+  document.getElementById('chCode').innerHTML=c.code;
+  document.getElementById('chNote').innerHTML=c.note;
+  var cv=document.getElementById('chCanvas'); if(!cv || typeof Chart==='undefined') return;
+  if(chart){ chart.destroy(); chart=null; }
+  chart=new Chart(cv.getContext('2d'), c.build());
+}
+</script>
+
+<script>
+/* ===== QUIZ ===== */
+var QUIZ=[
+ {q:'คำสั่งใดใน Pandas ทำหน้าที่เหมือนกับการสร้าง PivotTable ที่ลากฟิลด์ลงช่องแถวและช่องค่า?',
+  a:['df.sort_values() ซึ่งจัดเรียงข้อมูลตามคอลัมน์ที่ระบุไว้','df.groupby() ซึ่งจัดกลุ่มแล้วคำนวณค่าให้แต่ละกลุ่ม','df.describe() ซึ่งแสดงสถิติพื้นฐานของทุกคอลัมน์','df.query() ซึ่งกรองแถวตามเงื่อนไขที่เขียนเป็นประโยค'],
+  c:1, e:'groupby คือ PivotTable ในรูปแบบโค้ด — ฟิลด์ที่ลากลงช่องแถวคือสิ่งที่ใส่ใน groupby() ส่วนช่องค่าคือคอลัมน์ที่เลือกตามด้วยฟังก์ชันสรุป เช่น sum() หรือ mean()'},
+ {q:'เปิดไฟล์มาแล้วสั่ง harvest[harvest[\'ปี\'] == 2570] ทันที แต่ขึ้น KeyError: \'ปี\' เพราะอะไร?',
+  a:['ไฟล์มีแต่คอลัมน์ วันที่ ยังไม่ได้สร้างคอลัมน์ ปี ขึ้นมาเอง','ต้องเขียนชื่อคอลัมน์ภาษาไทยไว้ในวงเล็บเหลี่ยมสองชั้นเสมอ','ค่าปีเป็นตัวเลข จึงต้องใส่เครื่องหมายคำพูดครอบเลข 2570 ด้วย','ไฟล์ Excel ต้องเรียงข้อมูลตามวันที่ก่อน จึงจะกรองตามปีได้'],
+  c:0, e:'KeyError แปลว่าไม่มีคอลัมน์ชื่อนั้นอยู่จริง · ไฟล์เก็บแค่คอลัมน์ วันที่ ต้องสร้างเองก่อนด้วย harvest[\'ปี\'] = harvest[\'วันที่\'].dt.year + 543 และ harvest[\'เดือน\'] = harvest[\'วันที่\'].dt.month — ตรงกับการใช้ =YEAR() และ =MONTH() ใน Excel'},
+ {q:'ต้องการกรองแถวที่โรงเรือนเป็น B และของเสียเกิน 8% ข้อใดเขียนถูกต้อง?',
+  a:["df[df['โรงเรือน']=='B' and df['ของเสีย%']>8]","df[(df['โรงเรือน']=='B') & (df['ของเสีย%']>8)]","df[df['โรงเรือน']=='B', df['ของเสีย%']>8]","df.filter('โรงเรือน'=='B', 'ของเสีย%'>8)"],
+  c:1, e:'แบบวงเล็บเหลี่ยมต้องใช้เครื่องหมาย & และต้องครอบวงเล็บแต่ละเงื่อนไขไว้ · ถ้าอยากเขียนด้วยคำว่า and ให้ใช้ query() แทน เช่น df.query("โรงเรือน==\'B\' and ของเสีย%>8")'},
+ {q:'df.info() แสดงว่าคอลัมน์ "ปริมาณกก." มี Dtype เป็น object หมายความว่าอย่างไร?',
+  a:['ข้อมูลถูกอ่านเข้ามาเป็นข้อความ จึงยังนำไปคำนวณทางคณิตศาสตร์ไม่ได้','ข้อมูลเป็นตัวเลขทศนิยมที่มีความละเอียดสูงกว่าจำนวนเต็มทั่วไป','คอลัมน์นี้มีค่าว่างปนอยู่จำนวนมากจนระบุชนิดข้อมูลไม่ได้','คอลัมน์นี้ถูกกำหนดให้เป็นคีย์หลักสำหรับการเชื่อมกับตารางอื่น'],
+  c:0, e:'object คือชนิดข้อมูลข้อความ · เกิดบ่อยมากกับไฟล์จริงที่มีเครื่องหมายจุลภาคคั่นหลักพัน หรือมีช่องว่างปนอยู่ในเซลล์ · ต้องทำความสะอาดแล้วแปลงชนิดก่อน ไม่งั้นค่าที่คำนวณได้จะผิดทั้งหมด'},
+ {q:'จากตาราง describe() ที่ให้ 25% = 52 และ 75% = 74 ค่าใดเข้าข่าย Outlier ด้านล่างตามกฎ 1.5 × IQR?',
+  a:['45 กิโลกรัม เพราะต่ำกว่าควอไทล์ที่หนึ่งอยู่พอสมควร','30 กิโลกรัม เพราะต่ำกว่าครึ่งหนึ่งของค่าเฉลี่ยทั้งหมด','14 กิโลกรัม เพราะต่ำกว่าขอบล่างที่คำนวณได้เท่ากับ 19','52 กิโลกรัม เพราะเป็นค่าที่ควอไทล์ที่หนึ่งพอดี'],
+  c:2, e:'IQR = 74 − 52 = 22 · ขอบล่าง = 52 − 1.5 × 22 = 19 · ค่า 14 จึงต่ำกว่าขอบล่าง เข้าข่าย Outlier · เป็นวิธีคิดเดียวกับที่ใช้ใน Excel คาบ 5 เพียงแต่ describe() ให้ค่าควอไทล์มาให้แล้วในคำสั่งเดียว'},
+ {q:'ต้องทำรายงานสรุปผลผลิตชุดเดิมส่งทุกสิ้นเดือน โดยข้อมูลดิบมาเป็นไฟล์ Excel หลายไฟล์ ควรแบ่งงานอย่างไรจึงเหมาะที่สุด?',
+  a:['ทำทุกขั้นตอนใน Excel เหมือนเดิม เพราะเป็นเครื่องมือที่คุ้นเคยที่สุดอยู่แล้ว','ใช้ Power Query รวมและทำความสะอาดไฟล์ แล้วให้ Python สรุปและทำกราฟ จากนั้น to_excel() ส่งกลับ','เขียน Python ทำทั้งหมดตั้งแต่ต้น เพราะโค้ดเหนือกว่าการคลิกในทุกกรณี','ทำใน Excel ก่อนหนึ่งรอบ แล้วพิมพ์ตัวเลขที่ได้เข้าไปในโค้ด Python อีกครั้งเพื่อตรวจทาน'],
+  c:1, e:'แต่ละเครื่องมือทำสิ่งที่ตัวเองถนัด — Power Query รวมและทำความสะอาดได้เห็นภาพและตรวจง่าย ส่วนงานที่ต้องทำซ้ำทุกเดือนคือจุดที่ Python คุ้มที่สุด เพราะกด Run All ครั้งเดียวได้ผลใหม่ทั้งชุด แล้วส่งกลับเป็นไฟล์ Excel ให้คนอื่นใช้ต่อได้'},
+ {q:'ต้องการหา % ของเสียของแต่ละโรงเรือน วิธีใดถูกต้อง?',
+  a:['หา % ของเสียของแต่ละแถวก่อน แล้วนำมาหาค่าเฉลี่ยแยกตามโรงเรือน','รวมของเสียและรวมปริมาณของแต่ละโรงเรือนก่อน แล้วจึงนำมาหารกัน','นับจำนวนแถวที่ของเสียเกินเกณฑ์ แล้วหารด้วยจำนวนแถวทั้งหมดของกลุ่ม','เรียงข้อมูลตามของเสียจากมากไปน้อย แล้วดูค่าที่อยู่ตรงกลางของแต่ละกลุ่ม'],
+  c:1, e:'ต้องรวมตัวตั้งและตัวหารก่อนแล้วค่อยหาร · การเอาเปอร์เซ็นต์รายแถวมาเฉลี่ยกันจะให้ค่าผิด เพราะแต่ละแถวมีปริมาณไม่เท่ากัน — เป็นข้อผิดพลาดเดียวกับ "เฉลี่ยแบบไม่ถ่วงน้ำหนัก" ที่เตือนไว้ตอนเขียน DAX ในคาบ 4'},
+ {q:'กราฟที่พล็อตออกมามีหัวกราฟภาษาไทยเป็นสี่เหลี่ยมว่างทั้งหมด สาเหตุคืออะไร?',
+  a:['ข้อมูลในคอลัมน์นั้นเสียหาย จึงแสดงผลเป็นสัญลักษณ์แทนตัวอักษร','Colab ไม่มีฟอนต์ภาษาไทยติดตั้งมาให้ ต้องรันเซลล์ติดตั้งฟอนต์ก่อน','ต้องเปลี่ยนไปใช้ภาษาอังกฤษ เพราะ Matplotlib ไม่รองรับภาษาไทย','ลืมใส่คำสั่ง plt.show() ปิดท้ายก่อนแสดงผลกราฟออกมา'],
+  c:1, e:'เป็นเรื่องของฟอนต์ล้วน ๆ ไม่ใช่ error และไม่ใช่ข้อจำกัดของ Matplotlib · แก้ด้วยการรันเซลล์ติดตั้งฟอนต์ไทยที่ให้ไว้ในหน้าแรกหนึ่งครั้งต่อการเปิดสมุดหนึ่งครั้ง'},
+ {q:'ผลจาก groupby แสดงว่าโรงเรือน A ได้ 4,533 กก. B ได้ 2,694 กก. และ C ได้ 4,083 กก. ในไตรมาส 2 ปี 2570 ควรสรุปว่าอย่างไร?',
+  a:['ผลผลิตทั้งฟาร์มลดลงอย่างสม่ำเสมอ จึงควรทบทวนแผนการผลิตทั้งระบบ','ปัญหากระจุกอยู่ที่โรงเรือน B เป็นหลัก จึงควรเจาะหาสาเหตุที่โรงเรือนนั้นก่อน','โรงเรือน A ทำได้ดีที่สุด จึงควรขยายพื้นที่ปลูกของโรงเรือน A เพิ่มขึ้น','ตัวเลขต่างกันไม่มากนัก จึงถือว่าเป็นความผันผวนตามปกติของฤดูกาล'],
+  c:1, e:'B ต่ำกว่าอีกสองโรงเรือนเกือบ 40% ทั้งที่พื้นที่ใกล้เคียงกัน · นี่คือคุณค่าของการจัดกลุ่ม คือทำให้เห็นว่าปัญหากระจุกที่เดียวไม่ได้กระจายทั่วฟาร์ม ซึ่งค่าเฉลี่ยรวมทั้งฟาร์มปิดบังไว้'},
+ {q:'เหตุใดงานส่งของคาบนี้จึงให้ทำซ้ำผลวิเคราะห์ที่เคยทำด้วย Excel และ Power BI มาแล้ว?',
+  a:['เพราะเป็นวิธีตรวจว่าเขียนโค้ดถูกหรือไม่ ในเมื่อเรารู้คำตอบที่ถูกอยู่แล้ว','เพราะข้อมูลชุดอื่นมีขนาดใหญ่เกินกว่าที่ Colab จะประมวลผลไหว','เพราะ Python จะให้ผลลัพธ์ที่แม่นยำกว่าเครื่องมือทั้งสองอย่างเสมอ','เพราะต้องส่งงานเดิมซ้ำเพื่อยืนยันว่าเคยทำงานคาบก่อนหน้าจริง'],
+  c:0, e:'ตอนเพิ่งหัดเขียนโค้ด สิ่งที่อันตรายที่สุดคือได้คำตอบผิดโดยไม่รู้ตัว เพราะโค้ดรันผ่านโดยไม่มี error · การทำซ้ำโจทย์ที่รู้คำตอบแล้วจึงเป็นวิธีสร้างความมั่นใจก่อนไปทำโจทย์ใหม่ในคาบถัดไป'}
+];
+</script>
+<script>
+/* ===== navigation ===== */
+var PAGES = document.querySelectorAll('section.page');
+var TABS  = document.querySelectorAll('#tabs button');
+function go(i){
+  if(i<0) i=0; if(i>=PAGES.length) i=PAGES.length-1;
+  PAGES.forEach(function(p,k){ p.classList.toggle('active', k===i); });
+  TABS.forEach(function(b,k){ b.classList.toggle('active', k===i); });
+  document.getElementById('pbar').style.width = ((i+1)/PAGES.length*100)+'%';
+  window.scrollTo({top:0, behavior:'smooth'});
+  if(typeof onPage==='function') onPage(i);
+}
+function onPage(i){
+  if(i===2 && !document.querySelector('#expList button.on')){ var e=document.querySelector('#expList button'); if(e) e.click(); }
+  if(i===3) fillF();
+  if(i===4) runGroup();
+  if(i===6 && !document.querySelector('#chList button.on')){ var c=document.querySelector('#chList button'); if(c) c.click(); }
+}
+TABS.forEach(function(b){ b.addEventListener('click', function(){ go(+b.dataset.p); }); });
+document.addEventListener('keydown', function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+  var cur = 0; PAGES.forEach(function(p,k){ if(p.classList.contains('active')) cur=k; });
+  if(e.key==='ArrowRight') go(cur+1);
+  if(e.key==='ArrowLeft')  go(cur-1);
+});
+go(0);
+
+/* ===== quiz engine ===== */
+(function(){
+  var wrap = document.getElementById('quizWrap');
+  if(!wrap || typeof QUIZ==='undefined') return;
+  var answered = 0, score = 0;
+  QUIZ.forEach(function(q, qi){
+    var d = document.createElement('div');
+    d.className = 'quiz-q';
+    var h = '<div class="qhead">'+(qi+1)+'. '+q.q+'</div>';
+    q.a.forEach(function(opt, oi){
+      h += '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+opt+'</button>';
+    });
+    h += '<div class="explain" id="ex'+qi+'"><b>เฉลย:</b> '+q.e+'</div>';
+    d.innerHTML = h;
+    wrap.appendChild(d);
+  });
+  wrap.addEventListener('click', function(ev){
+    var b = ev.target.closest('.opt');
+    if(!b || b.classList.contains('disabled')) return;
+    var qi = +b.dataset.q, oi = +b.dataset.o;
+    var box = b.parentNode;
+    if(box.dataset.done) return;
+    box.dataset.done = '1';
+    box.querySelectorAll('.opt').forEach(function(o,k){
+      o.classList.add('disabled');
+      if(k===QUIZ[qi].c) o.classList.add('correct');
+    });
+    if(oi!==QUIZ[qi].c) b.classList.add('wrong'); else score++;
+    document.getElementById('ex'+qi).classList.add('show');
+    answered++;
+    var sb = document.getElementById('scorebox');
+    if(answered===QUIZ.length && sb){
+      window.__quizScore = score; window.__quizTotal = QUIZ.length;
+      sb.classList.add('show');
+      document.getElementById('scoreNum').textContent = score+' / '+QUIZ.length;
+      var pct = Math.round(score/QUIZ.length*100);
+      document.getElementById('scoreMsg').textContent =
+        pct>=80 ? 'เยี่ยมมาก! พร้อมไปคาบต่อไปแล้ว 🎉' :
+        pct>=60 ? 'ผ่านเกณฑ์ แต่ควรทบทวนข้อที่ตอบผิดอีกครั้ง' :
+                  'ลองกลับไปทบทวนเนื้อหาแต่ละหน้าอีกรอบนะ';
+      sb.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  });
+  var rb = document.getElementById('resetQuiz');
+  if(rb) rb.addEventListener('click', function(){ location.reload(); });
+})();
+</script>
+<script>
+/* ---------- Page 0: Check-in (Google Form) ---------- */
+var ROSTER=["67090218 นางสาวเบญจรัตน์ กาศา","67090219 นางสาวมาริษา ชินสุข","67090220 นางสาวริลลดา อัตรา","67090221 นางสาววิจิตรา แนวคำพา","67090379 นางสาวจิรนันท์ ทองดอนน้อย","67090380 นางสาวชรินพัชร พรมกุล","67090382 นายธัญวิชญ์ แอบศรีหาด","67090383 นางสาวนิศากร จะคำรัมย์","67090384 นายบริรักษ์ ปัตตานัง","67090385 นางสาวปาลิดา อินทรคุ้มวงค์","67090386 นางสาวรุจิรดา ยอดทอง","67090387 นายวุฒิชัย ปัญจกะบุตร","67090388 นางสาวศุพิชญ์ทิญา เครือแก้ว","67090389 นางสาวสาธิดา ฤกษมงคล","67090390 นางสาวสิฐิตา บุญโยประการ","67090391 นางสาวอนัญพร ทวีพจน์","67090392 นายอนุพล นามสาม","67090393 นายก้องภพ เทินสระเกษ","67090394 นางสาวขวัญข้าว พุ่มทอง","67090395 นางสาวจิรัศยา พันธุ์ครุฑ","67090396 นายณฐนนท์ กองสุข","67090397 นายณภัทร ศิริโชติรุ่งขจร","67090398 นายณัฏฐวุฒิ พงศ์ภัคพันธุ์","67090401 นายธีรเดช โซว","67090403 นายนันทกร ธรรมวงศ์","67090404 นางสาวใบเฟิร์น บุญทูล","67090405 นางสาวปานไพลิน ชานาเมือง","67090407 นางสาวภนิดา สุทธิธรรมานันต์","67090408 นายรวิช ทองมี","67090409 นางสาวสิวพร หิรัญโท","67090410 นางสาวสุธาสินี อู่นอก","67090412 นางสาวสุภาพร แก่นการ","67090413 นางสาวหทัยภัทร รัตนรุ่งเรือง","67090414 นายอภิสิทธิ์ ตรงต่อกิจ","67090434 นายกฤตภัค ห้วยลำดวน","67090436 นายศิวนาถ ราศรีจันทร์","67090437 นางสาวกรณิศ กลั่นอักโข","67090441 นางสาวนันทิกา สะอาดประโคน","67090443 นางสาวปวีณอร เพ็งวิสาภาพพงษ์","67090445 นายรัฐภูมิ สว่างภพ"];
+(function(){
+  var sel=document.getElementById('ci_student'); if(!sel) return;
+  ROSTER.forEach(function(name){var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);});
+  try{ var st=localStorage.getItem('bda2_student'); if(st){ sel.value=st; } }catch(e){}
+  try{ var em=localStorage.getItem('bda2_email'); if(em){ var el=document.getElementById('ci_email'); if(el) el.value=em; } }catch(e){}
+  try{ var prev=localStorage.getItem('bda8_checkin'); if(prev){ var m=document.getElementById('ci_msg'); if(m){ m.className='ci-msg ok'; m.textContent='ℹ️ เคยเช็คชื่อคาบนี้จากเครื่องนี้: '+prev; } } }catch(e){}
+})();
+function formReady(id){ var f=document.getElementById(id); return f && f.action.indexOf('FORM_ID_')<0; }
+function submitCheckin(){
+  var email=(document.getElementById('ci_email').value||'').trim();
+  var student=document.getElementById('ci_student').value;
+  var msg=document.getElementById('ci_msg');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณากรอกอีเมลให้ถูกต้อง'; return; }
+  if(!student){ msg.className='ci-msg err'; msg.textContent='⚠️ กรุณาเลือกชื่อ–รหัสนิสิตของคุณ'; return; }
+  if(!formReady('ci_form')){ msg.className='ci-msg err'; msg.textContent='⚠️ ระบบเช็คชื่อของคาบนี้ยังไม่เปิด — อาจารย์จะเปิดให้ในคาบ'; return; }
+  document.getElementById('ci_f_email').value=email;
+  document.getElementById('ci_f_student').value=student;
+  document.getElementById('ci_form').submit();
+  msg.className='ci-msg ok'; msg.textContent='✅ ส่งเช็คชื่อแล้ว: '+student;
+  try{ localStorage.setItem('bda2_student', student); localStorage.setItem('bda2_email', email); localStorage.setItem('bda8_checkin', student+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
+function submitQuizScore(){
+  var student=(document.getElementById('ci_student')||{}).value||'';
+  var msg=document.getElementById('qz_msg');
+  var sc=window.__quizScore, tot=window.__quizTotal||10;
+  if(sc===undefined){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาทำแบบทดสอบให้ครบทุกข้อก่อนส่งคะแนน'; return; }
+  if(!student){ msg.className='qz-msg err'; msg.textContent='⚠️ กรุณาไปที่หน้าแรก แล้วเลือกชื่อของคุณในส่วน "เช็คชื่อเข้าเรียน" ก่อนส่งคะแนน'; return; }
+  if(!formReady('qz_form')){ msg.className='qz-msg err'; msg.textContent='⚠️ ระบบส่งคะแนนของคาบนี้ยังไม่เปิด — อาจารย์จะเปิดให้ในคาบ'; return; }
+  document.getElementById('qz_f_student').value=student;
+  document.getElementById('qz_f_score').value=sc;
+  document.getElementById('qz_form').submit();
+  var btn=document.getElementById('qz_btn'); if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='default'; }
+  msg.className='qz-msg ok'; msg.textContent='✅ ส่งคะแนนแล้ว: '+student+' — '+sc+'/'+tot+' คะแนน';
+  try{ localStorage.setItem('bda8_quiz', student+' : '+sc+'/'+tot+' @ '+new Date().toLocaleString('th-TH')); }catch(e){}
+}
+</script>
+</body>
+</html>
