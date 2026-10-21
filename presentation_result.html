@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ผลการจัดลำดับการนำเสนอโปรเจกต์</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --text:#1c2430; --muted:#667085; --line:#e4e7ec;
+    --accent:#2457d6; --accent-soft:#e8eefc; --warn:#b54708; --warn-soft:#fef0c7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12161c; --card:#1b212a; --text:#e8ecf2; --muted:#98a2b3; --line:#2b3340;
+      --accent:#7ea3ff; --accent-soft:#1f2b48; --warn:#fdb022; --warn-soft:#3a2d0b; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Sarabun","Leelawadee UI","Tahoma","Noto Sans Thai",system-ui,sans-serif;line-height:1.55}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 16px 56px}
+  h1{font-size:1.6rem;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .sub b{color:var(--text)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  th{background:var(--accent-soft);color:var(--accent);font-size:.85rem;font-weight:700;white-space:nowrap}
+  tr:last-child td{border-bottom:0}
+  td.n{width:48px;font-weight:700;color:var(--accent);text-align:center}
+  td.t{white-space:nowrap;font-weight:700;font-variant-numeric:tabular-nums}
+  td.g{white-space:nowrap;font-weight:700}
+  td.g small{display:block;color:var(--muted);font-weight:400}
+  td ol{margin:0;padding-left:20px}
+  td li{font-size:.92rem}
+  .id{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:6px}
+  .dup{background:var(--warn-soft);color:var(--warn);border-radius:6px;padding:0 6px;font-size:.78rem;margin-left:6px;white-space:nowrap}
+  .note{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:.9rem;margin-top:16px}
+  .foot{color:var(--muted);font-size:.82rem;margin-top:14px}
+  @media (max-width:640px){
+    th:nth-child(1),td.n{display:none}
+    th,td{padding:10px}
+    td.t{font-size:.9rem}
+  }
+  @media print{
+    body{background:#fff;color:#000}
+    :root{--card:#fff;--text:#000;--muted:#555;--line:#bbb;--accent:#000;--accent-soft:#eee}
+    tr{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ผลการจัดลำดับการนำเสนอโปรเจกต์</h1>
+  <p class="sub">Data Analytics · เริ่มเวลา <b>13:00</b> · กลุ่มละ <b>30 นาที</b> · ทั้งหมด 11 กลุ่ม เสร็จสิ้นประมาณ <b>18:30</b></p>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>ลำดับ</th><th>เวลา</th><th>กลุ่ม</th><th>สมาชิก</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="n">1</td><td class="t">13:00 – 13:30</td><td class="g">กลุ่ม 8<small>1 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090403</span>นายนันทกร ธรรมวงศ์</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">2</td><td class="t">13:30 – 14:00</td><td class="g">กลุ่ม 9<small>5 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090384</span>นายบริรักษ์ ปัตตานัง</li>
+            <li><span class="id">67090386</span>นางสาวรุจิรดา ยอดทอง</li>
+            <li><span class="id">67090408</span>นายรวิช ทองมี</li>
+            <li><span class="id">67090410</span>นางสาวสุธาสินี อู่นอก</li>
+            <li><span class="id">67090434</span>นายกฤตภัค ห้วยลำดวน</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">3</td><td class="t">14:00 – 14:30</td><td class="g">กลุ่ม 3<small>5 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090382</span>นายธัญวิชญ์ แอบศรีหาด</li>
+            <li><span class="id">67090390</span>นางสาวสิฐิตา บุญโยประการ</li>
+            <li><span class="id">67090407</span>นางสาวภนิดา สุทธิธรรมานันต์</li>
+            <li><span class="id">67090409</span>นางสาวสิวพร หิรัญโท</li>
+            <li><span class="id">67090414</span>นายอภิสิทธิ์ ตรงต่อกิจ<span class="dup">ชื่อซ้ำกับกลุ่ม 5</span></li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">4</td><td class="t">14:30 – 15:00</td><td class="g">กลุ่ม 4<small>4 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090394</span>นางสาวขวัญข้าว พุ่มทอง</li>
+            <li><span class="id">67090395</span>นางสาวจิรัศยา พันธุ์ครุฑ</li>
+            <li><span class="id">67090396</span>นายณฐนนท์ กองสุข</li>
+            <li><span class="id">67090441</span>นางสาวนันทิกา สะอาดประโคน</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">5</td><td class="t">15:00 – 15:30</td><td class="g">กลุ่ม 2<small>3 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090379</span>นางสาวจิรนันท์ ทองดอนน้อย</li>
+            <li><span class="id">67090380</span>นางสาวชรินพัชร พรมกุล</li>
+            <li><span class="id">67090385</span>นางสาวปาลิดา อินทรคุ้มวงค์</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">6</td><td class="t">15:30 – 16:00</td><td class="g">กลุ่ม 11<small>4 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090393</span>นายก้องภพ เทินสระเกษ</li>
+            <li><span class="id">67090397</span>นายณภัทร ศิริโชติรุ่งขจร</li>
+            <li><span class="id">67090398</span>นายณัฏฐวุฒิ พงศ์ภัคพันธุ์</li>
+            <li><span class="id">67090436</span>นายศิวนาถ ราศรีจันทร์</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">7</td><td class="t">16:00 – 16:30</td><td class="g">กลุ่ม 6<small>5 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090392</span>นายอนุพล นามสาม</li>
+            <li><span class="id">67090401</span>นายธีรเดช โซว</li>
+            <li><span class="id">67090404</span>นางสาวใบเฟิร์น บุญทูล</li>
+            <li><span class="id">67090405</span>นางสาวปานไพลิน ชานาเมือง</li>
+            <li><span class="id">67090443</span>นางสาวปวีณอร เพ็งวิสาภาพพงษ์</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">8</td><td class="t">16:30 – 17:00</td><td class="g">กลุ่ม 10<small>2 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090220</span>นางสาวริลลดา อัตรา</li>
+            <li><span class="id">67090445</span>นายรัฐภูมิ สว่างภพ</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">9</td><td class="t">17:00 – 17:30</td><td class="g">กลุ่ม 5<small>5 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090387</span>นายวุฒิชัย ปัญจกะบุตร</li>
+            <li><span class="id">67090389</span>นางสาวสาธิดา ฤกษมงคล</li>
+            <li><span class="id">67090413</span>นางสาวหทัยภัทร รัตนรุ่งเรือง</li>
+            <li><span class="id">67090414</span>นายอภิสิทธิ์ ตรงต่อกิจ<span class="dup">ชื่อซ้ำกับกลุ่ม 3</span></li>
+            <li><span class="id">67090437</span>นางสาวกรณิศ กลั่นอักโข</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">10</td><td class="t">17:30 – 18:00</td><td class="g">กลุ่ม 7<small>4 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090219</span>นางสาวมาริษา ชินสุข</li>
+            <li><span class="id">67090221</span>นางสาววิจิตรา แนวคำพา</li>
+            <li><span class="id">67090383</span>นางสาวนิศากร จะคำรัมย์</li>
+            <li><span class="id">67090412</span>นางสาวสุภาพร แก่นการ</li>
+          </ol></td>
+        </tr>
+        <tr>
+          <td class="n">11</td><td class="t">18:00 – 18:30</td><td class="g">กลุ่ม 1<small>3 คน</small></td>
+          <td><ol>
+            <li><span class="id">67090218</span>นางสาวเบญจรัตน์ กาศา</li>
+            <li><span class="id">67090388</span>นางสาวศุพิชญ์ทิญา เครือแก้ว</li>
+            <li><span class="id">67090391</span>นางสาวอนัญพร ทวีพจน์</li>
+          </ol></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    ⚠ 67090414 นายอภิสิทธิ์ ตรงต่อกิจ ถูกเลือกไว้ทั้งกลุ่ม 3 (ลำดับ 3) และกลุ่ม 5 (ลำดับ 9) โปรดยืนยันว่าอยู่กลุ่มไหน
+  </div>
+  <p class="foot">เลขกลุ่มเรียงตามเวลาที่ส่งแบบฟอร์ม · ลำดับการนำเสนอได้จากการสุ่มเมื่อ 21 ต.ค. 2569</p>
+</div>
+</body>
+</html>
